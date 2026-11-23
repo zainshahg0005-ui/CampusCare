@@ -219,9 +219,9 @@ const SubmitComplaintPage = () => {
                     style={{
                       textAlign: 'left',
                       padding: '1rem',
-                      borderRadius: 12,
-                      border: isSelected ? '2px solid #059669' : '1px solid #e5e7eb',
-                      background: isSelected ? '#ecfdf5' : '#ffffff',
+                      borderRadius: 10,
+                      border: isSelected ? '2px solid #09090b' : '1px solid #e4e4e7',
+                      background: isSelected ? '#f4f4f5' : '#ffffff',
                       cursor: 'pointer',
                       display: 'flex',
                       flexDirection: 'column',
@@ -233,9 +233,9 @@ const SubmitComplaintPage = () => {
                       style={{
                         width: 32,
                         height: 32,
-                        borderRadius: 8,
-                        background: isSelected ? '#059669' : '#f3f4f6',
-                        color: isSelected ? '#ffffff' : '#059669',
+                        borderRadius: 6,
+                        background: isSelected ? '#09090b' : '#f4f4f5',
+                        color: isSelected ? '#ffffff' : '#18181b',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -244,7 +244,7 @@ const SubmitComplaintPage = () => {
                     >
                       <Icon size={18} />
                     </div>
-                    <strong style={{ fontSize: '0.85rem', color: isSelected ? '#064e3b' : '#111827' }}>
+                    <strong style={{ fontSize: '0.85rem', color: isSelected ? '#09090b' : '#18181b' }}>
                       {cat.label}
                     </strong>
                     <span style={{ fontSize: '0.725rem', color: '#6b7280', lineHeight: 1.3 }}>

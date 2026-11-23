@@ -182,7 +182,7 @@ const AdminDashboard = () => {
                 Operational capacity over the last 7 calendar days
               </p>
             </div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', background: '#ecfdf5', padding: '0.2rem 0.6rem', borderRadius: 6 }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#18181b', background: '#f4f4f5', border: '1px solid #e4e4e7', padding: '0.2rem 0.6rem', borderRadius: 6 }}>
               On-Target (Avg 2.8 hrs)
             </span>
           </div>
@@ -198,18 +198,18 @@ const AdminDashboard = () => {
               { day: 'Sun', count: 5, height: '25%' },
             ].map((bar) => (
               <div key={bar.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#6b7280' }}>{bar.count}</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#71717a' }}>{bar.count}</div>
                 <div
                   style={{
                     width: '55%',
                     maxWidth: 36,
                     height: bar.height,
-                    background: 'linear-gradient(180deg, #10b981 0%, #064e3b 100%)',
-                    borderRadius: '6px 6px 0 0',
+                    background: '#09090b',
+                    borderRadius: '4px 4px 0 0',
                     transition: 'all 0.3s ease',
                   }}
                 />
-                <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: 600 }}>{bar.day}</span>
+                <span style={{ fontSize: '0.75rem', color: '#a1a1aa', fontWeight: 500 }}>{bar.day}</span>
               </div>
             ))}
           </div>
@@ -217,15 +217,15 @@ const AdminDashboard = () => {
 
         {/* Category Breakdown */}
         <div className="dashboard-card" style={{ padding: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.05rem', color: '#111827', margin: '0 0 1.25rem' }}>
+          <h3 style={{ fontSize: '1.05rem', color: '#09090b', margin: '0 0 1.25rem' }}>
             Volume by Infrastructure
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
             {[
-              { label: 'Electricity & Power', pct: 38, count: 19, color: '#059669' },
-              { label: 'Network & Wi-Fi', pct: 28, count: 14, color: '#10b981' },
-              { label: 'Plumbing & Water', pct: 18, count: 9, color: '#34d399' },
-              { label: 'Classroom & Labs', pct: 16, count: 8, color: '#6ee7b7' },
+              { label: 'Electricity & Power', pct: 38, count: 19, color: '#09090b' },
+              { label: 'Network & Wi-Fi', pct: 28, count: 14, color: '#3f3f46' },
+              { label: 'Plumbing & Water', pct: 18, count: 9, color: '#71717a' },
+              { label: 'Classroom & Labs', pct: 16, count: 8, color: '#a1a1aa' },
             ].map((item) => (
               <div key={item.label}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: 4 }}>

@@ -41,7 +41,7 @@ const NotificationPopover = ({ isOpen, onClose }) => {
     <div className="notification-popover" onClick={(e) => e.stopPropagation()}>
       <div className="notification-popover-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <Bell size={16} color="#059669" />
+          <Bell size={15} color="#09090b" />
           <span>Campus Alerts & Logs</span>
         </div>
         <button
@@ -49,7 +49,7 @@ const NotificationPopover = ({ isOpen, onClose }) => {
           style={{
             background: 'transparent',
             border: 'none',
-            color: '#059669',
+            color: '#18181b',
             fontSize: '0.75rem',
             fontWeight: 600,
             cursor: 'pointer',
@@ -81,7 +81,7 @@ const NotificationPopover = ({ isOpen, onClose }) => {
                 </p>
               </div>
               {item.unread && (
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#059669', marginTop: 6 }} />
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#09090b', marginTop: 6 }} />
               )}
             </div>
           );

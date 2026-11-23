@@ -105,7 +105,7 @@ const CommandPalette = ({ isOpen, onClose }) => {
       <div className="cmd-palette-dialog" onClick={(e) => e.stopPropagation()}>
         {/* Search Input Bar */}
         <div className="cmd-search-header">
-          <Search size={20} color="#059669" />
+          <Search size={18} color="#18181b" />
           <input
             ref={inputRef}
             type="text"
@@ -148,8 +148,8 @@ const CommandPalette = ({ isOpen, onClose }) => {
                       style={{
                         width: 32,
                         height: 32,
-                        borderRadius: 8,
-                        background: isSelected ? '#059669' : '#f3f4f6',
+                        borderRadius: 6,
+                        background: isSelected ? '#09090b' : '#f4f4f5',
                         color: isSelected ? '#ffffff' : '#374151',
                         display: 'flex',
                         alignItems: 'center',
@@ -161,7 +161,7 @@ const CommandPalette = ({ isOpen, onClose }) => {
                     </div>
                     <div>
                       <div className="cmd-item-title">{item.title}</div>
-                      <div style={{ fontSize: '0.75rem', color: isSelected ? '#065f46' : '#6b7280' }}>
+                      <div style={{ fontSize: '0.75rem', color: isSelected ? '#71717a' : '#71717a' }}>
                         {item.subtitle}
                       </div>
                     </div>
@@ -180,7 +180,7 @@ const CommandPalette = ({ isOpen, onClose }) => {
             <span><kbd>↵</kbd> to select</span>
             <span><kbd>esc</kbd> to close</span>
           </div>
-          <span style={{ fontWeight: 600, color: '#059669' }}>CampusCare Command</span>
+          <span style={{ fontWeight: 600, color: '#18181b' }}>CampusCare Command</span>
         </div>
       </div>
     </div>

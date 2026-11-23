@@ -102,13 +102,13 @@ const AdminManageComplaintsPage = () => {
                 key={tab}
                 onClick={() => setStatusFilter(tab)}
                 style={{
-                  padding: '0.45rem 0.85rem',
+                  padding: '0.4rem 0.8rem',
                   borderRadius: 999,
-                  border: isSelected ? '1px solid #059669' : '1px solid #e5e7eb',
-                  background: isSelected ? '#ecfdf5' : '#ffffff',
-                  color: isSelected ? '#064e3b' : '#6b7280',
+                  border: isSelected ? '1px solid #09090b' : '1px solid #e4e4e7',
+                  background: isSelected ? '#09090b' : '#ffffff',
+                  color: isSelected ? '#ffffff' : '#52525b',
                   fontSize: '0.8rem',
-                  fontWeight: isSelected ? 700 : 500,
+                  fontWeight: isSelected ? 600 : 500,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -121,8 +121,8 @@ const AdminManageComplaintsPage = () => {
                 <span
                   style={{
                     fontSize: '0.7rem',
-                    background: isSelected ? '#059669' : '#f3f4f6',
-                    color: isSelected ? '#ffffff' : '#6b7280',
+                    background: isSelected ? '#27272a' : '#f4f4f5',
+                    color: isSelected ? '#ffffff' : '#71717a',
                     padding: '0.1rem 0.4rem',
                     borderRadius: 999,
                   }}

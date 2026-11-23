@@ -93,60 +93,58 @@ const StudentDashboard = () => {
       <div
         className="card"
         style={{
-          background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)',
+          background: '#09090b',
+          border: '1px solid #27272a',
           color: '#ffffff',
-          marginBottom: '2rem',
+          marginBottom: '1.75rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '1.5rem',
-          padding: '2.25rem',
-          boxShadow: 'var(--shadow-pop)',
+          gap: '1.25rem',
+          padding: '1.75rem 2rem',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
           borderRadius: 'var(--radius-lg)',
           position: 'relative',
-          overflow: 'hidden',
         }}
       >
-        <div style={{ position: 'relative', zIndex: 1 }}>
+        <div>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.45rem',
-              padding: '0.3rem 0.85rem',
-              background: 'rgba(255, 255, 255, 0.15)',
+              gap: '0.4rem',
+              padding: '0.25rem 0.65rem',
+              background: '#27272a',
               borderRadius: '9999px',
-              fontSize: '0.775rem',
-              fontWeight: 700,
-              color: '#ffffff',
-              marginBottom: '0.75rem',
+              fontSize: '0.725rem',
+              fontWeight: 600,
+              color: '#d4d4d8',
+              marginBottom: '0.65rem',
             }}
           >
-            <Sparkles size={14} />
-            <span>CAMPUS MAINTENANCE ASSISTANT</span>
+            <Sparkles size={12} />
+            <span>CAMPUS SUPPORT PORTAL</span>
           </div>
-          <h2 style={{ color: '#ffffff', fontSize: '1.65rem', fontWeight: 800, marginBottom: '0.4rem', letterSpacing: '-0.02em' }}>
+          <h2 style={{ color: '#ffffff', fontSize: '1.45rem', fontWeight: 700, marginBottom: '0.35rem', letterSpacing: '-0.02em' }}>
             Notice an issue on campus facilities?
           </h2>
-          <p style={{ color: '#d1fae5', fontSize: '0.95rem', maxWidth: '580px', lineHeight: 1.6 }}>
-            Report faulty lighting, damaged laboratory equipment, sanitation, or Wi-Fi connectivity.
+          <p style={{ color: '#a1a1aa', fontSize: '0.875rem', maxWidth: '520px', lineHeight: 1.5, margin: 0 }}>
+            Report faulty lighting, damaged lab equipment, sanitation, or Wi-Fi connectivity.
             University technicians are dispatched and track every resolution.
           </p>
         </div>
         <Link
           to="/student/submit"
-          className="btn btn-lg"
+          className="btn btn-outline btn-lg"
           style={{
             backgroundColor: '#ffffff',
-            color: '#064e3b',
-            fontWeight: 800,
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
-            position: 'relative',
-            zIndex: 1,
+            color: '#09090b',
+            border: 'none',
+            fontWeight: 700,
           }}
         >
-          <FilePlus2 size={20} color="#059669" />
+          <FilePlus2 size={18} color="#09090b" />
           <span>Submit New Complaint</span>
         </Link>
       </div>

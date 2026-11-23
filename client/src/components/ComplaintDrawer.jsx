@@ -310,19 +310,19 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
             {/* Official Administrative Remarks */}
             <div
               style={{
-                background: '#ecfdf5',
-                border: '1px solid #a7f3d0',
-                borderRadius: 12,
-                padding: '1.25rem',
+                background: '#f4f4f5',
+                border: '1px solid #e4e4e7',
+                borderRadius: 10,
+                padding: '1.15rem',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <ShieldCheck size={18} color="#059669" />
-                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#064e3b', textTransform: 'uppercase' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                <ShieldCheck size={16} color="#18181b" />
+                <span style={{ fontSize: '0.775rem', fontWeight: 700, color: '#18181b', textTransform: 'uppercase' }}>
                   Facilities Desk Response
                 </span>
               </div>
-              <p style={{ fontSize: '0.875rem', color: '#065f46', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '0.85rem', color: '#3f3f46', lineHeight: 1.5, margin: 0 }}>
                 {complaint.adminResponse || 'No official remarks added yet. Technician will update upon inspection.'}
               </p>
             </div>
@@ -333,20 +333,20 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
                 onSubmit={handleAdminUpdate}
                 style={{
                   background: '#ffffff',
-                  border: '2px solid #059669',
-                  borderRadius: 14,
+                  border: '1px solid #09090b',
+                  borderRadius: 12,
                   padding: '1.25rem',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '1rem',
+                  gap: '0.85rem',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 750, color: '#064e3b' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#09090b' }}>
                     Quick Dispatch & Status Update
                   </div>
                   {updateSuccess && (
-                    <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.75rem', color: '#18181b', fontWeight: 600 }}>
                       ✓ Updated Successfully
                     </span>
                   )}

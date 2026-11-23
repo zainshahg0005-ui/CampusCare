@@ -72,8 +72,8 @@ const DashboardLayout = ({ children, title, subtitle }) => {
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
           <div className="brand-logo">
-            <div className="brand-icon-box" style={{ background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)' }}>
-              <ShieldCheck size={22} color="#ffffff" />
+            <div className="brand-icon-box">
+              <ShieldCheck size={20} color="#ffffff" />
             </div>
             <span className="brand-text">
               Campus<span className="brand-accent">Care</span>
@@ -183,7 +183,7 @@ const DashboardLayout = ({ children, title, subtitle }) => {
               className="topbar-cmd-trigger"
               title="Search tickets or jump to pages (Ctrl+K)"
             >
-              <Search size={15} color="#059669" />
+              <Search size={15} color="#71717a" />
               <span>Search or command...</span>
               <kbd style={{ marginLeft: 6 }}>Ctrl K</kbd>
             </button>
