@@ -26,7 +26,7 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
  * Dispatch Email Notification
  */
 const sendEmail = async ({ to, subject, html, text }) => {
-  const fromAddress = process.env.EMAIL_FROM || 'CampusCare <notifications@campuscare.edu>';
+  const fromAddress = process.env.EMAIL_FROM || 'CampusCare <onboarding@resend.dev>';
 
   // 1. Try Resend API if API Key is configured
   if (process.env.RESEND_API_KEY) {
@@ -47,7 +47,12 @@ const sendEmail = async ({ to, subject, html, text }) => {
       });
       const data = await response.json();
       console.log(`[Email Sent via Resend] To: ${to}, Id: ${data.id || 'ok'}`);
-      return { success: true, provider: 'resend', id: data.id };
+      if (data.id) {
+        return { success: true, provider: 'resend', id: data.id };
+      }
+      if (data.message) {
+        console.warn(`[Resend Message]: ${data.message}`);
+      }
     } catch (err) {
       console.error('[Resend Email Error]:', err.message);
     }
