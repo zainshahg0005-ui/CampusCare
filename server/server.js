@@ -8,10 +8,18 @@ const { apiLimiter } = require('./middleware/rateLimitMiddleware');
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
+
+// Ensure DB connection is established for incoming requests (critical for serverless / Vercel)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('[DB Middleware Error]:', err.message);
+    next(err);
+  }
+});
 
 // Security: Disable X-Powered-By header to prevent fingerprinting
 app.disable('x-powered-by');
