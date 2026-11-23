@@ -8,29 +8,47 @@ const nodemailer = require('nodemailer');
  * - Built-in fallback logger so system functions smoothly even without live API credentials
  */
 
-// Initialize Nodemailer transporter if SMTP credentials are provided
-let transporter = null;
-if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-  transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
+// Initialize Nodemailer transporter helper
+const getTransporter = () => {
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS.replace(/\s+/g, ''),
+      },
+    });
+  }
+  return null;
+};
 
 /**
  * Dispatch Email Notification
  */
 const sendEmail = async ({ to, subject, html, text }) => {
-  const fromAddress = process.env.EMAIL_FROM || 'CampusCare <onboarding@resend.dev>';
+  // 1. Try Gmail SMTP first if configured (Sends real emails to ANY address in the world!)
+  const transporter = getTransporter();
+  if (transporter) {
+    try {
+      const fromAddr = process.env.EMAIL_FROM || `CampusCare <${process.env.SMTP_USER}>`;
+      const info = await transporter.sendMail({
+        from: fromAddr,
+        to,
+        subject,
+        html,
+        text: text || html.replace(/<[^>]*>/g, ''),
+      });
+      console.log(`[Email Sent via Gmail SMTP] To: ${to}, MessageId: ${info.messageId}`);
+      return { success: true, provider: 'smtp', messageId: info.messageId };
+    } catch (err) {
+      console.error('[Gmail SMTP Error]:', err.message);
+    }
+  }
 
-  // 1. Try Resend API if API Key is configured
+  // 2. Try Resend API if API Key is configured
   if (process.env.RESEND_API_KEY) {
     try {
+      const fromAddress = process.env.EMAIL_FROM || 'CampusCare <onboarding@resend.dev>';
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -55,23 +73,6 @@ const sendEmail = async ({ to, subject, html, text }) => {
       }
     } catch (err) {
       console.error('[Resend Email Error]:', err.message);
-    }
-  }
-
-  // 2. Try Nodemailer / Gmail SMTP if transporter is active
-  if (transporter) {
-    try {
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to,
-        subject,
-        html,
-        text: text || html.replace(/<[^>]*>/g, ''),
-      });
-      console.log(`[Email Sent via SMTP] To: ${to}, MessageId: ${info.messageId}`);
-      return { success: true, provider: 'smtp', messageId: info.messageId };
-    } catch (err) {
-      console.error('[SMTP Email Error]:', err.message);
     }
   }
 
