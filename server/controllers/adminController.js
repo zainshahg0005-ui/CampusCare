@@ -142,14 +142,16 @@ const updateComplaintStatus = async (req, res) => {
       'name studentId email phone'
     );
 
-    // Trigger Email / WhatsApp notification to student asynchronously
+    // Trigger Email / WhatsApp notification to student (strictly awaited for serverless execution)
     if (populated && populated.studentId) {
-      sendComplaintStatusNotification({
-        student: populated.studentId,
-        complaint: populated,
-      }).catch((notifyErr) => {
+      try {
+        await sendComplaintStatusNotification({
+          student: populated.studentId,
+          complaint: populated,
+        });
+      } catch (notifyErr) {
         console.error('[Notification Dispatch Warning]:', notifyErr.message);
-      });
+      }
     }
 
     res.json({

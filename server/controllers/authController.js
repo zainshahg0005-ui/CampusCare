@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -6,6 +7,20 @@ const {
   sendPasswordResetNotification,
   sendRegistrationOtpNotification,
 } = require('../services/notificationService');
+
+// Secure SHA-256 hash helper for OTPs (never store plaintext OTPs in DB)
+const hashOtp = (otp) => {
+  if (!otp) return null;
+  return crypto.createHash('sha256').update(String(otp).trim()).digest('hex');
+};
+
+// Dual-mode comparison helper (supports both hashed and plaintext during rollout)
+const matchesOtp = (storedOtp, inputOtp) => {
+  if (!storedOtp || !inputOtp) return false;
+  const clean = String(inputOtp).trim();
+  const hashed = hashOtp(clean);
+  return storedOtp === hashed || storedOtp === clean;
+};
 
 // Helper to generate JWT
 const generateToken = (id, role) => {
@@ -123,16 +138,22 @@ const registerUser = async (req, res) => {
     const existingStudentId = await User.findOne({
       studentId: studentId.toUpperCase(),
     });
-    if (existingStudentId && existingStudentId._id.toString() !== existingUser?._id.toString() && existingStudentId.isVerified !== false) {
-      return res.status(400).json({
-        success: false,
-        message: 'A student with this Student ID is already registered',
-      });
+    if (existingStudentId && existingStudentId._id.toString() !== existingUser?._id.toString()) {
+      if (existingStudentId.isVerified !== false) {
+        return res.status(400).json({
+          success: false,
+          message: 'A student with this Student ID is already registered',
+        });
+      } else {
+        // Remove abandoned squatting unverified record
+        await User.deleteOne({ _id: existingStudentId._id });
+      }
     }
 
     // Generate 6-digit secure numeric verification OTP (15 min lifespan)
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
+    const unverifiedExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 min MongoDB TTL
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -140,13 +161,15 @@ const registerUser = async (req, res) => {
 
     let user;
     if (existingUser && existingUser.isVerified === false) {
-      // Update pending registration
+      // Overwrite/update pending registration with fresh details and OTP
       existingUser.name = name.trim();
       existingUser.studentId = studentId.trim().toUpperCase();
       existingUser.password = hashedPassword;
       if (cleanPhone) existingUser.phone = cleanPhone;
-      existingUser.verificationOtp = otp;
+      existingUser.verificationOtp = hashOtp(otp);
       existingUser.verificationOtpExpires = otpExpires;
+      existingUser.otpAttempts = 0;
+      existingUser.unverifiedExpiresAt = unverifiedExpiry;
       user = await existingUser.save();
     } else {
       // Create new pending registration
@@ -158,8 +181,10 @@ const registerUser = async (req, res) => {
         password: hashedPassword,
         role: 'student',
         isVerified: false,
-        verificationOtp: otp,
+        verificationOtp: hashOtp(otp),
         verificationOtpExpires: otpExpires,
+        otpAttempts: 0,
+        unverifiedExpiresAt: unverifiedExpiry,
       });
     }
 
@@ -229,10 +254,14 @@ const verifyRegistrationOtp = async (req, res) => {
       });
     }
 
-    if (!user.verificationOtp || user.verificationOtp !== cleanOtp) {
-      return res.status(400).json({
+    // Invalidate OTP after 5 failed attempts to prevent brute-force attacks
+    if (user.otpAttempts >= 5) {
+      user.verificationOtp = null;
+      user.verificationOtpExpires = null;
+      await user.save();
+      return res.status(429).json({
         success: false,
-        message: 'Invalid verification code. Please check your code and try again.',
+        message: 'Too many incorrect attempts. For security, this verification code has been invalidated. Please request a new code.',
       });
     }
 
@@ -243,10 +272,24 @@ const verifyRegistrationOtp = async (req, res) => {
       });
     }
 
-    // Activate account
+    if (!user.verificationOtp || !matchesOtp(user.verificationOtp, cleanOtp)) {
+      user.otpAttempts = (user.otpAttempts || 0) + 1;
+      await user.save();
+      const remaining = 5 - user.otpAttempts;
+      return res.status(400).json({
+        success: false,
+        message: remaining > 0
+          ? `Invalid verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`
+          : 'Too many incorrect attempts. This code has been invalidated. Please request a new code.',
+      });
+    }
+
+    // Activate account & clear unverified TTL expiry
     user.isVerified = true;
     user.verificationOtp = null;
     user.verificationOtpExpires = null;
+    user.otpAttempts = 0;
+    user.unverifiedExpiresAt = null;
     await user.save();
 
     res.status(200).json({
@@ -305,8 +348,10 @@ const resendRegistrationOtp = async (req, res) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.verificationOtp = otp;
+    user.verificationOtp = hashOtp(otp);
     user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
+    user.otpAttempts = 0;
+    user.unverifiedExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
     await user.save();
 
     await sendRegistrationOtpNotification({
@@ -472,8 +517,9 @@ const forgotPassword = async (req, res) => {
 
     // Generate secure 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.resetPasswordOtp = otp;
+    user.resetPasswordOtp = hashOtp(otp);
     user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    user.otpAttempts = 0;
     await user.save();
 
     // Dispatch via Notification Service (Email or WhatsApp)
@@ -522,28 +568,57 @@ const resetPassword = async (req, res) => {
     }
 
     const cleanInput = lookupVal.trim();
-    let queryConditions = {
-      resetPasswordOtp: otp.toString().trim(),
-      resetPasswordExpires: { $gt: Date.now() },
-    };
+    let query = {};
 
     if (cleanInput.includes('@')) {
-      queryConditions.email = cleanInput.toLowerCase();
+      query.email = cleanInput.toLowerCase();
     } else {
       const cleanPhone = cleanInput.replace(/[^\d+]/g, '');
-      queryConditions.$or = [
-        { phone: cleanPhone },
-        { phone: cleanInput },
-        { email: cleanInput.toLowerCase() }
-      ];
+      query = {
+        $or: [
+          { phone: cleanPhone },
+          { phone: cleanInput },
+          { email: cleanInput.toLowerCase() }
+        ]
+      };
     }
 
-    const user = await User.findOne(queryConditions);
+    const user = await User.findOne(query);
 
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired verification code. Please request a new code.',
+        message: 'Account not found. Please initiate password recovery.',
+      });
+    }
+
+    // Invalidate OTP after 5 failed attempts to prevent brute-force attacks
+    if (user.otpAttempts >= 5) {
+      user.resetPasswordOtp = null;
+      user.resetPasswordExpires = null;
+      await user.save();
+      return res.status(429).json({
+        success: false,
+        message: 'Too many incorrect attempts. For security, this verification code has been invalidated. Please request a new code.',
+      });
+    }
+
+    if (!user.resetPasswordExpires || user.resetPasswordExpires < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code has expired. Please request a new code.',
+      });
+    }
+
+    if (!user.resetPasswordOtp || !matchesOtp(user.resetPasswordOtp, otp)) {
+      user.otpAttempts = (user.otpAttempts || 0) + 1;
+      await user.save();
+      const remaining = 5 - user.otpAttempts;
+      return res.status(400).json({
+        success: false,
+        message: remaining > 0
+          ? `Invalid verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`
+          : 'Too many incorrect attempts. This code has been invalidated. Please request a new code.',
       });
     }
 
@@ -552,6 +627,7 @@ const resetPassword = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, salt);
     user.resetPasswordOtp = null;
     user.resetPasswordExpires = null;
+    user.otpAttempts = 0;
     await user.save();
 
     res.json({

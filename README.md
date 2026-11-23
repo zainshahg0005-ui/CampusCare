@@ -113,9 +113,8 @@ cd server
 npm run seed:admin
 ```
 
-This creates the initial admin account:
-- **Email:** `admin@campuscare.edu`
-- **Password:** `Admin@12345`
+This provisions an administrator account based on the `ADMIN_EMAIL` and `ADMIN_PASSWORD` defined in your environment:
+- **Email:** Specified in `ADMIN_EMAIL`
 - **Role:** `admin`
 
 ---
@@ -149,7 +148,7 @@ npm run dev
 5. Click **Submit New Complaint** (`/student/submit`) and lodge an issue (e.g., Category: *Classroom*, Location: *Science Block Room 204*, Title: *Broken ceiling fan regulator*, attach an optional image).
 6. Check **My Complaints** (`/student/complaints`) to view your new ticket with status `Pending`.
 7. Sign out from the sidebar.
-8. Navigate to `/login` and sign in using the **Admin** credentials (`admin@campuscare.edu` / `Admin@12345`).
+8. Navigate to `/admin/login` and sign in using your designated Administrator credentials.
 9. You will be redirected to the **Admin Dashboard** (`/admin/dashboard`).
 10. Go to **Manage Complaints** (`/admin/complaints`), locate Alex's ticket, click **Status**, change status to `In Progress` or `Resolved`, and add an official note: *"Electrician dispatched; regulator repaired on Nov 23"*.
 11. Log back in as Alex to observe the immediate status update and admin response on the student portal!

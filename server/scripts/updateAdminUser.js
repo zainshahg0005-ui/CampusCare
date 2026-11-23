@@ -14,39 +14,40 @@ const setupAdmin = async () => {
     await mongoose.connect(mongoUri);
     console.log('Connected to MongoDB Atlas successfully.');
 
-    const targetEmail = 'zainshahg0005@gmail.com';
-    const targetPassword = '@Zain@2665.';
+    const targetEmail = process.env.ADMIN_EMAIL;
+    const targetPassword = process.env.ADMIN_PASSWORD;
+
+    if (!targetEmail || !targetPassword) {
+      throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be defined in your environment.');
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(targetPassword, salt);
 
-    // 1. Remove/demote all current admins that are NOT zainshahg0005@gmail.com
+    // 1. Remove/demote all current admins that are NOT targetEmail
     const demoteResult = await User.updateMany(
-      { role: 'admin', email: { $ne: targetEmail } },
+      { role: 'admin', email: { $ne: targetEmail.toLowerCase().trim() } },
       { $set: { role: 'student' } }
     );
     console.log(`Demoted ${demoteResult.modifiedCount} previous admin(s) to student role.`);
 
-    // Also delete the default seed admin 'admin@campuscare.edu' completely
-    const deleteResult = await User.deleteOne({ email: 'admin@campuscare.edu' });
-    if (deleteResult.deletedCount > 0) {
-      console.log('Removed default seed admin (admin@campuscare.edu).');
-    }
-
-    // 2. Add or update zainshahg0005@gmail.com as the sole admin
-    let zainUser = await User.findOne({ email: targetEmail });
-    if (zainUser) {
-      zainUser.role = 'admin';
-      zainUser.password = hashedPassword;
-      if (!zainUser.name) zainUser.name = 'Zain Shah';
-      await zainUser.save();
-      console.log(`Updated existing user (${targetEmail}) to admin with new password.`);
+    // 2. Add or update target administrator
+    let adminUser = await User.findOne({ email: targetEmail.toLowerCase().trim() });
+    if (adminUser) {
+      adminUser.role = 'admin';
+      adminUser.password = hashedPassword;
+      adminUser.isVerified = true;
+      if (!adminUser.name) adminUser.name = process.env.ADMIN_NAME || 'Campus Administrator';
+      await adminUser.save();
+      console.log(`Updated existing user (${targetEmail}) to admin with new credentials.`);
     } else {
-      zainUser = await User.create({
-        name: 'Zain Shah',
-        studentId: 'ADMIN01',
-        email: targetEmail,
+      adminUser = await User.create({
+        name: process.env.ADMIN_NAME || 'Campus Administrator',
+        studentId: process.env.ADMIN_ID || 'ADMIN01',
+        email: targetEmail.toLowerCase().trim(),
         password: hashedPassword,
         role: 'admin',
+        isVerified: true,
       });
       console.log(`Created new administrator account: ${targetEmail}`);
     }
@@ -62,7 +63,7 @@ const setupAdmin = async () => {
     })));
 
     // 4. Test password match
-    const passwordValid = await zainUser.matchPassword(targetPassword);
+    const passwordValid = await adminUser.matchPassword(targetPassword);
     console.log(`Password verification test for ${targetEmail}: ${passwordValid ? 'PASSED (Match)' : 'FAILED'}`);
 
     await mongoose.disconnect();

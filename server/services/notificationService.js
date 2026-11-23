@@ -8,19 +8,26 @@ const nodemailer = require('nodemailer');
  * - Built-in fallback logger so system functions smoothly even without live API credentials
  */
 
-// Initialize Nodemailer transporter helper
+// Cached Nodemailer transporter with connection pooling for serverless execution
+let cachedTransporter = null;
 const getTransporter = () => {
+  if (cachedTransporter) return cachedTransporter;
+
   const user = process.env.SMTP_USER || 'zainshahg0005@gmail.com';
   const pass = (process.env.SMTP_PASS || Buffer.from('Zm5hd2lrbXl2ZHFwcGJpaQ==', 'base64').toString('utf8')).replace(/\s+/g, '');
 
   if (user && pass) {
-    return nodemailer.createTransport({
+    cachedTransporter = nodemailer.createTransport({
       service: 'gmail',
+      pool: true,
+      maxConnections: 3,
+      maxMessages: 100,
       auth: {
         user,
         pass,
       },
     });
+    return cachedTransporter;
   }
   return null;
 };

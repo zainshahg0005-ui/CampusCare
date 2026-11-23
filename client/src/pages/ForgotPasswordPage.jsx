@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import PublicNavbar from '../layouts/PublicNavbar';
 import api from '../services/api';
+import useOtpTimer from '../hooks/useOtpTimer';
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(1); // 1 = request code, 2 = verify & set password
@@ -30,6 +31,7 @@ const ForgotPasswordPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const { secondsLeft, canResend, formattedTime, startTimer } = useOtpTimer(60);
   const navigate = useNavigate();
 
   // Step 1: Request 6-digit OTP
@@ -60,6 +62,7 @@ const ForgotPasswordPage = () => {
         setDestinationLabel(res.data.destination || identifier.trim());
         setSuccess(res.data.message || 'Verification code dispatched!');
         setStep(2);
+        startTimer(60);
       }
     } catch (err) {
       console.error('Request OTP error:', err);
@@ -311,9 +314,28 @@ const ForgotPasswordPage = () => {
                     required
                   />
                 </div>
-                <span style={{ fontSize: '0.75rem', color: '#71717a', marginTop: '4px', display: 'block' }}>
-                  Code sent to {destinationLabel} ({method === 'whatsapp' ? 'WhatsApp' : 'Email'}). Valid for 10 mins.
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#71717a' }}>
+                    Code sent to {destinationLabel}. Valid for 10 mins.
+                  </span>
+                  <button
+                    type="button"
+                    disabled={!canResend || loading}
+                    onClick={handleRequestOtp}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: canResend ? '#09090b' : '#a1a1aa',
+                      fontWeight: 600,
+                      fontSize: '0.75rem',
+                      cursor: canResend ? 'pointer' : 'not-allowed',
+                      textDecoration: canResend ? 'underline' : 'none',
+                      padding: 0,
+                    }}
+                  >
+                    {canResend ? 'Resend Code' : `Resend in ${formattedTime}`}
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">

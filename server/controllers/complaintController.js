@@ -1,4 +1,35 @@
 const Complaint = require('../models/Complaint');
+const cloudinary = require('cloudinary').v2;
+
+// Configure Cloudinary if credentials are provided in environment
+if (
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
+
+// Upload buffer helper for Cloudinary stream
+const uploadBufferToCloudinary = (buffer, mimetype) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'campuscare_complaints',
+        resource_type: 'image',
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 // @desc    Get all complaints created by logged-in student
 // @route   GET /api/complaints/my
@@ -49,11 +80,20 @@ const createComplaint = async (req, res) => {
       });
     }
 
-    // Determine image path if an image was uploaded
+    // Determine image URL/path if an image was uploaded (serverless safe)
     let imagePath = '';
     if (req.file) {
-      // Store relative path accessible via /uploads/filename
-      imagePath = `/uploads/${req.file.filename}`;
+      if (
+        process.env.CLOUDINARY_CLOUD_NAME &&
+        process.env.CLOUDINARY_API_KEY &&
+        process.env.CLOUDINARY_API_SECRET
+      ) {
+        // Stream directly to Cloudinary
+        imagePath = await uploadBufferToCloudinary(req.file.buffer, req.file.mimetype);
+      } else {
+        // Safe in-memory data URI fallback (never touches read-only Vercel filesystem)
+        imagePath = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      }
     }
 
     const complaint = await Complaint.create({

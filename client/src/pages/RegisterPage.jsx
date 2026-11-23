@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../layouts/PublicNavbar';
+import useOtpTimer from '../hooks/useOtpTimer';
 
 const RegisterPage = () => {
   const [step, setStep] = useState('form'); // 'form' | 'verify'
@@ -41,22 +42,12 @@ const RegisterPage = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
-  const [timer, setTimer] = useState(0);
   const [otpSent, setOtpSent] = useState(false);
+
+  const { secondsLeft: timer, canResend, startTimer } = useOtpTimer(60);
 
   const { register, verifyRegistrationOtp, resendRegistrationOtp } = useAuth();
   const navigate = useNavigate();
-
-  // Cooldown countdown for resending OTP
-  useEffect(() => {
-    let interval = null;
-    if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [timer]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -110,7 +101,7 @@ const RegisterPage = () => {
       // Transition to separate OTP Screen
       setStep('verify');
       setOtpSent(true);
-      setTimer(60);
+      startTimer(60);
       if (result.code) {
         setReceivedOtp(result.code);
       }
@@ -136,7 +127,7 @@ const RegisterPage = () => {
 
     if (result.success) {
       setOtpSent(true);
-      setTimer(60);
+      startTimer(60);
       if (result.code) {
         setReceivedOtp(result.code);
       }

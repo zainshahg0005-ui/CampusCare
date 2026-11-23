@@ -59,6 +59,14 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  otpAttempts: {
+    type: Number,
+    default: 0,
+  },
+  unverifiedExpiresAt: {
+    type: Date,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -69,5 +77,8 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+// Automatic TTL cleanup for abandoned unverified registrations (30 minutes)
+userSchema.index({ unverifiedExpiresAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('User', userSchema);

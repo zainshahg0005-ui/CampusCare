@@ -9,13 +9,17 @@ const seedAdmin = async () => {
     console.log(`Connecting to MongoDB at: ${mongoUri}...`);
     await mongoose.connect(mongoUri);
 
-    const adminEmail = process.env.ADMIN_EMAIL || 'zainshahg0005@gmail.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || '@Zain@2665.';
-    const adminName = 'Zain Shah';
-    const adminStudentId = 'ADMIN01';
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminName = process.env.ADMIN_NAME || 'Campus Administrator';
+    const adminStudentId = process.env.ADMIN_ID || 'ADMIN01';
+
+    if (!adminEmail || !adminPassword) {
+      throw new Error('Missing required environment variables: ADMIN_EMAIL and ADMIN_PASSWORD must be configured.');
+    }
 
     // Check if admin already exists
-    const existing = await User.findOne({ email: adminEmail });
+    const existing = await User.findOne({ email: adminEmail.trim().toLowerCase() });
 
     if (existing) {
       console.log(`Admin account (${adminEmail}) already exists.`);
@@ -29,17 +33,18 @@ const seedAdmin = async () => {
       const hashedPassword = await bcrypt.hash(adminPassword, salt);
 
       await User.create({
-        name: adminName,
-        studentId: adminStudentId,
-        email: adminEmail,
+        name: adminName.trim(),
+        studentId: adminStudentId.trim().toUpperCase(),
+        email: adminEmail.trim().toLowerCase(),
         password: hashedPassword,
         role: 'admin',
+        isVerified: true,
       });
 
       console.log('--------------------------------------------------');
-      console.log('✅ Admin account created successfully!');
+      console.log('✅ Admin account provisioned successfully!');
       console.log(`Email:    ${adminEmail}`);
-      console.log(`Password: ${adminPassword}`);
+      console.log(`Admin ID: ${adminStudentId}`);
       console.log('Role:     admin');
       console.log('--------------------------------------------------');
     }

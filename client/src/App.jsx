@@ -34,7 +34,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/terms" element={<TermsPage />} />
-          <Route path="/terms-and-conditions" element={<TermsPage />} />
+          <Route path="/terms-and-conditions" element={<Navigate to="/terms" replace />} />
 
           {/* Student Protected Routes */}
           <Route
