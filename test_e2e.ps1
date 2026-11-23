@@ -123,8 +123,8 @@ try {
 $adminToken = ""
 try {
     $adminLoginBody = @{
-        email = "admin@campuscare.edu"
-        password = "Admin@12345"
+        email = "zainshahg0005@gmail.com"
+        password = "@Zain@2665."
     } | ConvertTo-Json
 
     $adminRes = Invoke-RestMethod -Uri "$baseUrl/auth/login" -Method Post -Body $adminLoginBody -ContentType "application/json"
