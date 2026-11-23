@@ -171,11 +171,11 @@ const ForgotPasswordPage = () => {
                     style={{
                       padding: '0.65rem 0.5rem',
                       borderRadius: 8,
-                      border: method === 'email' ? '2px solid #09090b' : '1px solid #e4e4e7',
-                      background: method === 'email' ? '#f4f4f5' : '#ffffff',
+                      border: '2px solid #09090b',
+                      background: '#f4f4f5',
                       color: '#09090b',
                       fontSize: '0.825rem',
-                      fontWeight: method === 'email' ? 700 : 500,
+                      fontWeight: 700,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -187,30 +187,31 @@ const ForgotPasswordPage = () => {
                     <span>Send via Email</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMethod('whatsapp');
-                      setError('');
-                    }}
-                    style={{
-                      padding: '0.65rem 0.5rem',
-                      borderRadius: 8,
-                      border: method === 'whatsapp' ? '2px solid #09090b' : '1px solid #e4e4e7',
-                      background: method === 'whatsapp' ? '#f4f4f5' : '#ffffff',
-                      color: '#09090b',
-                      fontSize: '0.825rem',
-                      fontWeight: method === 'whatsapp' ? 700 : 500,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 6,
-                    }}
-                  >
-                    <MessageSquare size={15} />
-                    <span>WhatsApp Code</span>
-                  </button>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      disabled
+                      style={{
+                        width: '100%',
+                        padding: '0.65rem 0.5rem',
+                        borderRadius: 8,
+                        border: '1px solid #e4e4e7',
+                        background: '#f4f4f5',
+                        color: '#a1a1aa',
+                        fontSize: '0.825rem',
+                        fontWeight: 500,
+                        cursor: 'not-allowed',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <MessageSquare size={15} />
+                      <span>WhatsApp Code</span>
+                    </button>
+                    <span style={{ fontSize: '11px', color: '#71717a', marginTop: '4px', fontWeight: 600 }}>Coming Soon</span>
+                  </div>
                 </div>
               </div>
 

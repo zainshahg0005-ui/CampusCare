@@ -172,15 +172,13 @@ const registerUser = async (req, res) => {
       method,
     });
 
-    const destination = method === 'whatsapp' && user.phone ? `WhatsApp (${user.phone})` : user.email;
-    const isSimulated = !process.env.RESEND_API_KEY && (!process.env.SMTP_USER || !process.env.SMTP_PASS);
+    const destination = user.email;
     res.status(200).json({
       success: true,
       requiresOtp: true,
       email: user.email,
       phone: user.phone,
-      method,
-      code: isSimulated ? otp : undefined,
+      method: 'email',
       message: `A 6-digit verification code has been dispatched to ${destination}.`,
     });
   } catch (error) {
@@ -319,11 +317,9 @@ const resendRegistrationOtp = async (req, res) => {
       method,
     });
 
-    const destination = method === 'whatsapp' && user.phone ? `WhatsApp (${user.phone})` : user.email;
-    const isSimulated = !process.env.RESEND_API_KEY && (!process.env.SMTP_USER || !process.env.SMTP_PASS);
+    const destination = user.email;
     res.json({
       success: true,
-      code: isSimulated ? otp : undefined,
       message: `A fresh 6-digit verification code has been dispatched to ${destination}.`,
     });
   } catch (error) {
@@ -487,13 +483,11 @@ const forgotPassword = async (req, res) => {
       method,
     });
 
-    const destination = method === 'whatsapp' ? `WhatsApp (${user.phone})` : user.email;
-    const isSimulated = !process.env.RESEND_API_KEY && (!process.env.SMTP_USER || !process.env.SMTP_PASS);
+    const destination = user.email;
     res.json({
       success: true,
-      method,
+      method: 'email',
       destination,
-      code: isSimulated ? otp : undefined,
       message: `A 6-digit verification code has been dispatched to ${destination}.`,
     });
   } catch (error) {

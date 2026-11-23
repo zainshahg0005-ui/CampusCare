@@ -438,7 +438,7 @@ const RegisterPage = () => {
               {formData.phone && (
                 <div style={{ marginBottom: '1rem' }}>
                   <label className="form-label" style={{ marginBottom: '0.4rem', display: 'block', fontSize: '12px' }}>
-                    Select OTP Delivery Destination
+                    Verification Code Delivery Channel
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                     <button
@@ -447,11 +447,11 @@ const RegisterPage = () => {
                       style={{
                         padding: '0.5rem',
                         borderRadius: 6,
-                        border: method === 'email' ? '2px solid #09090b' : '1px solid #e4e4e7',
-                        background: method === 'email' ? '#f4f4f5' : '#ffffff',
+                        border: '2px solid #09090b',
+                        background: '#f4f4f5',
                         color: '#09090b',
                         fontSize: '12px',
-                        fontWeight: method === 'email' ? 700 : 500,
+                        fontWeight: 700,
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -459,28 +459,32 @@ const RegisterPage = () => {
                         gap: 6,
                       }}
                     >
-                      <Mail size={14} /> Email
+                      <Mail size={14} /> Email OTP
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setMethod('whatsapp')}
-                      style={{
-                        padding: '0.5rem',
-                        borderRadius: 6,
-                        border: method === 'whatsapp' ? '2px solid #09090b' : '1px solid #e4e4e7',
-                        background: method === 'whatsapp' ? '#f4f4f5' : '#ffffff',
-                        color: '#09090b',
-                        fontSize: '12px',
-                        fontWeight: method === 'whatsapp' ? 700 : 500,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <MessageSquare size={14} /> WhatsApp
-                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        disabled
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          borderRadius: 6,
+                          border: '1px solid #e4e4e7',
+                          background: '#f4f4f5',
+                          color: '#a1a1aa',
+                          fontSize: '12px',
+                          fontWeight: 500,
+                          cursor: 'not-allowed',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                        }}
+                      >
+                        <MessageSquare size={14} /> WhatsApp
+                      </button>
+                      <span style={{ fontSize: '10px', color: '#71717a', marginTop: '3px', fontWeight: 600 }}>Coming Soon</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -511,44 +515,15 @@ const RegisterPage = () => {
                   <Send size={15} />
                   <span>
                     {sendingOtp
-                      ? 'Dispatching Code...'
+                      ? 'Dispatching Code to Your Email...'
                       : timer > 0
-                      ? `OTP Dispatched (Resend in ${timer}s)`
+                      ? `Code Dispatched (Resend in ${timer}s)`
                       : otpSent
-                      ? 'Send OTP Again'
+                      ? 'Resend OTP to Email'
                       : 'Send OTP'}
                   </span>
                 </button>
               </div>
-
-              {/* Demo Mode Code Badge (Allows testing without configured SMTP) */}
-              {receivedOtp && (
-                <div
-                  onClick={autoFillOtp}
-                  style={{
-                    marginBottom: '1.25rem',
-                    padding: '10px 14px',
-                    borderRadius: 8,
-                    background: '#09090b',
-                    color: '#ffffff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
-                  }}
-                  title="Click to auto-fill code"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Sparkles size={16} color="#ffffff" />
-                    <span style={{ fontSize: '13px' }}>
-                      Verification Code: <strong style={{ letterSpacing: '2px', fontSize: '15px' }}>{receivedOtp}</strong>
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '11px', textDecoration: 'underline', color: '#a1a1aa' }}>
-                    Auto-fill →
-                  </span>
-                </div>
-              )}
 
               {/* Verification Form */}
               <form onSubmit={handleVerify}>
