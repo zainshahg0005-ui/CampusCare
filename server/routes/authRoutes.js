@@ -18,6 +18,7 @@ const {
 
 // Protected against brute-force and credential stuffing
 router.post('/register', authLimiter, registerUser);
+router.post('/send-registration-otp', forgotPasswordLimiter, resendRegistrationOtp);
 router.post('/verify-registration-otp', authLimiter, verifyRegistrationOtp);
 router.post('/resend-registration-otp', forgotPasswordLimiter, resendRegistrationOtp);
 router.post('/login', authLimiter, loginUser);

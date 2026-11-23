@@ -69,6 +69,8 @@ export const AuthProvider = ({ children }) => {
             success: true,
             requiresOtp: true,
             email: res.data.email,
+            phone: res.data.phone,
+            code: res.data.code,
             message: res.data.message,
           };
         }
@@ -114,7 +116,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const body = typeof payload === 'string' ? { email: payload } : payload;
       const res = await api.post('/auth/resend-registration-otp', body);
-      return { success: !!res.data?.success, message: res.data?.message };
+      return { success: !!res.data?.success, message: res.data?.message, code: res.data?.code };
     } catch (err) {
       return {
         success: false,
