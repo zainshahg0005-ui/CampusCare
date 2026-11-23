@@ -1,0 +1,91 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Public Pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
+// Student Pages
+import StudentDashboard from './pages/StudentDashboard';
+import SubmitComplaintPage from './pages/SubmitComplaintPage';
+import MyComplaintsPage from './pages/MyComplaintsPage';
+
+// Admin Pages
+import AdminDashboard from './pages/AdminDashboard';
+import AdminManageComplaintsPage from './pages/AdminManageComplaintsPage';
+import AdminManageStudentsPage from './pages/AdminManageStudentsPage';
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Public Landing & Auth Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* Student Protected Routes */}
+          <Route
+            path="/student/dashboard"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/submit"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <SubmitComplaintPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/complaints"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <MyComplaintsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Protected Routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/complaints"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminManageComplaintsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/students"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminManageStudentsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch-all redirect to Home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;

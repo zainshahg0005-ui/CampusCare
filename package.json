@@ -1,0 +1,13 @@
+{
+  "name": "campuscare",
+  "version": "1.0.0",
+  "description": "CampusCare - Student Complaint Management System (MERN Stack)",
+  "scripts": {
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "seed:admin": "cd server && npm run seed:admin"
+  },
+  "keywords": ["mern", "react", "express", "mongodb", "complaint-management"],
+  "author": "",
+  "license": "ISC"
+}
