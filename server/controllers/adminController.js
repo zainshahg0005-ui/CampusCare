@@ -81,7 +81,9 @@ const getAllComplaints = async (req, res) => {
     let complaints = await complaintsQuery.sort({ createdAt: -1 });
 
     if (search && search.trim() !== '') {
-      const regex = new RegExp(search.trim(), 'i');
+      // Escape regex special characters to prevent ReDoS (Regular Expression Denial of Service)
+      const safeSearch = search.trim().slice(0, 50).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(safeSearch, 'i');
       complaints = complaints.filter((c) => {
         const titleMatch = regex.test(c.title);
         const locMatch = regex.test(c.location);
@@ -163,7 +165,9 @@ const getStudentsList = async (req, res) => {
     const query = { role: 'student' };
 
     if (search && search.trim() !== '') {
-      const regex = new RegExp(search.trim(), 'i');
+      // Escape regex special characters to prevent ReDoS
+      const safeSearch = search.trim().slice(0, 50).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(safeSearch, 'i');
       query.$or = [{ name: regex }, { studentId: regex }, { email: regex }];
     }
 

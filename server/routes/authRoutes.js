@@ -6,9 +6,11 @@ const {
   getCurrentUser,
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
+const { authLimiter } = require('../middleware/rateLimitMiddleware');
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
+// Protected against brute-force and credential stuffing
+router.post('/register', authLimiter, registerUser);
+router.post('/login', authLimiter, loginUser);
 router.get('/me', protect, getCurrentUser);
 
 module.exports = router;

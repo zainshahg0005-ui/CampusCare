@@ -18,6 +18,19 @@ const registerUser = async (req, res) => {
   try {
     const { name, studentId, email, password, confirmPassword } = req.body;
 
+    // Strict type checks against NoSQL injection
+    if (
+      typeof name !== 'string' ||
+      typeof studentId !== 'string' ||
+      typeof email !== 'string' ||
+      typeof password !== 'string'
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid input format provided',
+      });
+    }
+
     // Validation
     if (!name || !studentId || !email || !password) {
       return res.status(400).json({
@@ -107,6 +120,14 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Strict type checks against NoSQL object injection
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid input format provided',
+      });
+    }
 
     if (!email || !password) {
       return res.status(400).json({
