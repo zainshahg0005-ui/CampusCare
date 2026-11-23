@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Mail,
+  Phone,
   Lock,
   Eye,
   EyeOff,
@@ -17,8 +18,9 @@ import api from '../services/api';
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(1); // 1 = request code, 2 = verify & set password
-  const [email, setEmail] = useState('');
   const [method, setMethod] = useState('email'); // 'email' | 'whatsapp'
+  const [identifier, setIdentifier] = useState(''); // email or phone
+  const [destinationLabel, setDestinationLabel] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -36,26 +38,33 @@ const ForgotPasswordPage = () => {
     setError('');
     setSuccess('');
 
-    if (!email.trim()) {
-      setError('Please provide your registered account email address.');
+    if (!identifier.trim()) {
+      setError(
+        method === 'whatsapp'
+          ? 'Please enter your registered WhatsApp / Mobile number.'
+          : 'Please enter your registered account email address.'
+      );
       return;
     }
 
     try {
       setLoading(true);
       const res = await api.post('/auth/forgot-password', {
-        email: email.trim().toLowerCase(),
+        identifier: identifier.trim(),
+        email: method === 'email' ? identifier.trim().toLowerCase() : undefined,
+        phone: method === 'whatsapp' ? identifier.trim() : undefined,
         method,
       });
 
       if (res.data?.success) {
-        setSuccess(res.data.message || 'Verification code sent!');
+        setDestinationLabel(res.data.destination || identifier.trim());
+        setSuccess(res.data.message || 'Verification code dispatched!');
         setStep(2);
       }
     } catch (err) {
       console.error('Request OTP error:', err);
       setError(
-        err.response?.data?.message || 'Failed to dispatch verification code. Please try again.'
+        err.response?.data?.message || 'Failed to dispatch verification code. Please verify your details.'
       );
     } finally {
       setLoading(false);
@@ -86,7 +95,9 @@ const ForgotPasswordPage = () => {
     try {
       setLoading(true);
       const res = await api.post('/auth/reset-password', {
-        email: email.trim().toLowerCase(),
+        identifier: identifier.trim(),
+        email: method === 'email' ? identifier.trim().toLowerCase() : undefined,
+        phone: method === 'whatsapp' ? identifier.trim() : undefined,
         otp: otp.trim(),
         newPassword,
       });
@@ -111,7 +122,7 @@ const ForgotPasswordPage = () => {
     <div>
       <PublicNavbar />
       <div className="auth-wrapper">
-        <div className="auth-card">
+        <div className="auth-card" style={{ maxWidth: '440px' }}>
           <div className="auth-header">
             <div className="brand-logo" style={{ justifyContent: 'center', marginBottom: '0.85rem' }}>
               <div className="brand-icon-box">
@@ -130,14 +141,14 @@ const ForgotPasswordPage = () => {
           </div>
 
           {error && (
-            <div className="alert alert-error">
+            <div className="alert alert-error" style={{ marginBottom: '1.25rem' }}>
               <AlertCircle size={18} style={{ flexShrink: 0 }} />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="alert alert-success">
+            <div className="alert alert-success" style={{ marginBottom: '1.25rem' }}>
               <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
               <span>{success}</span>
             </div>
@@ -145,33 +156,18 @@ const ForgotPasswordPage = () => {
 
           {step === 1 ? (
             <form onSubmit={handleRequestOtp}>
-              <div className="form-group">
-                <label className="form-label" htmlFor="email">
-                  Registered Account Email <span className="required">*</span>
-                </label>
-                <div className="input-with-icon">
-                  <Mail size={18} className="input-icon" />
-                  <input
-                    id="email"
-                    type="email"
-                    className="form-control"
-                    placeholder="student@campuscare.edu"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
               {/* Delivery Method Selector (Email vs WhatsApp) */}
-              <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ marginBottom: '1.25rem' }}>
                 <label className="form-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
-                  Delivery Channel
+                  Recovery Delivery Channel <span className="required">*</span>
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                   <button
                     type="button"
-                    onClick={() => setMethod('email')}
+                    onClick={() => {
+                      setMethod('email');
+                      setError('');
+                    }}
                     style={{
                       padding: '0.65rem 0.5rem',
                       borderRadius: 8,
@@ -193,7 +189,10 @@ const ForgotPasswordPage = () => {
 
                   <button
                     type="button"
-                    onClick={() => setMethod('whatsapp')}
+                    onClick={() => {
+                      setMethod('whatsapp');
+                      setError('');
+                    }}
                     style={{
                       padding: '0.65rem 0.5rem',
                       borderRadius: 8,
@@ -215,13 +214,58 @@ const ForgotPasswordPage = () => {
                 </div>
               </div>
 
+              {/* Dynamic Input based on Selected Method */}
+              {method === 'email' ? (
+                <div className="form-group">
+                  <label className="form-label" htmlFor="email">
+                    Registered Account Email <span className="required">*</span>
+                  </label>
+                  <div className="input-with-icon">
+                    <Mail size={18} className="input-icon" />
+                    <input
+                      id="email"
+                      type="email"
+                      className="form-control"
+                      placeholder="student@campuscare.edu"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <span className="form-hint">We'll dispatch a 6-digit recovery OTP to this email address</span>
+                </div>
+              ) : (
+                <div className="form-group">
+                  <label className="form-label" htmlFor="phone">
+                    Registered WhatsApp / Mobile Number <span className="required">*</span>
+                  </label>
+                  <div className="input-with-icon">
+                    <Phone size={18} className="input-icon" />
+                    <input
+                      id="phone"
+                      type="tel"
+                      className="form-control"
+                      placeholder="+1 555-019-2834 or +92 300 1234567"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <span className="form-hint">Enter your enrolled mobile/WhatsApp number with country code</span>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary full-width"
-                style={{ marginBottom: '1rem' }}
+                className="btn btn-primary full-width btn-lg"
+                style={{ marginTop: '0.75rem', marginBottom: '1rem' }}
               >
-                <span>{loading ? 'Dispatching Code...' : 'Send Verification Code'}</span>
+                <span>
+                  {loading
+                    ? 'Dispatching Code...'
+                    : `Send ${method === 'whatsapp' ? 'WhatsApp' : 'Email'} Code`}
+                </span>
               </button>
 
               <div style={{ textAlign: 'center' }}>
@@ -252,16 +296,22 @@ const ForgotPasswordPage = () => {
                     id="otp"
                     type="text"
                     maxLength={6}
+                    autoFocus
                     className="form-control"
-                    placeholder="Enter 6-digit OTP"
+                    placeholder="123456"
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    style={{ fontFamily: 'monospace', letterSpacing: '4px', fontSize: '1.1rem' }}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    style={{
+                      letterSpacing: '6px',
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      textAlign: 'center',
+                    }}
                     required
                   />
                 </div>
-                <span style={{ fontSize: '0.725rem', color: '#71717a' }}>
-                  Code sent to {email} ({method === 'whatsapp' ? 'WhatsApp' : 'Email'}). Valid for 10 mins.
+                <span style={{ fontSize: '0.75rem', color: '#71717a', marginTop: '4px', display: 'block' }}>
+                  Code sent to {destinationLabel} ({method === 'whatsapp' ? 'WhatsApp' : 'Email'}). Valid for 10 mins.
                 </span>
               </div>
 
@@ -275,7 +325,7 @@ const ForgotPasswordPage = () => {
                     id="newPassword"
                     type={showPassword ? 'text' : 'password'}
                     className="form-control"
-                    placeholder="Minimum 6 characters"
+                    placeholder="At least 6 characters"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -284,8 +334,9 @@ const ForgotPasswordPage = () => {
                     type="button"
                     className="password-toggle-btn"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Toggle password view"
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
@@ -311,10 +362,10 @@ const ForgotPasswordPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary full-width"
-                style={{ marginBottom: '1rem' }}
+                className="btn btn-primary full-width btn-lg"
+                style={{ marginTop: '0.75rem', marginBottom: '1rem' }}
               >
-                <span>{loading ? 'Resetting Password...' : 'Reset Password & Sign In'}</span>
+                <span>{loading ? 'Updating Password...' : 'Reset Password & Proceed'}</span>
               </button>
 
               <div style={{ textAlign: 'center' }}>
@@ -322,22 +373,30 @@ const ForgotPasswordPage = () => {
                   type="button"
                   onClick={() => {
                     setStep(1);
-                    setOtp('');
                     setError('');
+                    setSuccess('');
                   }}
                   style={{
-                    background: 'transparent',
+                    background: 'none',
                     border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '0.825rem',
                     color: '#71717a',
+                    fontSize: '0.825rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
                   }}
                 >
-                  ← Request a new verification code
+                  <ArrowLeft size={14} />
+                  <span>Change {method === 'whatsapp' ? 'Phone Number' : 'Email'}</span>
                 </button>
               </div>
             </form>
           )}
+
+          <div className="auth-footer" style={{ marginTop: '1.5rem' }}>
+            Remembered your credentials? <Link to="/login">Sign In here</Link>
+          </div>
         </div>
       </div>
     </div>

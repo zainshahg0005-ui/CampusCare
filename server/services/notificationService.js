@@ -231,9 +231,20 @@ const sendPasswordResetNotification = async ({ user, otp, method = 'email' }) =>
 };
 
 /**
- * Dispatch Registration OTP Verification Email
+ * Dispatch Registration OTP Verification Email or WhatsApp
  */
-const sendRegistrationOtpNotification = async ({ email, name, otp }) => {
+const sendRegistrationOtpNotification = async ({ email, phone, name, otp, method = 'email' }) => {
+  const isWhatsApp = method === 'whatsapp' && phone;
+
+  if (isWhatsApp) {
+    const waText = `🎓 *Welcome to CampusCare*\n\nHello ${name || 'Student'},\nYour 6-digit registration verification code is:\n\n*${otp}*\n\nThis verification code expires in 15 minutes. Enter it to activate your student account.`;
+    return await sendWhatsApp({
+      to: phone,
+      message: waText,
+    });
+  }
+
+  // Default: Email
   const subject = `CampusCare: ${otp} is your verification code`;
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; border: 1px solid #e4e4e7; border-radius: 12px; background: #ffffff;">

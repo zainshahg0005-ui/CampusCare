@@ -89,9 +89,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Verify Registration OTP handler
-  const verifyRegistrationOtp = async ({ email, otp }) => {
+  const verifyRegistrationOtp = async (payload) => {
     try {
-      const res = await api.post('/auth/verify-registration-otp', { email, otp });
+      const res = await api.post('/auth/verify-registration-otp', payload);
       if (res.data?.success && res.data?.token) {
         const { user: newUser, token: authToken } = res.data;
         setUser(newUser);
@@ -110,9 +110,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Resend Registration OTP
-  const resendRegistrationOtp = async (email) => {
+  const resendRegistrationOtp = async (payload) => {
     try {
-      const res = await api.post('/auth/resend-registration-otp', { email });
+      const body = typeof payload === 'string' ? { email: payload } : payload;
+      const res = await api.post('/auth/resend-registration-otp', body);
       return { success: !!res.data?.success, message: res.data?.message };
     } catch (err) {
       return {

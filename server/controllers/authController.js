@@ -21,7 +21,7 @@ const generateToken = (id, role) => {
 // @access  Public
 const registerUser = async (req, res) => {
   try {
-    const { name, studentId, email, password, confirmPassword } = req.body;
+    const { name, studentId, email, phone, password, confirmPassword, method = 'email' } = req.body;
 
     // Strict type checks against NoSQL injection
     if (
@@ -58,6 +58,21 @@ const registerUser = async (req, res) => {
       });
     }
 
+    // Phone validation if WhatsApp method is selected or phone is supplied
+    let cleanPhone = '';
+    if (phone && typeof phone === 'string') {
+      cleanPhone = phone.replace(/[^\d+]/g, '').trim();
+    }
+
+    if (method === 'whatsapp') {
+      if (!cleanPhone || cleanPhone.length < 7) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid WhatsApp / Mobile number (with country code, e.g. +1 555-019-2834) to receive your code via WhatsApp.',
+        });
+      }
+    }
+
     // Strict email format and legitimate domain validation
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
     if (!emailRegex.test(email.trim())) {
@@ -89,6 +104,21 @@ const registerUser = async (req, res) => {
       });
     }
 
+    // Check if phone already registered by another verified user
+    if (cleanPhone) {
+      const existingPhone = await User.findOne({
+        phone: cleanPhone,
+        isVerified: { $ne: false },
+        _id: { $ne: existingUser?._id },
+      });
+      if (existingPhone) {
+        return res.status(400).json({
+          success: false,
+          message: 'An account with this mobile/WhatsApp number already exists',
+        });
+      }
+    }
+
     // Check if studentId already registered by an active verified user
     const existingStudentId = await User.findOne({
       studentId: studentId.toUpperCase(),
@@ -114,6 +144,7 @@ const registerUser = async (req, res) => {
       existingUser.name = name.trim();
       existingUser.studentId = studentId.trim().toUpperCase();
       existingUser.password = hashedPassword;
+      if (cleanPhone) existingUser.phone = cleanPhone;
       existingUser.verificationOtp = otp;
       existingUser.verificationOtpExpires = otpExpires;
       user = await existingUser.save();
@@ -123,6 +154,7 @@ const registerUser = async (req, res) => {
         name: name.trim(),
         studentId: studentId.trim().toUpperCase(),
         email: email.trim().toLowerCase(),
+        phone: cleanPhone || undefined,
         password: hashedPassword,
         role: 'student',
         isVerified: false,
@@ -131,18 +163,23 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Dispatch verification OTP email asynchronously
+    // Dispatch verification OTP via chosen channel (WhatsApp or Email)
     await sendRegistrationOtpNotification({
       email: user.email,
+      phone: user.phone,
       name: user.name,
       otp,
+      method,
     });
 
+    const destination = method === 'whatsapp' && user.phone ? `WhatsApp (${user.phone})` : user.email;
     res.status(200).json({
       success: true,
       requiresOtp: true,
       email: user.email,
-      message: `A 6-digit verification code has been dispatched to ${user.email}. Enter it to activate your account.`,
+      phone: user.phone,
+      method,
+      message: `A 6-digit verification code has been dispatched to ${destination}. Enter it to activate your account.`,
     });
   } catch (error) {
     console.error('[Register Error]:', error);
@@ -158,17 +195,24 @@ const registerUser = async (req, res) => {
 // @access  Public
 const verifyRegistrationOtp = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, phone, otp } = req.body;
 
-    if (!email || !otp) {
+    if ((!email && !phone) || !otp) {
       return res.status(400).json({
         success: false,
-        message: 'Email and 6-digit verification code are required',
+        message: 'Account identifier and 6-digit verification code are required',
       });
     }
 
     const cleanOtp = String(otp).trim();
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    let query = {};
+    if (email) {
+      query.email = email.trim().toLowerCase();
+    } else if (phone) {
+      query.phone = String(phone).replace(/[^\d+]/g, '').trim();
+    }
+
+    const user = await User.findOne(query);
 
     if (!user) {
       return res.status(404).json({
@@ -188,7 +232,7 @@ const verifyRegistrationOtp = async (req, res) => {
     if (!user.verificationOtp || user.verificationOtp !== cleanOtp) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid verification code. Please check your email and try again.',
+        message: 'Invalid verification code. Please check your code and try again.',
       });
     }
 
@@ -213,6 +257,7 @@ const verifyRegistrationOtp = async (req, res) => {
         name: user.name,
         studentId: user.studentId,
         email: user.email,
+        phone: user.phone,
         role: user.role,
       },
       token: generateToken(user._id, user.role),
@@ -231,16 +276,20 @@ const verifyRegistrationOtp = async (req, res) => {
 // @access  Public
 const resendRegistrationOtp = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, phone, method = 'email' } = req.body;
 
-    if (!email) {
+    if (!email && !phone) {
       return res.status(400).json({
         success: false,
-        message: 'Email address is required',
+        message: 'Email address or phone number is required',
       });
     }
 
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    let query = {};
+    if (email) query.email = email.trim().toLowerCase();
+    else if (phone) query.phone = String(phone).replace(/[^\d+]/g, '').trim();
+
+    const user = await User.findOne(query);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -262,13 +311,16 @@ const resendRegistrationOtp = async (req, res) => {
 
     await sendRegistrationOtpNotification({
       email: user.email,
+      phone: user.phone,
       name: user.name,
       otp,
+      method,
     });
 
+    const destination = method === 'whatsapp' && user.phone ? `WhatsApp (${user.phone})` : user.email;
     res.json({
       success: true,
-      message: `A fresh 6-digit verification code has been dispatched to ${user.email}.`,
+      message: `A fresh 6-digit verification code has been dispatched to ${destination}.`,
     });
   } catch (error) {
     console.error('[Resend OTP Error]:', error);
@@ -370,22 +422,52 @@ const getCurrentUser = async (req, res) => {
 // @access  Public (Rate-limited)
 const forgotPassword = async (req, res) => {
   try {
-    const { email, method = 'email' } = req.body;
+    const { identifier, email, phone, method = 'email' } = req.body;
 
-    if (!email || typeof email !== 'string') {
+    const lookupVal = identifier || (method === 'whatsapp' ? (phone || email) : (email || phone));
+    if (!lookupVal || typeof lookupVal !== 'string') {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid registered email address',
+        message: method === 'whatsapp'
+          ? 'Please provide your registered WhatsApp / Mobile number or account email'
+          : 'Please provide your registered account email address',
       });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const cleanInput = lookupVal.trim();
+    let query = {};
+    if (cleanInput.includes('@')) {
+      query.email = cleanInput.toLowerCase();
+    } else {
+      const cleanPhone = cleanInput.replace(/[^\d+]/g, '');
+      query = {
+        $or: [
+          { phone: cleanPhone },
+          { phone: cleanInput },
+          { email: cleanInput.toLowerCase() }
+        ]
+      };
+    }
+
+    const user = await User.findOne(query);
+
     if (!user) {
-      // Return ambiguous success message to prevent user enumeration attacks
+      // Ambiguous message to prevent account enumeration
       return res.json({
         success: true,
-        message: 'If an account exists with this email, a verification code has been dispatched.',
+        message: `If an account matches this ${method === 'whatsapp' ? 'phone number' : 'email'}, a verification code has been dispatched.`,
       });
+    }
+
+    // Security check: if user requests WhatsApp OTP but has no phone on record
+    if (method === 'whatsapp') {
+      if (!user.phone) {
+        return res.status(400).json({
+          success: false,
+          requiresEmail: true,
+          message: 'No registered WhatsApp / Mobile number is associated with this account. Please switch to Email to receive your verification code.',
+        });
+      }
     }
 
     // Generate secure 6-digit OTP
@@ -401,9 +483,12 @@ const forgotPassword = async (req, res) => {
       method,
     });
 
+    const destination = method === 'whatsapp' ? `WhatsApp (${user.phone})` : user.email;
     res.json({
       success: true,
-      message: `A 6-digit verification code has been sent via ${method === 'whatsapp' ? 'WhatsApp' : 'email'}.`,
+      method,
+      destination,
+      message: `A 6-digit verification code has been dispatched to ${destination}.`,
     });
   } catch (error) {
     console.error('[Forgot Password Error]:', error);
@@ -419,12 +504,13 @@ const forgotPassword = async (req, res) => {
 // @access  Public (Rate-limited)
 const resetPassword = async (req, res) => {
   try {
-    const { email, otp, newPassword } = req.body;
+    const { identifier, email, phone, otp, newPassword } = req.body;
 
-    if (!email || !otp || !newPassword) {
+    const lookupVal = identifier || email || phone;
+    if (!lookupVal || !otp || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email, verification code, and new password',
+        message: 'Please provide your account identifier, verification code, and new password',
       });
     }
 
@@ -435,11 +521,24 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({
-      email: email.toLowerCase().trim(),
+    const cleanInput = lookupVal.trim();
+    let queryConditions = {
       resetPasswordOtp: otp.toString().trim(),
       resetPasswordExpires: { $gt: Date.now() },
-    });
+    };
+
+    if (cleanInput.includes('@')) {
+      queryConditions.email = cleanInput.toLowerCase();
+    } else {
+      const cleanPhone = cleanInput.replace(/[^\d+]/g, '');
+      queryConditions.$or = [
+        { phone: cleanPhone },
+        { phone: cleanInput },
+        { email: cleanInput.toLowerCase() }
+      ];
+    }
+
+    const user = await User.findOne(queryConditions);
 
     if (!user) {
       return res.status(400).json({

@@ -4,6 +4,7 @@ import {
   User,
   CreditCard,
   Mail,
+  Phone,
   Lock,
   Eye,
   EyeOff,
@@ -13,16 +14,19 @@ import {
   ArrowLeft,
   CheckCircle2,
   RefreshCw,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../layouts/PublicNavbar';
 
 const RegisterPage = () => {
   const [step, setStep] = useState('form'); // 'form' | 'otp'
+  const [method, setMethod] = useState('email'); // 'email' | 'whatsapp'
   const [formData, setFormData] = useState({
     name: '',
     studentId: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     agreeTerms: true,
@@ -67,7 +71,7 @@ const RegisterPage = () => {
     setError('');
     setSuccessMsg('');
 
-    const { name, studentId, email, password, confirmPassword, agreeTerms } = formData;
+    const { name, studentId, email, phone, password, confirmPassword, agreeTerms } = formData;
 
     if (!name.trim() || !studentId.trim() || !email.trim() || !password) {
       setError('Please fill in all required fields.');
@@ -76,6 +80,11 @@ const RegisterPage = () => {
 
     if (!agreeTerms) {
       setError('You must agree to the Terms & Conditions to create an account.');
+      return;
+    }
+
+    if (method === 'whatsapp' && (!phone || phone.trim().length < 7)) {
+      setError('Please provide a valid WhatsApp / Mobile number (e.g. +1 555-019-2834 or +92 300 1234567) to receive your code on WhatsApp.');
       return;
     }
 
@@ -94,6 +103,8 @@ const RegisterPage = () => {
       name: name.trim(),
       studentId: studentId.trim().toUpperCase(),
       email: email.trim().toLowerCase(),
+      phone: phone.trim() || undefined,
+      method,
       password,
       confirmPassword,
     });
@@ -104,7 +115,7 @@ const RegisterPage = () => {
         setStep('otp');
         setTimer(60);
         setCanResend(false);
-        setSuccessMsg(result.message || `A 6-digit code was sent to ${email.trim().toLowerCase()}.`);
+        setSuccessMsg(result.message || `A 6-digit code was dispatched.`);
       } else {
         // Direct registration fallback
         navigate('/student/dashboard');
@@ -129,6 +140,7 @@ const RegisterPage = () => {
     setLoading(true);
     const result = await verifyRegistrationOtp({
       email: formData.email.trim().toLowerCase(),
+      phone: formData.phone.trim() || undefined,
       otp: cleanOtp,
     });
     setLoading(false);
@@ -147,11 +159,15 @@ const RegisterPage = () => {
     setSuccessMsg('');
     setResending(true);
 
-    const result = await resendRegistrationOtp(formData.email.trim().toLowerCase());
+    const result = await resendRegistrationOtp({
+      email: formData.email.trim().toLowerCase(),
+      phone: formData.phone.trim() || undefined,
+      method,
+    });
     setResending(false);
 
     if (result.success) {
-      setSuccessMsg(result.message || 'A fresh verification code was sent to your email.');
+      setSuccessMsg(result.message || 'A fresh verification code was dispatched.');
       setTimer(60);
       setCanResend(false);
     } else {
@@ -159,11 +175,16 @@ const RegisterPage = () => {
     }
   };
 
+  const destinationLabel =
+    method === 'whatsapp' && formData.phone
+      ? `WhatsApp (${formData.phone})`
+      : formData.email;
+
   return (
     <div>
       <PublicNavbar />
       <div className="auth-wrapper">
-        <div className="auth-card" style={{ maxWidth: '440px' }}>
+        <div className="auth-card" style={{ maxWidth: '460px' }}>
           {/* Header */}
           <div className="auth-header">
             <div className="brand-logo" style={{ justifyContent: 'center', marginBottom: '0.85rem' }}>
@@ -174,10 +195,10 @@ const RegisterPage = () => {
                 Campus<span className="brand-accent">Care</span>
               </span>
             </div>
-            <h2>{step === 'otp' ? 'Verify Your Email' : 'Student Registration'}</h2>
+            <h2>{step === 'otp' ? 'Verify Your Account' : 'Student Registration'}</h2>
             <p>
               {step === 'otp'
-                ? `Enter the 6-digit security code sent to ${formData.email}`
+                ? `Enter the 6-digit security code sent to ${destinationLabel}`
                 : 'Create your verified student account to report and track complaints'}
             </p>
           </div>
@@ -269,7 +290,83 @@ const RegisterPage = () => {
                     required
                   />
                 </div>
-                <span className="form-hint">We'll send a 6-digit OTP code to verify this address</span>
+              </div>
+
+              {/* WhatsApp / Mobile Number Input */}
+              <div className="form-group">
+                <label className="form-label" htmlFor="phone">
+                  WhatsApp / Mobile Number {method === 'whatsapp' ? <span className="required">*</span> : <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(Optional)</span>}
+                </label>
+                <div className="input-with-icon">
+                  <Phone size={18} className="input-icon" />
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    className="form-control"
+                    placeholder="e.g. +1 555-019-2834 or +92 300 1234567"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required={method === 'whatsapp'}
+                  />
+                </div>
+                <span className="form-hint">
+                  {method === 'whatsapp'
+                    ? 'Required: Your 6-digit registration code will be sent here.'
+                    : 'Optional: Used for maintenance SMS/WhatsApp alerts on your tickets.'}
+                </span>
+              </div>
+
+              {/* Verification Channel Toggle */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label className="form-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
+                  Verification Code Delivery Channel <span className="required">*</span>
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setMethod('email')}
+                    style={{
+                      padding: '0.65rem 0.5rem',
+                      borderRadius: 8,
+                      border: method === 'email' ? '2px solid #09090b' : '1px solid #e4e4e7',
+                      background: method === 'email' ? '#f4f4f5' : '#ffffff',
+                      color: '#09090b',
+                      fontSize: '0.825rem',
+                      fontWeight: method === 'email' ? 700 : 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <Mail size={15} />
+                    <span>Email OTP</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMethod('whatsapp')}
+                    style={{
+                      padding: '0.65rem 0.5rem',
+                      borderRadius: 8,
+                      border: method === 'whatsapp' ? '2px solid #09090b' : '1px solid #e4e4e7',
+                      background: method === 'whatsapp' ? '#f4f4f5' : '#ffffff',
+                      color: '#09090b',
+                      fontSize: '0.825rem',
+                      fontWeight: method === 'whatsapp' ? 700 : 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <MessageSquare size={15} />
+                    <span>WhatsApp OTP</span>
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
@@ -353,10 +450,10 @@ const RegisterPage = () => {
                 {loading ? (
                   <>
                     <div className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }}></div>
-                    <span>Sending Verification Code...</span>
+                    <span>Dispatching {method === 'whatsapp' ? 'WhatsApp' : 'Email'} Code...</span>
                   </>
                 ) : (
-                  'Continue & Send OTP'
+                  `Send ${method === 'whatsapp' ? 'WhatsApp' : 'Email'} Verification Code`
                 )}
               </button>
             </form>
@@ -388,7 +485,9 @@ const RegisterPage = () => {
                     required
                   />
                 </div>
-                <span className="form-hint">Valid for 15 minutes. Check spam folder if not in inbox.</span>
+                <span className="form-hint">
+                  Valid for 15 minutes. Delivered via {method === 'whatsapp' ? 'WhatsApp message' : 'Email'}.
+                </span>
               </div>
 
               <button
@@ -435,7 +534,7 @@ const RegisterPage = () => {
                     padding: 0,
                   }}
                 >
-                  <ArrowLeft size={14} /> Edit Email
+                  <ArrowLeft size={14} /> Edit Details
                 </button>
 
                 <button
