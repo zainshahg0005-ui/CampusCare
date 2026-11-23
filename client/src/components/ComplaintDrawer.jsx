@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import ImageWithSkeleton from './ImageWithSkeleton';
 
 const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => {
   const { isAdmin } = useAuth();
@@ -275,15 +276,15 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
                     borderRadius: 12,
                     overflow: 'hidden',
                     border: '1px solid #e5e7eb',
-                    maxHeight: 220,
+                    height: 200,
                     cursor: 'pointer',
                   }}
                   onClick={() => setLightboxOpen(true)}
                 >
-                  <img
+                  <ImageWithSkeleton
                     src={complaint.photoUrl}
                     alt="Complaint Evidence"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    height="100%"
                   />
                   <div
                     style={{
@@ -298,6 +299,7 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
                       display: 'flex',
                       alignItems: 'center',
                       gap: 4,
+                      zIndex: 2,
                     }}
                   >
                     <Maximize2 size={13} />

@@ -11,11 +11,10 @@ import {
   Activity,
   ShieldCheck,
   CheckCircle2,
-  Clock,
-  Layers,
 } from 'lucide-react';
 import PublicNavbar from '../layouts/PublicNavbar';
 import PublicFooter from '../layouts/PublicFooter';
+import ImageWithSkeleton from '../components/ImageWithSkeleton';
 
 const HomePage = () => {
   const [ticketSearch, setTicketSearch] = useState('');
@@ -127,12 +126,13 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Hero Visual */}
+          {/* Hero Visual with Skeleton Loader & Lazy Loading */}
           <div className="hero-visual-wrapper">
-            <img
-              src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
+            <ImageWithSkeleton
+              src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1000&q=80&fm=webp"
               alt="University Campus Architecture"
               className="hero-main-photo"
+              containerStyle={{ borderRadius: 16, height: 380 }}
             />
             <div className="hero-floating-glass-card">
               <div

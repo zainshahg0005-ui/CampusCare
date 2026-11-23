@@ -28,36 +28,38 @@ const PublicNavbar = () => {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="desktop-nav">
-          <a href="/#features" className="nav-link">Features</a>
-          <a href="/#how-it-works" className="nav-link">How It Works</a>
-          <a href="/#stats" className="nav-link">Statistics</a>
-          <a href="/#contact" className="nav-link">Contact</a>
-        </nav>
+          {/* Desktop Nav */}
+          <nav className="desktop-nav">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/login" className="nav-link">Student Portal</Link>
+            <Link to="/admin/login" className="nav-link">Admin Access</Link>
+          </nav>
 
-        {/* Desktop Actions */}
-        <div className="nav-actions">
-          {isAuthenticated ? (
-            <div className="user-nav-group">
-              <button onClick={handleDashboardRedirect} className="btn btn-primary btn-sm">
-                Dashboard ({user?.name.split(' ')[0]})
-              </button>
-              <button onClick={logout} className="btn btn-outline btn-sm" title="Log Out">
-                <LogOut size={16} />
-              </button>
-            </div>
-          ) : (
-            <div className="auth-buttons">
-              <Link to="/login" className="btn btn-ghost btn-sm">
-                Log In
-              </Link>
-              <Link to="/register" className="btn btn-primary btn-sm">
-                Get Started
-              </Link>
-            </div>
-          )}
-        </div>
+          {/* Desktop Actions */}
+          <div className="nav-actions">
+            {isAuthenticated ? (
+              <div className="user-nav-group">
+                <button onClick={handleDashboardRedirect} className="btn btn-primary btn-sm">
+                  Dashboard ({user?.name.split(' ')[0]})
+                </button>
+                <button onClick={logout} className="btn btn-outline btn-sm" title="Log Out">
+                  <LogOut size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="auth-buttons">
+                <Link to="/login" className="btn btn-outline btn-sm">
+                  Student Sign In
+                </Link>
+                <Link to="/admin/login" className="btn btn-ghost btn-sm" style={{ border: '1px solid #e4e4e7' }}>
+                  Admin
+                </Link>
+                <Link to="/register" className="btn btn-primary btn-sm">
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
 
         {/* Mobile Hamburger Toggle */}
         <button

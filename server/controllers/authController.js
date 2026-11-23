@@ -55,6 +55,28 @@ const registerUser = async (req, res) => {
       });
     }
 
+    // Strict email format and legitimate domain validation
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid, properly formatted email address (e.g. name@university.edu)',
+      });
+    }
+
+    const emailDomain = email.trim().toLowerCase().split('@')[1];
+    const blockedDisposableDomains = [
+      'tempmail.com', 'throwawaymail.com', 'mailinator.com', '10minutemail.com',
+      'guerrillamail.com', 'sharklasers.com', 'trashmail.com', 'temp-mail.org',
+      'yopmail.com', 'dispostable.com', 'fakeinbox.com', 'getairmail.com',
+    ];
+    if (blockedDisposableDomains.includes(emailDomain)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Disposable or temporary email services are not permitted. Please use your legitimate personal or university email.',
+      });
+    }
+
     // Check if email already registered
     const emailExists = await User.findOne({ email: email.toLowerCase() });
     if (emailExists) {
