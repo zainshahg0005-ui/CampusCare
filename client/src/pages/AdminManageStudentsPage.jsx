@@ -10,17 +10,22 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
+import SkeletonTable from '../components/SkeletonTable';
+import EmptyState from '../components/EmptyState';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import api from '../services/api';
 
-const studentAvatars = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80',
-];
+const getInitials = (name) => {
+  if (!name) return 'ST';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
 
 const AdminManageStudentsPage = () => {
+  useDocumentTitle('Student Directory');
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -98,22 +103,17 @@ const AdminManageStudentsPage = () => {
         </div>
 
         {loading ? (
-          <div className="empty-state">
-            <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-            <p>Loading student directory...</p>
-          </div>
+          <SkeletonTable rows={5} cols={7} />
         ) : students.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon-box">
-              <Users size={32} />
-            </div>
-            <h4 className="empty-title">No students found</h4>
-            <p className="empty-subtitle">
-              {search.trim()
+          <EmptyState
+            icon={Users}
+            title="No students found"
+            description={
+              search.trim()
                 ? 'No registered student matched your search query.'
-                : 'No students have registered yet. New signups will appear here.'}
-            </p>
-          </div>
+                : 'No students have registered yet. New signups will appear here.'
+            }
+          />
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table className="modern-table">
@@ -129,21 +129,35 @@ const AdminManageStudentsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {students.map((student, idx) => (
+                {students.map((student) => (
                   <tr key={student._id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <img
-                          src={studentAvatars[idx % studentAvatars.length]}
-                          alt={student.name}
-                          style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover' }}
-                        />
+                        <div
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: '50%',
+                            background: '#09090b',
+                            color: '#ffffff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                            letterSpacing: '0.5px',
+                            flexShrink: 0,
+                            border: '1px solid #27272a',
+                          }}
+                        >
+                          {getInitials(student.name)}
+                        </div>
                         <div className="table-title">{student.name}</div>
                       </div>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 700, color: '#1e3a8a' }}>
-                        <CreditCard size={15} color="#64748b" />
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 700, color: '#09090b', fontFamily: 'monospace' }}>
+                        <CreditCard size={15} color="#71717a" />
                         {student.studentId}
                       </span>
                     </td>

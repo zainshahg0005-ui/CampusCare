@@ -21,8 +21,10 @@ import {
 import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../layouts/PublicNavbar';
 import useOtpTimer from '../hooks/useOtpTimer';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const RegisterPage = () => {
+  useDocumentTitle('Student Registration');
   const [step, setStep] = useState('form'); // 'form' | 'verify'
   const [method, setMethod] = useState('email'); // 'email' | 'whatsapp'
   const [formData, setFormData] = useState({

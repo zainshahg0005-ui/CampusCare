@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../layouts/PublicNavbar';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const LoginPage = () => {
+  useDocumentTitle('Student Sign In');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

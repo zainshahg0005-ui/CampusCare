@@ -9,12 +9,16 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ComplaintDrawer from '../components/ComplaintDrawer';
+import SkeletonTable from '../components/SkeletonTable';
+import EmptyState from '../components/EmptyState';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import api from '../services/api';
 import { CATEGORY_FILTER_OPTIONS as categories } from '../constants/categories';
 
 const statusTabs = ['All', 'Pending', 'In Progress', 'Resolved', 'Rejected'];
 
 const AdminManageComplaintsPage = () => {
+  useDocumentTitle('Manage Complaints');
   const [searchParams] = useSearchParams();
   const initialStatus = searchParams.get('status') || 'All';
   const initialPriority = searchParams.get('priority') || 'All';
@@ -163,29 +167,18 @@ const AdminManageComplaintsPage = () => {
       {/* Complaints Table */}
       <div className="dashboard-card">
         {loading ? (
-          <div style={{ padding: '3.5rem', textAlign: 'center', color: '#6b7280' }}>
-            Filtering grievances...
-          </div>
+          <SkeletonTable rows={5} cols={8} />
         ) : complaints.length === 0 ? (
-          <div style={{ padding: '3.5rem 1.5rem', textAlign: 'center' }}>
-            <AlertCircle size={44} color="#059669" style={{ margin: '0 auto 0.75rem' }} />
-            <h4 style={{ fontSize: '1.1rem', color: '#111827', marginBottom: '0.35rem' }}>
-              No grievances found
-            </h4>
-            <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
-              No tickets matched the current filter criteria.
-            </p>
-            <button
-              className="btn btn-outline"
-              onClick={() => {
-                setSearch('');
-                setCategoryFilter('All');
-                setStatusFilter('All');
-              }}
-            >
-              Reset Filters
-            </button>
-          </div>
+          <EmptyState
+            title="No grievances match the filter"
+            description="No student maintenance tickets matched your active filter criteria."
+            actionLabel="Reset Filters"
+            onAction={() => {
+              setSearch('');
+              setCategoryFilter('All');
+              setStatusFilter('All');
+            }}
+          />
         ) : (
           <div className="table-responsive">
             <table className="data-table">
@@ -209,7 +202,7 @@ const AdminManageComplaintsPage = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <td>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#09090b', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #e4e4e7' }}>
                         #{c.ticketId || c._id.slice(-6).toUpperCase()}
                       </span>
                     </td>

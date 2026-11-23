@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, FileText, CheckCircle2, AlertTriangle, Lock, BellRing } from 'lucide-react';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const TermsPage = () => {
+  useDocumentTitle('Terms & Conditions');
   const navigate = useNavigate();
 
   return (

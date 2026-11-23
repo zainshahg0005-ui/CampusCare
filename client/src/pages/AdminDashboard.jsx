@@ -18,9 +18,13 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ComplaintDrawer from '../components/ComplaintDrawer';
+import SkeletonTable from '../components/SkeletonTable';
+import EmptyState from '../components/EmptyState';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import api from '../services/api';
 
 const AdminDashboard = () => {
+  useDocumentTitle('Executive Cockpit');
   const [dashboardData, setDashboardData] = useState({
     totalStudents: 0,
     totalComplaints: 0,
@@ -264,13 +268,12 @@ const AdminDashboard = () => {
         </div>
 
         {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
-            Refreshing telemetry...
-          </div>
+          <SkeletonTable rows={4} cols={7} />
         ) : dashboardData.recentComplaints.length === 0 ? (
-          <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: '#6b7280' }}>
-            No complaints logged on campus yet.
-          </div>
+          <EmptyState
+            title="No complaints logged yet"
+            description="The campus facilities system has zero reported active grievances right now."
+          />
         ) : (
           <div className="table-responsive">
             <table className="data-table">
@@ -293,7 +296,7 @@ const AdminDashboard = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <td>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#09090b', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #e4e4e7' }}>
                         #{c.ticketId || c._id.slice(-6).toUpperCase()}
                       </span>
                     </td>

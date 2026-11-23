@@ -15,22 +15,16 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ComplaintDrawer from '../components/ComplaintDrawer';
+import SkeletonTable from '../components/SkeletonTable';
+import EmptyState from '../components/EmptyState';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import api from '../services/api';
-
-const categories = [
-  'All',
-  'Electricity',
-  'Internet/Wi-Fi',
-  'Water Supply',
-  'Washroom',
-  'Laboratory',
-  'Classroom',
-  'Other',
-];
+import { CATEGORY_FILTER_OPTIONS as categories } from '../constants/categories';
 
 const statusTabs = ['All', 'Pending', 'In Progress', 'Resolved', 'Rejected'];
 
 const MyComplaintsPage = () => {
+  useDocumentTitle('My Grievances');
   const [searchParams] = useSearchParams();
   const initialStatus = searchParams.get('status') || 'All';
   const initialPriority = searchParams.get('priority') || 'All';
@@ -188,30 +182,28 @@ const MyComplaintsPage = () => {
       {/* Complaints List Table */}
       <div className="dashboard-card">
         {loading ? (
-          <div style={{ padding: '3.5rem', textAlign: 'center', color: '#6b7280' }}>
-            Loading complaints...
-          </div>
+          <SkeletonTable rows={5} cols={7} />
         ) : filteredComplaints.length === 0 ? (
-          <div style={{ padding: '3.5rem 1.5rem', textAlign: 'center' }}>
-            <AlertCircle size={44} color="#059669" style={{ margin: '0 auto 0.75rem' }} />
-            <h4 style={{ fontSize: '1.1rem', color: '#111827', marginBottom: '0.35rem' }}>
-              No complaints match the filter
-            </h4>
-            <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
-              Try adjusting your category or status filters to view records.
-            </p>
-            <button
-              className="btn btn-outline"
-              onClick={() => {
+          <EmptyState
+            title={complaints.length === 0 ? 'No complaints lodged yet' : 'No complaints match the filter'}
+            description={
+              complaints.length === 0
+                ? 'Report facility issues with electricity, Wi-Fi, washrooms, or classrooms to have them resolved.'
+                : 'Try adjusting your search terms, status, or facility category.'
+            }
+            actionLabel={complaints.length === 0 ? 'Submit First Grievance' : 'Reset Filters'}
+            actionIcon={complaints.length === 0 ? FilePlus2 : RefreshCw}
+            onAction={() => {
+              if (complaints.length === 0) {
+                window.location.href = '/student/submit';
+              } else {
                 setSearch('');
                 setSelectedCategory('All');
                 setSelectedStatus('All');
                 setSelectedPriority('All');
-              }}
-            >
-              Reset Filters
-            </button>
-          </div>
+              }
+            }}
+          />
         ) : (
           <div className="table-responsive">
             <table className="data-table">
@@ -234,7 +226,7 @@ const MyComplaintsPage = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <td>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#09090b', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #e4e4e7' }}>
                         #{c.ticketId || c._id.slice(-6).toUpperCase()}
                       </span>
                     </td>

@@ -16,8 +16,10 @@ import {
 import PublicNavbar from '../layouts/PublicNavbar';
 import api from '../services/api';
 import useOtpTimer from '../hooks/useOtpTimer';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const ForgotPasswordPage = () => {
+  useDocumentTitle('Password Recovery');
   const [step, setStep] = useState(1); // 1 = request code, 2 = verify & set password
   const [method, setMethod] = useState('email'); // 'email' | 'whatsapp'
   const [identifier, setIdentifier] = useState(''); // email or phone

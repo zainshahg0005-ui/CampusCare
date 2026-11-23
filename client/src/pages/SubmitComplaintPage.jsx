@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import api from '../services/api';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import { FACILITY_CATEGORIES as categoryOptions } from '../constants/categories';
 
 const priorityLevels = [
@@ -26,6 +27,7 @@ const priorityLevels = [
 ];
 
 const SubmitComplaintPage = () => {
+  useDocumentTitle('Lodge Facility Complaint');
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState(() => {
@@ -362,8 +364,8 @@ const SubmitComplaintPage = () => {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 style={{
-                  border: isDragging ? '2px dashed #059669' : '2px dashed #d1d5db',
-                  background: isDragging ? '#ecfdf5' : '#f9fafb',
+                  border: isDragging ? '2px dashed #09090b' : '2px dashed #d4d4d8',
+                  background: isDragging ? '#f4f4f5' : '#fafafa',
                   borderRadius: 14,
                   padding: '2rem',
                   textAlign: 'center',

@@ -13,8 +13,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../layouts/PublicNavbar';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const AdminLoginPage = () => {
+  useDocumentTitle('Admin Terminal');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

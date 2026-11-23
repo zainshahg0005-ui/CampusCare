@@ -18,10 +18,14 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ComplaintDrawer from '../components/ComplaintDrawer';
+import SkeletonTable from '../components/SkeletonTable';
+import EmptyState from '../components/EmptyState';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const StudentDashboard = () => {
+  useDocumentTitle('Student Workspace');
   const { user } = useAuth();
   const [stats, setStats] = useState({
     total: 0,
@@ -244,23 +248,25 @@ const StudentDashboard = () => {
         </div>
 
         {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
-            Loading grievances...
-          </div>
+          <SkeletonTable rows={4} cols={6} />
         ) : filteredComplaints.length === 0 ? (
-          <div style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
-            <AlertCircle size={40} color="#059669" style={{ margin: '0 auto 0.75rem' }} />
-            <h4 style={{ fontSize: '1.05rem', color: '#111827', marginBottom: '0.25rem' }}>
-              No complaints filed yet
-            </h4>
-            <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
-              Have an issue with hostel Wi-Fi, lab equipment, or classroom lighting?
-            </p>
-            <Link to="/student/submit" className="btn btn-primary">
-              <FilePlus2 size={16} />
-              <span>Submit First Complaint</span>
-            </Link>
-          </div>
+          <EmptyState
+            title={recentComplaints.length === 0 ? 'No complaints filed yet' : 'No matching grievances found'}
+            description={
+              recentComplaints.length === 0
+                ? 'Report an issue with hostel Wi-Fi, lab equipment, or classroom facilities to notify technicians.'
+                : 'Try adjusting your search keywords.'
+            }
+            actionLabel={recentComplaints.length === 0 ? 'Submit First Complaint' : 'Clear Search'}
+            actionIcon={recentComplaints.length === 0 ? FilePlus2 : Search}
+            onAction={() => {
+              if (recentComplaints.length === 0) {
+                window.location.href = '/student/submit';
+              } else {
+                setSearchFilter('');
+              }
+            }}
+          />
         ) : (
           <div className="table-responsive">
             <table className="data-table">
@@ -282,7 +288,7 @@ const StudentDashboard = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <td>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#09090b', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #e4e4e7' }}>
                         #{c.ticketId || c._id.slice(-6).toUpperCase()}
                       </span>
                     </td>
@@ -292,7 +298,7 @@ const StudentDashboard = () => {
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4b5563' }}>
-                        <MapPin size={13} color="#059669" />
+                        <MapPin size={13} color="#71717a" />
                         <span>{c.location || 'Campus'}</span>
                       </div>
                     </td>

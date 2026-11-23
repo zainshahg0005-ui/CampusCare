@@ -15,8 +15,10 @@ import {
 import PublicNavbar from '../layouts/PublicNavbar';
 import PublicFooter from '../layouts/PublicFooter';
 import ImageWithSkeleton from '../components/ImageWithSkeleton';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const HomePage = () => {
+  useDocumentTitle('Student Grievance & Facility Management');
   const [ticketSearch, setTicketSearch] = useState('');
   const [searchFeedback, setSearchFeedback] = useState(null);
 
