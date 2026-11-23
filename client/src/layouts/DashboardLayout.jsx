@@ -57,9 +57,16 @@ const DashboardLayout = ({ children, title, subtitle }) => {
 
   const navItems = isAdmin ? adminNavItems : studentNavItems;
 
-  const userAvatarUrl = isAdmin
-    ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80'
-    : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
+  const getInitials = (name) => {
+    if (!name) return 'CC';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const initials = getInitials(user?.name);
 
   return (
     <div className="dashboard-container">
@@ -121,11 +128,26 @@ const DashboardLayout = ({ children, title, subtitle }) => {
         {/* Bottom Profile Card */}
         <div className="sidebar-footer">
           <div className="user-profile-card">
-            <img
-              src={userAvatarUrl}
-              alt="Avatar"
-              className="user-avatar-img"
-            />
+            <div
+              className="user-avatar-badge"
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: '#09090b',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                letterSpacing: '0.5px',
+                flexShrink: 0,
+                border: '1px solid #27272a',
+              }}
+            >
+              {initials}
+            </div>
             <div className="user-info">
               <div className="user-name" title={user?.name}>{user?.name}</div>
               <div className="user-subtext">
@@ -203,11 +225,26 @@ const DashboardLayout = ({ children, title, subtitle }) => {
 
             {/* User Chip */}
             <div className="user-chip">
-              <img
-                src={userAvatarUrl}
-                alt="Profile"
-                className="user-chip-avatar"
-              />
+              <div
+                className="user-chip-avatar-badge"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: '#09090b',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  fontSize: '0.775rem',
+                  letterSpacing: '0.5px',
+                  flexShrink: 0,
+                  border: '1px solid #27272a',
+                }}
+              >
+                {initials}
+              </div>
               <div className="user-chip-text">
                 <span className="chip-name">{user?.name}</span>
                 <span className="chip-role">{isAdmin ? 'Admin' : user?.studentId || 'Student'}</span>

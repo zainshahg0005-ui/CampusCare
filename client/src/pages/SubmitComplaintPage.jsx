@@ -16,16 +16,7 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import api from '../services/api';
-
-const categoryOptions = [
-  { id: 'Electricity', label: 'Electricity & Power', icon: Zap, hint: 'Lights, sockets, lab power, AC' },
-  { id: 'Internet/Wi-Fi', label: 'Network & Wi-Fi', icon: Wifi, hint: 'Hostel signal, Ethernet, router drop' },
-  { id: 'Water Supply', label: 'Water & Plumbing', icon: Droplet, hint: 'Taps, dispensers, pressure, heaters' },
-  { id: 'Washroom', label: 'Washroom & Sanitary', icon: Sparkles, hint: 'Hygiene, drains, fixtures' },
-  { id: 'Laboratory', label: 'Lab & Heavy Equipment', icon: Activity, hint: 'Fume hoods, chemicals, gas lines' },
-  { id: 'Classroom', label: 'Classroom & Facilities', icon: Building, hint: 'Desks, projectors, audio, doors' },
-  { id: 'Other', label: 'General / Other', icon: HelpCircle, hint: 'Grounds, transport, general issues' },
-];
+import { FACILITY_CATEGORIES as categoryOptions } from '../constants/categories';
 
 const priorityLevels = [
   { id: 'Urgent', label: 'Urgent (Emergency)', sla: 'Technician dispatched in < 2 hrs', bg: '#fef2f2', text: '#dc2626', border: '#fecaca' },

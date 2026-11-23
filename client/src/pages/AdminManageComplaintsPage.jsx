@@ -10,17 +10,7 @@ import {
 import DashboardLayout from '../layouts/DashboardLayout';
 import ComplaintDrawer from '../components/ComplaintDrawer';
 import api from '../services/api';
-
-const categories = [
-  'All',
-  'Electricity',
-  'Internet/Wi-Fi',
-  'Water Supply',
-  'Washroom',
-  'Laboratory',
-  'Classroom',
-  'Other',
-];
+import { CATEGORY_FILTER_OPTIONS as categories } from '../constants/categories';
 
 const statusTabs = ['All', 'Pending', 'In Progress', 'Resolved', 'Rejected'];
 

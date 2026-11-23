@@ -265,6 +265,114 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Project Team Credits Section */}
+      <section style={{ padding: '4.5rem 0 5rem', background: '#ffffff', borderTop: '1px solid #e4e4e7' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 2.75rem' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.35rem 0.85rem',
+                background: '#f4f4f5',
+                border: '1px solid #e4e4e7',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                color: '#52525b',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                marginBottom: '1rem',
+              }}
+            >
+              <span>Project Team</span>
+            </div>
+            <h2 style={{ fontSize: '1.85rem', color: '#09090b', marginBottom: '0.5rem', fontWeight: 700 }}>
+              Developed By
+            </h2>
+            <p style={{ color: '#71717a', fontSize: '0.925rem' }}>
+              Engineered by the CampusCare development team with modern MERN architecture, secure authentication, and real-time maintenance telemetry.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.5rem',
+              maxWidth: 960,
+              margin: '0 auto',
+            }}
+          >
+            {[
+              { name: 'Zain Shah', rollNo: '2665', initials: 'ZS', role: 'Full Stack & Security' },
+              { name: 'M. Salman', rollNo: '2652', initials: 'MS', role: 'Frontend & Architecture' },
+              { name: 'M. Furqan', rollNo: '2692', initials: 'MF', role: 'Backend & Database' },
+            ].map((member, idx) => (
+              <div
+                key={idx}
+                className="card"
+                style={{
+                  padding: '2rem 1.5rem',
+                  textAlign: 'center',
+                  background: '#ffffff',
+                  border: '1px solid #e4e4e7',
+                  borderRadius: '12px',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    background: '#09090b',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    fontSize: '1.15rem',
+                    letterSpacing: '1px',
+                    marginBottom: '1rem',
+                    boxShadow: '0 4px 12px rgba(9, 9, 11, 0.15)',
+                  }}
+                >
+                  {member.initials}
+                </div>
+                <h3 style={{ fontSize: '1.125rem', color: '#09090b', margin: '0 0 0.35rem', fontWeight: 700 }}>
+                  {member.name}
+                </h3>
+                <div style={{ fontSize: '0.8rem', color: '#71717a', marginBottom: '1rem' }}>
+                  {member.role}
+                </div>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '0.25rem 0.75rem',
+                    background: '#f4f4f5',
+                    border: '1px solid #e4e4e7',
+                    borderRadius: '6px',
+                    fontFamily: 'monospace',
+                    fontSize: '0.825rem',
+                    fontWeight: 700,
+                    color: '#18181b',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Roll No: {member.rollNo}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <PublicFooter />
     </div>
   );

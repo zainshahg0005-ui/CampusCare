@@ -1,8 +1,9 @@
 import React from 'react';
 import { ShieldCheck, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { FACILITY_CATEGORIES } from '../constants/categories';
 
-const currentYear = 2026;
+const currentYear = new Date().getFullYear();
 
 const PublicFooter = () => {
   return (
@@ -24,6 +25,9 @@ const PublicFooter = () => {
           <div className="footer-copy">
             © {currentYear} CampusCare Inc. All rights reserved.
           </div>
+          <div style={{ fontSize: '0.8rem', color: '#71717a', marginTop: '0.65rem', lineHeight: 1.5 }}>
+            Built by <strong style={{ color: '#27272a' }}>Zain Shah</strong> (2665) • <strong style={{ color: '#27272a' }}>M. Salman</strong> (2652) • <strong style={{ color: '#27272a' }}>M. Furqan</strong> (2692)
+          </div>
         </div>
 
         <div className="footer-col">
@@ -38,13 +42,11 @@ const PublicFooter = () => {
         </div>
 
         <div className="footer-col">
-          <h4 className="footer-title">Categories</h4>
+          <h4 className="footer-title">Facility Categories</h4>
           <ul className="footer-links">
-            <li><span>Classroom Maintenance</span></li>
-            <li><span>Laboratory Equipment</span></li>
-            <li><span>High-Speed Wi-Fi</span></li>
-            <li><span>Washroom Hygiene</span></li>
-            <li><span>Power & Electricity</span></li>
+            {FACILITY_CATEGORIES.slice(0, 6).map((c) => (
+              <li key={c.id}><span>{c.label}</span></li>
+            ))}
           </ul>
         </div>
 
