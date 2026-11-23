@@ -18,7 +18,7 @@ app.disable('x-powered-by');
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: true,
   credentials: true,
 }));
 app.use(express.json());
@@ -72,7 +72,11 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 CampusCare Server running on port ${PORT}`);
-  console.log(`🌐 Base URL: http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 CampusCare Server running on port ${PORT}`);
+    console.log(`🌐 Base URL: http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
