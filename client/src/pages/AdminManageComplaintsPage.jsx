@@ -1,64 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Search,
-  Filter,
-  Eye,
   Edit,
-  Tag,
   MapPin,
-  Calendar,
-  X,
-  MessageSquare,
   AlertCircle,
-  CheckCircle,
   RefreshCw,
-  FolderOpen,
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ComplaintDrawer from '../components/ComplaintDrawer';
 import api from '../services/api';
 
 const categories = [
   'All',
-  'Classroom',
-  'Laboratory',
-  'Internet/Wi-Fi',
-  'Washroom',
   'Electricity',
+  'Internet/Wi-Fi',
   'Water Supply',
+  'Washroom',
+  'Laboratory',
+  'Classroom',
   'Other',
 ];
 
-const statuses = ['All', 'Pending', 'In Progress', 'Resolved', 'Rejected'];
-
-const studentAvatars = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80',
-];
+const statusTabs = ['All', 'Pending', 'In Progress', 'Resolved', 'Rejected'];
 
 const AdminManageComplaintsPage = () => {
+  const [searchParams] = useSearchParams();
+  const initialStatus = searchParams.get('status') || 'All';
+  const initialPriority = searchParams.get('priority') || 'All';
+
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState(initialStatus);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [viewComplaint, setViewComplaint] = useState(null);
-  const [editComplaint, setEditComplaint] = useState(null);
-  const [formData, setFormData] = useState({
-    status: '',
-    adminResponse: '',
-  });
-  const [updating, setUpdating] = useState(false);
-  const [notification, setNotification] = useState({ type: '', text: '' });
-
-  useEffect(() => {
-    fetchComplaints();
-  }, [categoryFilter, statusFilter]);
-
-  const fetchComplaints = async () => {
+  const fetchComplaints = useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
@@ -75,11 +54,20 @@ const AdminManageComplaintsPage = () => {
     } finally {
       setLoading(false);
     }
+  }, [categoryFilter, statusFilter, search]);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [fetchComplaints]);
+
+  const handleOpenDrawer = (complaint) => {
+    setSelectedComplaint(complaint);
+    setDrawerOpen(true);
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
+  const handleComplaintUpdated = (updated) => {
     fetchComplaints();
+    setSelectedComplaint(updated);
   };
 
   const getStatusBadge = (status) => {
@@ -97,65 +85,62 @@ const AdminManageComplaintsPage = () => {
     }
   };
 
-  const openEditModal = (complaint) => {
-    setEditComplaint(complaint);
-    setFormData({
-      status: complaint.status,
-      adminResponse: complaint.adminResponse || '',
-    });
-  };
-
-  const handleStatusSubmit = async (e) => {
-    e.preventDefault();
-    if (!editComplaint) return;
-
-    try {
-      setUpdating(true);
-      const res = await api.put(`/admin/complaints/${editComplaint._id}/status`, {
-        status: formData.status,
-        adminResponse: formData.adminResponse,
-      });
-
-      if (res.data?.success) {
-        setNotification({
-          type: 'success',
-          text: `Ticket #${editComplaint._id.slice(-6)} successfully updated to "${formData.status}".`,
-        });
-        setEditComplaint(null);
-        fetchComplaints();
-        setTimeout(() => setNotification({ type: '', text: '' }), 4000);
-      }
-    } catch (err) {
-      setNotification({
-        type: 'error',
-        text: err.response?.data?.message || 'Failed to update complaint status',
-      });
-    } finally {
-      setUpdating(false);
-    }
-  };
-
   return (
     <DashboardLayout
-      title="Manage Grievance Tickets 🗂️"
-      subtitle="Complete maintenance dispatch and real-time status publication"
+      title="Facility Grievances Dispatch"
+      subtitle="Administrative triage desk, technician assignment & resolution validation"
     >
-      {notification.text && (
-        <div className={`alert ${notification.type === 'success' ? 'alert-success' : 'alert-error'}`}>
-          {notification.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
-          <span>{notification.text}</span>
+      {/* Filter and Search Bar */}
+      <div className="dashboard-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        {/* Status Tab Pills */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+          {statusTabs.map((tab) => {
+            const count = tab === 'All' ? complaints.length : complaints.filter((c) => c.status === tab).length;
+            const isSelected = statusFilter === tab;
+            return (
+              <button
+                key={tab}
+                onClick={() => setStatusFilter(tab)}
+                style={{
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: 999,
+                  border: isSelected ? '1px solid #059669' : '1px solid #e5e7eb',
+                  background: isSelected ? '#ecfdf5' : '#ffffff',
+                  color: isSelected ? '#064e3b' : '#6b7280',
+                  fontSize: '0.8rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>{tab}</span>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    background: isSelected ? '#059669' : '#f3f4f6',
+                    color: isSelected ? '#ffffff' : '#6b7280',
+                    padding: '0.1rem 0.4rem',
+                    borderRadius: 999,
+                  }}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
-      )}
 
-      {/* Filter and Search Panel */}
-      <div className="card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
-        <form onSubmit={handleSearchSubmit} className="filters-bar">
-          <div className="search-box">
+        <div className="filters-bar" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="search-box" style={{ flex: 1, minWidth: 260 }}>
             <Search size={18} className="search-icon" />
             <input
               type="text"
               className="form-control search-input"
-              placeholder="Search by student name, ID, title, or building..."
+              placeholder="Search by ticket ID, student, keyword, or room..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -169,143 +154,129 @@ const AdminManageComplaintsPage = () => {
               style={{ width: 'auto', minWidth: '150px' }}
             >
               {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c === 'All' ? 'All Categories' : c}
-                </option>
+                <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
               ))}
             </select>
-
-            <select
-              className="form-select"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              style={{ width: 'auto', minWidth: '140px' }}
-            >
-              {statuses.map((s) => (
-                <option key={s} value={s}>
-                  {s === 'All' ? 'All Statuses' : s}
-                </option>
-              ))}
-            </select>
-
-            <button type="submit" className="btn btn-primary">
-              Filter
-            </button>
 
             <button
-              type="button"
-              onClick={() => {
-                setSearch('');
-                setCategoryFilter('All');
-                setStatusFilter('All');
-                fetchComplaints();
-              }}
+              onClick={fetchComplaints}
               className="btn btn-outline"
-              title="Reset Filters"
+              title="Refresh logs"
+              style={{ padding: '0.55rem' }}
             >
               <RefreshCw size={16} />
             </button>
           </div>
-        </form>
+        </div>
       </div>
 
       {/* Complaints Table */}
-      <div className="table-container">
-        <div className="table-header-strip">
-          <div>
-            <h3 className="table-title">All Campus Grievances</h3>
-            <p className="table-subtitle">Showing {complaints.length} filtered ticket records</p>
-          </div>
-        </div>
-
+      <div className="dashboard-card">
         {loading ? (
-          <div className="empty-state">
-            <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-            <p>Fetching records from MongoDB Atlas...</p>
+          <div style={{ padding: '3.5rem', textAlign: 'center', color: '#6b7280' }}>
+            Filtering grievances...
           </div>
         ) : complaints.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon-box">
-              <FolderOpen size={32} />
-            </div>
-            <h4 className="empty-title">No matching complaints</h4>
-            <p className="empty-subtitle">Try adjusting your category, status, or search keywords.</p>
+          <div style={{ padding: '3.5rem 1.5rem', textAlign: 'center' }}>
+            <AlertCircle size={44} color="#059669" style={{ margin: '0 auto 0.75rem' }} />
+            <h4 style={{ fontSize: '1.1rem', color: '#111827', marginBottom: '0.35rem' }}>
+              No grievances found
+            </h4>
+            <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
+              No tickets matched the current filter criteria.
+            </p>
+            <button
+              className="btn btn-outline"
+              onClick={() => {
+                setSearch('');
+                setCategoryFilter('All');
+                setStatusFilter('All');
+              }}
+            >
+              Reset Filters
+            </button>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="modern-table">
+          <div className="table-responsive">
+            <table className="data-table">
               <thead>
                 <tr>
-                  <th>Student</th>
+                  <th>Ticket</th>
+                  <th>Student Info</th>
                   <th>Title & Description</th>
                   <th>Category</th>
                   <th>Location</th>
-                  <th>Lodged Date</th>
+                  <th>Submitted</th>
                   <th>Status</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th style={{ textAlign: 'right' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {complaints.map((item, idx) => (
-                  <tr key={item._id}>
+                {complaints.map((c) => (
+                  <tr
+                    key={c._id}
+                    onClick={() => handleOpenDrawer(c)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <img
-                          src={studentAvatars[idx % studentAvatars.length]}
-                          alt="Student Avatar"
-                          style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
-                        />
-                        <div>
-                          <div className="table-title">{item.studentId?.name || 'Unknown Student'}</div>
-                          <div className="table-subtitle">
-                            ID: {item.studentId?.studentId || 'N/A'} • {item.studentId?.email}
-                          </div>
-                        </div>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                        #{c.ticketId || c._id.slice(-6).toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: '#111827' }}>
+                        {c.student?.name || 'Student'}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        {c.student?.studentId || c.student?.email}
+                      </div>
+                    </td>
+                    <td style={{ maxWidth: 280 }}>
+                      <div style={{ fontWeight: 600, color: '#111827' }}>{c.title}</div>
+                      <div
+                        style={{
+                          fontSize: '0.775rem',
+                          color: '#6b7280',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {c.description}
                       </div>
                     </td>
                     <td>
-                      <div className="table-title">{item.title}</div>
-                      <div className="table-subtitle" style={{ maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.description}
+                      <span style={{ fontSize: '0.8rem', fontWeight: 550, color: '#374151' }}>
+                        {c.category}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4b5563' }}>
+                        <MapPin size={13} color="#059669" />
+                        <span>{c.location}</span>
                       </div>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
-                        <Tag size={14} color="#64748b" />
-                        {item.category}
+                      <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                        {new Date(c.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
                       </span>
                     </td>
-                    <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
-                        <MapPin size={14} color="#64748b" />
-                        {item.location}
-                      </span>
-                    </td>
-                    <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: '#64748b' }}>
-                        <Calendar size={14} />
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td>{getStatusBadge(item.status)}</td>
+                    <td>{getStatusBadge(c.status)}</td>
                     <td style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'inline-flex', gap: '0.4rem' }}>
-                        <button
-                          onClick={() => setViewComplaint(item)}
-                          className="btn btn-outline btn-sm"
-                          title="View Full Inspection"
-                        >
-                          <Eye size={14} />
-                        </button>
-                        <button
-                          onClick={() => openEditModal(item)}
-                          className="btn btn-primary btn-sm"
-                          title="Change Status & Add Remarks"
-                        >
-                          <Edit size={14} />
-                          <span>Status</span>
-                        </button>
-                      </div>
+                      <button
+                        className="btn btn-outline"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDrawer(c);
+                        }}
+                      >
+                        <Edit size={14} />
+                        <span>Manage</span>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -315,200 +286,13 @@ const AdminManageComplaintsPage = () => {
         )}
       </div>
 
-      {/* View Detail Modal */}
-      {viewComplaint && (
-        <div className="modal-backdrop" onClick={() => setViewComplaint(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">Grievance Investigation Details</h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => setViewComplaint(null)}
-                aria-label="Close"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-                <h4 style={{ fontSize: '1.2rem', fontWeight: 700 }}>{viewComplaint.title}</h4>
-                {getStatusBadge(viewComplaint.status)}
-              </div>
-
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <span className="detail-label">Student Name</span>
-                  <span className="detail-value">{viewComplaint.studentId?.name}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Student ID</span>
-                  <span className="detail-value">{viewComplaint.studentId?.studentId}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Student Email</span>
-                  <span className="detail-value">{viewComplaint.studentId?.email}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Location / Room</span>
-                  <span className="detail-value">{viewComplaint.location}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Category</span>
-                  <span className="detail-value">{viewComplaint.category}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Created At</span>
-                  <span className="detail-value">{new Date(viewComplaint.createdAt).toLocaleString()}</span>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '1rem' }}>
-                <span className="detail-label">Student's Description</span>
-                <div className="detail-desc-box">{viewComplaint.description}</div>
-              </div>
-
-              {viewComplaint.image && (
-                <div className="detail-image-box">
-                  <span className="detail-label" style={{ display: 'block', marginBottom: '0.35rem' }}>
-                    Attached Photo Evidence
-                  </span>
-                  <img
-                    src={`http://localhost:5000${viewComplaint.image}`}
-                    alt="Complaint photo"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
-
-              {viewComplaint.adminResponse ? (
-                <div className="admin-response-box">
-                  <div className="admin-response-title">
-                    <MessageSquare size={16} />
-                    <span>Current Admin Response</span>
-                  </div>
-                  <p style={{ fontSize: '0.925rem', color: '#047857' }}>
-                    {viewComplaint.adminResponse}
-                  </p>
-                </div>
-              ) : (
-                <div className="alert alert-info" style={{ marginTop: '1rem', marginBottom: 0 }}>
-                  <AlertCircle size={16} />
-                  <span>No administrative response has been logged yet for this ticket.</span>
-                </div>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setViewComplaint(null)}
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => {
-                  const toEdit = viewComplaint;
-                  setViewComplaint(null);
-                  openEditModal(toEdit);
-                }}
-              >
-                <Edit size={16} />
-                <span>Update Status</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Status & Remarks Modal */}
-      {editComplaint && (
-        <div className="modal-backdrop" onClick={() => setEditComplaint(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">Change Ticket Status</h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => setEditComplaint(null)}
-                aria-label="Close"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleStatusSubmit}>
-              <div className="modal-body">
-                <div style={{ marginBottom: '1.25rem' }}>
-                  <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.25rem' }}>
-                    {editComplaint.title}
-                  </h4>
-                  <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                    Student: {editComplaint.studentId?.name} ({editComplaint.studentId?.studentId})
-                  </p>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label" htmlFor="edit-status">
-                    Complaint Status <span className="required">*</span>
-                  </label>
-                  <select
-                    id="edit-status"
-                    className="form-select"
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    required
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Resolved">Resolved</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" htmlFor="edit-response">
-                    Official Admin Response / Action Taken
-                  </label>
-                  <textarea
-                    id="edit-response"
-                    className="form-textarea"
-                    placeholder="Enter notes on work performed, technicians assigned, or explanation of rejection..."
-                    value={formData.adminResponse}
-                    onChange={(e) => setFormData({ ...formData, adminResponse: e.target.value })}
-                    rows={4}
-                  />
-                  <span className="form-hint">
-                    This message is immediately updated in MongoDB Atlas and displayed on the student's dashboard.
-                  </span>
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => setEditComplaint(null)}
-                  disabled={updating}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={updating}
-                >
-                  {updating ? 'Saving...' : 'Save & Publish Update'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Slide-over Inspection & Update Drawer */}
+      <ComplaintDrawer
+        complaint={selectedComplaint}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onComplaintUpdated={handleComplaintUpdated}
+      />
     </DashboardLayout>
   );
 };

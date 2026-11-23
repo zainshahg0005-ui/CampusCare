@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users,
@@ -12,20 +12,12 @@ import {
   Edit,
   Tag,
   MapPin,
-  Calendar,
-  X,
-  MessageSquare,
-  BarChart3,
   RefreshCw,
-  Sparkles,
-  Shield,
-  Layers,
   ArrowUp,
-  ArrowDown,
   TrendingUp,
-  PieChart,
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ComplaintDrawer from '../components/ComplaintDrawer';
 import api from '../services/api';
 
 const AdminDashboard = () => {
@@ -41,19 +33,9 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [statusModalOpen, setStatusModalOpen] = useState(false);
-  const [statusUpdate, setStatusUpdate] = useState({
-    status: '',
-    adminResponse: '',
-  });
-  const [updating, setUpdating] = useState(false);
-  const [feedback, setFeedback] = useState({ type: '', text: '' });
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => {
-    fetchDashboardMetrics();
-  }, []);
-
-  const fetchDashboardMetrics = async () => {
+  const fetchDashboardMetrics = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/admin/dashboard');
@@ -65,6 +47,20 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardMetrics();
+  }, [fetchDashboardMetrics]);
+
+  const handleOpenDrawer = (complaint) => {
+    setSelectedComplaint(complaint);
+    setDrawerOpen(true);
+  };
+
+  const handleComplaintUpdated = (updated) => {
+    fetchDashboardMetrics();
+    setSelectedComplaint(updated);
   };
 
   const getStatusBadge = (status) => {
@@ -82,67 +78,18 @@ const AdminDashboard = () => {
     }
   };
 
-  const openStatusModal = (complaint) => {
-    setSelectedComplaint(complaint);
-    setStatusUpdate({
-      status: complaint.status,
-      adminResponse: complaint.adminResponse || '',
-    });
-    setStatusModalOpen(true);
-  };
-
-  const handleUpdateStatus = async (e) => {
-    e.preventDefault();
-    if (!selectedComplaint) return;
-
-    try {
-      setUpdating(true);
-      const res = await api.put(`/admin/complaints/${selectedComplaint._id}/status`, {
-        status: statusUpdate.status,
-        adminResponse: statusUpdate.adminResponse,
-      });
-
-      if (res.data?.success) {
-        setFeedback({
-          type: 'success',
-          text: `Complaint #${selectedComplaint._id.slice(-6)} updated successfully!`,
-        });
-        setStatusModalOpen(false);
-        fetchDashboardMetrics();
-        setTimeout(() => setFeedback({ type: '', text: '' }), 4000);
-      }
-    } catch (err) {
-      setFeedback({
-        type: 'error',
-        text: err.response?.data?.message || 'Failed to update complaint status',
-      });
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const studentAvatars = [
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80',
-  ];
+  // Resolution velocity calculation
+  const resolvedRate = dashboardData.totalComplaints > 0
+    ? Math.round((dashboardData.resolvedComplaints / dashboardData.totalComplaints) * 100)
+    : 100;
 
   return (
     <DashboardLayout
-      title="Executive Overview 📊"
-      subtitle="Real-time campus grievance metrics, resolution velocity, and operations overview"
+      title="Executive Cockpit"
+      subtitle="Real-time campus maintenance telemetry, resolution velocity & SLA audits"
     >
-      {feedback.text && (
-        <div className={`alert ${feedback.type === 'success' ? 'alert-success' : 'alert-error'}`}>
-          {feedback.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
-          <span>{feedback.text}</span>
-        </div>
-      )}
-
-      {/* 5 Figma Sales KPI Cards */}
-      <div className="metric-grid">
+      {/* 5 KPI Metric Cards */}
+      <div className="admin-metric-grid" style={{ marginBottom: '2rem' }}>
         <div className="metric-card">
           <div className="metric-card-top">
             <span className="metric-label">Enrolled Students</span>
@@ -153,8 +100,8 @@ const AdminDashboard = () => {
           <div className="metric-value-row">
             <span className="metric-value">{dashboardData.totalStudents}</span>
             <span className="trend-pill trend-up">
-              <ArrowUp size={12} />
-              <span>+8.4%</span>
+              <TrendingUp size={12} />
+              <span>Active</span>
             </span>
           </div>
         </div>
@@ -162,7 +109,7 @@ const AdminDashboard = () => {
         <div className="metric-card">
           <div className="metric-card-top">
             <span className="metric-label">Total Grievances</span>
-            <div className="metric-icon-box metric-emerald">
+            <div className="metric-icon-box metric-dark">
               <FileText size={22} />
             </div>
           </div>
@@ -170,21 +117,23 @@ const AdminDashboard = () => {
             <span className="metric-value">{dashboardData.totalComplaints}</span>
             <span className="trend-pill trend-up">
               <ArrowUp size={12} />
-              <span>Campus total</span>
+              <span>Campus wide</span>
             </span>
           </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-card-top">
-            <span className="metric-label">Pending Review</span>
+            <span className="metric-label">Pending Triage</span>
             <div className="metric-icon-box metric-amber">
               <Clock size={22} />
             </div>
           </div>
           <div className="metric-value-row">
             <span className="metric-value">{dashboardData.pendingComplaints}</span>
-            <span className="badge badge-pending">Action Queue</span>
+            <span className="trend-pill" style={{ background: '#fffbeb', color: '#b45309', borderColor: '#fde68a' }}>
+              <span>Needs Triage</span>
+            </span>
           </div>
         </div>
 
@@ -197,256 +146,192 @@ const AdminDashboard = () => {
           </div>
           <div className="metric-value-row">
             <span className="metric-value">{dashboardData.inProgressComplaints}</span>
-            <span className="badge badge-in-progress">Dispatched</span>
+            <span className="trend-pill" style={{ background: '#faf5ff', color: '#6b21a8', borderColor: '#e9d5ff' }}>
+              <span>Dispatched</span>
+            </span>
           </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-card-top">
-            <span className="metric-label">Resolved</span>
-            <div className="metric-icon-box metric-emerald">
+            <span className="metric-label">Resolved Rate</span>
+            <div className="metric-icon-box metric-green">
               <CheckCircle size={22} />
             </div>
           </div>
           <div className="metric-value-row">
-            <span className="metric-value">{dashboardData.resolvedComplaints}</span>
+            <span className="metric-value">{resolvedRate}%</span>
             <span className="trend-pill trend-up">
-              <ArrowUp size={12} />
-              <span>Completed</span>
+              <CheckCircle size={12} />
+              <span>{dashboardData.resolvedComplaints} Closed</span>
             </span>
           </div>
         </div>
       </div>
 
-      {/* Analytics Chart Row (Figma Sales Dashboard Style) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '1.5rem', marginBottom: '2rem' }}>
-        {/* Weekly Activity Bar Chart Widget */}
-        <div className="card">
+      {/* Analytics Charts & Telemetry Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+        {/* Weekly Velocity Chart */}
+        <div className="dashboard-card" style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>Weekly Resolution Velocity</h3>
-              <p style={{ fontSize: '0.825rem', color: '#6b7280' }}>Daily resolved vs logged tickets over past 7 days</p>
+              <h3 style={{ fontSize: '1.05rem', color: '#111827', margin: 0 }}>
+                Weekly Dispatch & Resolution Velocity
+              </h3>
+              <p style={{ fontSize: '0.775rem', color: '#6b7280', margin: '2px 0 0' }}>
+                Operational capacity over the last 7 calendar days
+              </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.8rem' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ width: 10, height: 10, borderRadius: 2, background: '#059669' }}></span>
-                Resolved
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ width: 10, height: 10, borderRadius: 2, background: '#e5e7eb' }}></span>
-                Logged
-              </span>
-            </div>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', background: '#ecfdf5', padding: '0.2rem 0.6rem', borderRadius: 6 }}>
+              On-Target (Avg 2.8 hrs)
+            </span>
           </div>
 
-          {/* Clean Rounded Bar Chart */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '170px', padding: '0 0.5rem 1rem', borderBottom: '1px solid #f3f4f6' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: 160, paddingBottom: '1rem', borderBottom: '1px solid #e5e7eb' }}>
             {[
-              { day: 'Mon', resolved: 65, total: 80 },
-              { day: 'Tue', resolved: 85, total: 100 },
-              { day: 'Wed', resolved: 90, total: 95 },
-              { day: 'Thu', resolved: 70, total: 85 },
-              { day: 'Fri', resolved: 95, total: 110 },
-              { day: 'Sat', resolved: 40, total: 45 },
-              { day: 'Sun', resolved: 25, total: 30 },
-            ].map((col) => (
-              <div key={col.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
-                <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end', height: '130px' }}>
-                  <div
-                    style={{
-                      width: '16px',
-                      height: `${col.resolved}%`,
-                      background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
-                      borderRadius: '4px 4px 0 0',
-                      transition: 'height 0.4s ease',
-                    }}
-                    title={`${col.day} Resolved: ${col.resolved}%`}
-                  />
-                  <div
-                    style={{
-                      width: '16px',
-                      height: `${col.total}%`,
-                      background: '#e5e7eb',
-                      borderRadius: '4px 4px 0 0',
-                    }}
-                    title={`${col.day} Total: ${col.total}%`}
-                  />
-                </div>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6b7280' }}>{col.day}</span>
+              { day: 'Mon', count: 12, height: '65%' },
+              { day: 'Tue', count: 18, height: '90%' },
+              { day: 'Wed', count: 14, height: '70%' },
+              { day: 'Thu', count: 9, height: '45%' },
+              { day: 'Fri', count: 16, height: '80%' },
+              { day: 'Sat', count: 7, height: '35%' },
+              { day: 'Sun', count: 5, height: '25%' },
+            ].map((bar) => (
+              <div key={bar.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: 1 }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#6b7280' }}>{bar.count}</div>
+                <div
+                  style={{
+                    width: '55%',
+                    maxWidth: 36,
+                    height: bar.height,
+                    background: 'linear-gradient(180deg, #10b981 0%, #064e3b 100%)',
+                    borderRadius: '6px 6px 0 0',
+                    transition: 'all 0.3s ease',
+                  }}
+                />
+                <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: 600 }}>{bar.day}</span>
               </div>
             ))}
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', fontSize: '0.85rem' }}>
-            <span style={{ color: '#6b7280' }}>Average Resolution SLA</span>
-            <strong style={{ color: '#059669', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <ArrowUp size={14} /> 94.6% Within 24 Hours
-            </strong>
-          </div>
         </div>
 
-        {/* Resolution Efficiency Gauge & Breakdown */}
-        <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-            <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>Resolution Efficiency</h3>
-              <p style={{ fontSize: '0.825rem', color: '#6b7280' }}>Status distribution ratio</p>
-            </div>
-            <PieChart size={20} color="#059669" />
-          </div>
-
-          {/* Circular Donut Gauge Representation */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem 0' }}>
-            <div style={{ position: 'relative', width: 140, height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="140" height="140" viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3.5"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#10b981"
-                  strokeWidth="3.5"
-                  strokeDasharray="88, 100"
-                />
-              </svg>
-              <div style={{ position: 'absolute', textAlign: 'center' }}>
-                <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#111827', display: 'block', lineHeight: 1 }}>
-                  88%
-                </span>
-                <span style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 600 }}>Resolved</span>
+        {/* Category Breakdown */}
+        <div className="dashboard-card" style={{ padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '1.05rem', color: '#111827', margin: '0 0 1.25rem' }}>
+            Volume by Infrastructure
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            {[
+              { label: 'Electricity & Power', pct: 38, count: 19, color: '#059669' },
+              { label: 'Network & Wi-Fi', pct: 28, count: 14, color: '#10b981' },
+              { label: 'Plumbing & Water', pct: 18, count: 9, color: '#34d399' },
+              { label: 'Classroom & Labs', pct: 16, count: 8, color: '#6ee7b7' },
+            ].map((item) => (
+              <div key={item.label}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: 4 }}>
+                  <span style={{ fontWeight: 600, color: '#374151' }}>{item.label}</span>
+                  <span style={{ color: '#6b7280' }}>{item.count} tickets ({item.pct}%)</span>
+                </div>
+                <div style={{ height: 6, background: '#f3f4f6', borderRadius: 999, overflow: 'hidden' }}>
+                  <div style={{ width: `${item.pct}%`, height: '100%', background: item.color, borderRadius: 999 }} />
+                </div>
               </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#065f46', fontWeight: 600 }}>
-                <span className="badge-dot" style={{ backgroundColor: '#10b981' }}></span>
-                Resolved ({dashboardData.resolvedComplaints})
-              </span>
-              <span style={{ fontWeight: 700 }}>
-                {dashboardData.totalComplaints > 0
-                  ? Math.round((dashboardData.resolvedComplaints / dashboardData.totalComplaints) * 100)
-                  : 0}%
-              </span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#6b21a8', fontWeight: 600 }}>
-                <span className="badge-dot" style={{ backgroundColor: '#9333ea' }}></span>
-                In Progress ({dashboardData.inProgressComplaints})
-              </span>
-              <span style={{ fontWeight: 700 }}>
-                {dashboardData.totalComplaints > 0
-                  ? Math.round((dashboardData.inProgressComplaints / dashboardData.totalComplaints) * 100)
-                  : 0}%
-              </span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#92400e', fontWeight: 600 }}>
-                <span className="badge-dot" style={{ backgroundColor: '#f59e0b' }}></span>
-                Pending Review ({dashboardData.pendingComplaints})
-              </span>
-              <span style={{ fontWeight: 700 }}>
-                {dashboardData.totalComplaints > 0
-                  ? Math.round((dashboardData.pendingComplaints / dashboardData.totalComplaints) * 100)
-                  : 0}%
-              </span>
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Recent Submissions Table with Student Photo Avatars */}
-      <div className="table-container">
-        <div className="table-header-strip">
+      {/* Recent Grievances Feed */}
+      <div className="dashboard-card">
+        <div className="table-header">
           <div>
-            <h3 className="table-title">Recent Student Submissions</h3>
-            <p className="table-subtitle">Review incoming grievance tickets, assign technicians, and publish status updates</p>
+            <h3 style={{ fontSize: '1.15rem', color: '#111827', margin: 0 }}>
+              Live Grievance Dispatch Feed
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '2px 0 0' }}>
+              Click any ticket to inspect evidence and update resolution status
+            </p>
           </div>
-          <div style={{ display: 'flex', gap: '0.65rem' }}>
-            <button onClick={fetchDashboardMetrics} className="btn btn-outline btn-sm" title="Refresh">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button onClick={fetchDashboardMetrics} className="btn btn-outline" style={{ padding: '0.45rem 0.75rem' }} title="Refresh metrics">
               <RefreshCw size={15} />
             </button>
-            <Link to="/admin/complaints" className="btn btn-primary btn-sm">
-              <FolderOpen size={15} />
-              <span>Manage All</span>
+            <Link to="/admin/complaints" className="btn btn-primary" style={{ fontSize: '0.8rem' }}>
+              <FolderOpen size={16} />
+              <span>Manage All ({dashboardData.totalComplaints})</span>
             </Link>
           </div>
         </div>
 
         {loading ? (
-          <div className="empty-state">
-            <div className="spinner" style={{ margin: '0 auto 1.25rem' }}></div>
-            <p>Loading records from MongoDB Atlas...</p>
+          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
+            Refreshing telemetry...
           </div>
         ) : dashboardData.recentComplaints.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon-box">
-              <CheckCircle size={34} />
-            </div>
-            <h4 className="empty-title">All clean! No complaints found</h4>
-            <p className="empty-subtitle">When students log issues, they will appear right here.</p>
+          <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: '#6b7280' }}>
+            No complaints logged on campus yet.
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="modern-table">
+          <div className="table-responsive">
+            <table className="data-table">
               <thead>
                 <tr>
+                  <th>Ticket</th>
                   <th>Student Info</th>
-                  <th>Complaint</th>
-                  <th>Category</th>
+                  <th>Title & Category</th>
                   <th>Location</th>
+                  <th>Date</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {dashboardData.recentComplaints.map((item, idx) => (
-                  <tr key={item._id}>
+                {dashboardData.recentComplaints.map((c) => (
+                  <tr
+                    key={c._id}
+                    onClick={() => handleOpenDrawer(c)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <img
-                          src={studentAvatars[idx % studentAvatars.length]}
-                          alt="Student Avatar"
-                          style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
-                        />
-                        <div>
-                          <div className="table-title">{item.studentId?.name || 'Unknown Student'}</div>
-                          <div className="table-subtitle">{item.studentId?.studentId || item.studentId?.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="table-title">{item.title}</div>
-                      <div className="table-subtitle" style={{ maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.description}
-                      </div>
-                    </td>
-                    <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 600 }}>
-                        <Tag size={14} color="#64748b" />
-                        {item.category}
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                        #{c.ticketId || c._id.slice(-6).toUpperCase()}
                       </span>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                        <MapPin size={14} color="#64748b" />
-                        {item.location}
+                      <div style={{ fontWeight: 600, color: '#111827' }}>
+                        {c.student?.name || 'Student'}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        {c.student?.studentId || c.student?.email}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: '#111827' }}>{c.title}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{c.category}</div>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4b5563' }}>
+                        <MapPin size={13} color="#059669" />
+                        <span>{c.location}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                        {new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </span>
                     </td>
-                    <td>{getStatusBadge(item.status)}</td>
+                    <td>{getStatusBadge(c.status)}</td>
                     <td style={{ textAlign: 'right' }}>
                       <button
-                        onClick={() => openStatusModal(item)}
-                        className="btn btn-primary btn-sm"
-                        title="Update status & remarks"
+                        className="btn btn-outline"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDrawer(c);
+                        }}
                       >
                         <Edit size={14} />
-                        <span>Action</span>
+                        <span>Inspect & Update</span>
                       </button>
                     </td>
                   </tr>
@@ -457,122 +342,13 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      {/* Admin Status & Remarks Modal */}
-      {statusModalOpen && selectedComplaint && (
-        <div className="modal-backdrop" onClick={() => setStatusModalOpen(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">Take Action on Complaint</h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => setStatusModalOpen(false)}
-                aria-label="Close"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleUpdateStatus}>
-              <div className="modal-body">
-                <div style={{ marginBottom: '1.35rem' }}>
-                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.35rem' }}>
-                    {selectedComplaint.title}
-                  </h4>
-                  <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                    Submitted by: {selectedComplaint.studentId?.name} ({selectedComplaint.studentId?.studentId})
-                  </p>
-                </div>
-
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <span className="detail-label">Category</span>
-                    <span className="detail-value">{selectedComplaint.category}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Location</span>
-                    <span className="detail-value">{selectedComplaint.location}</span>
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: '1.35rem' }}>
-                  <span className="detail-label">Student's Description</span>
-                  <div className="detail-desc-box">{selectedComplaint.description}</div>
-                </div>
-
-                {selectedComplaint.image && (
-                  <div className="detail-image-box">
-                    <span className="detail-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
-                      Attached Photo Evidence
-                    </span>
-                    <img
-                      src={`http://localhost:5000${selectedComplaint.image}`}
-                      alt="Complaint attachment"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-
-                <div className="form-group">
-                  <label className="form-label" htmlFor="status">
-                    Change Status <span className="required">*</span>
-                  </label>
-                  <select
-                    id="status"
-                    className="form-select"
-                    value={statusUpdate.status}
-                    onChange={(e) => setStatusUpdate({ ...statusUpdate, status: e.target.value })}
-                    required
-                  >
-                    <option value="Pending">Pending (Under Initial Review)</option>
-                    <option value="In Progress">In Progress (Maintenance Team Dispatched)</option>
-                    <option value="Resolved">Resolved (Work Completed)</option>
-                    <option value="Rejected">Rejected (Invalid or Duplicate Request)</option>
-                  </select>
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" htmlFor="adminResponse">
-                    Official Admin Remarks / Solution Details
-                  </label>
-                  <textarea
-                    id="adminResponse"
-                    className="form-textarea"
-                    placeholder="e.g. Electrician team repaired wiring in Room 301. Fan capacitor replaced."
-                    value={statusUpdate.adminResponse}
-                    onChange={(e) =>
-                      setStatusUpdate({ ...statusUpdate, adminResponse: e.target.value })
-                    }
-                    rows={4}
-                  />
-                  <span className="form-hint">
-                    This note will be visible to the student on their portal.
-                  </span>
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => setStatusModalOpen(false)}
-                  disabled={updating}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={updating}
-                >
-                  {updating ? 'Saving...' : 'Update Status & Notify Student'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Slide-over Inspection & Update Drawer */}
+      <ComplaintDrawer
+        complaint={selectedComplaint}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onComplaintUpdated={handleComplaintUpdated}
+      />
     </DashboardLayout>
   );
 };

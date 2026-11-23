@@ -1,6 +1,8 @@
 import React from 'react';
-import { ShieldCheck, Mail, Phone, MapPin, Heart } from 'lucide-react';
+import { ShieldCheck, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const currentYear = 2026;
 
 const PublicFooter = () => {
   return (
@@ -20,7 +22,7 @@ const PublicFooter = () => {
             safer, and better learning environment.
           </p>
           <div className="footer-copy">
-            © {new Date().getFullYear()} CampusCare Inc. All rights reserved.
+            © {currentYear} CampusCare Inc. All rights reserved.
           </div>
         </div>
 

@@ -1,26 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FilePlus2,
   Clock,
   CheckCircle,
   Hourglass,
-  XCircle,
   FileText,
   Eye,
   Calendar,
   MapPin,
   Tag,
   AlertCircle,
-  X,
-  MessageSquare,
   Sparkles,
   ArrowUpRight,
-  TrendingUp,
   ArrowUp,
-  Layers,
+  Search,
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ComplaintDrawer from '../components/ComplaintDrawer';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -36,24 +33,31 @@ const StudentDashboard = () => {
   const [recentComplaints, setRecentComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchFilter, setSearchFilter] = useState('');
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/complaints/my');
       if (res.data?.success) {
         setStats(res.data.stats);
-        setRecentComplaints(res.data.complaints.slice(0, 5));
+        setRecentComplaints(res.data.complaints.slice(0, 8));
       }
     } catch (err) {
       console.error('Failed to load student dashboard data:', err);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  const handleOpenDrawer = (complaint) => {
+    setSelectedComplaint(complaint);
+    setDrawerOpen(true);
   };
 
   const getStatusBadge = (status) => {
@@ -70,6 +74,15 @@ const StudentDashboard = () => {
         return <span className="badge">{status}</span>;
     }
   };
+
+  const filteredComplaints = searchFilter.trim()
+    ? recentComplaints.filter(
+        (c) =>
+          c.title?.toLowerCase().includes(searchFilter.toLowerCase()) ||
+          c.category?.toLowerCase().includes(searchFilter.toLowerCase()) ||
+          c.location?.toLowerCase().includes(searchFilter.toLowerCase())
+      )
+    : recentComplaints;
 
   return (
     <DashboardLayout
@@ -138,7 +151,7 @@ const StudentDashboard = () => {
         </Link>
       </div>
 
-      {/* Figma Sales KPI Style Metrics Grid */}
+      {/* KPI Style Metrics Grid */}
       <div className="metric-grid">
         <div className="metric-card">
           <div className="metric-card-top">
@@ -158,14 +171,16 @@ const StudentDashboard = () => {
 
         <div className="metric-card">
           <div className="metric-card-top">
-            <span className="metric-label">Pending Review</span>
+            <span className="metric-label">Pending Triage</span>
             <div className="metric-icon-box metric-amber">
               <Clock size={22} />
             </div>
           </div>
           <div className="metric-value-row">
             <span className="metric-value">{stats.pending}</span>
-            <span className="badge badge-pending">Queue</span>
+            <span className="trend-pill" style={{ background: '#fffbeb', color: '#b45309', borderColor: '#fde68a' }}>
+              <span>Under Review</span>
+            </span>
           </div>
         </div>
 
@@ -178,14 +193,16 @@ const StudentDashboard = () => {
           </div>
           <div className="metric-value-row">
             <span className="metric-value">{stats.inProgress}</span>
-            <span className="badge badge-in-progress">Active</span>
+            <span className="trend-pill" style={{ background: '#faf5ff', color: '#6b21a8', borderColor: '#e9d5ff' }}>
+              <span>Technician On-site</span>
+            </span>
           </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-card-top">
             <span className="metric-label">Resolved</span>
-            <div className="metric-icon-box metric-emerald">
+            <div className="metric-icon-box metric-green">
               <CheckCircle size={22} />
             </div>
           </div>
@@ -193,96 +210,110 @@ const StudentDashboard = () => {
             <span className="metric-value">{stats.resolved}</span>
             <span className="trend-pill trend-up">
               <ArrowUp size={12} />
-              <span>Completed</span>
+              <span>Closed</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Recent Complaints Table */}
-      <div className="table-container">
-        <div className="table-header-strip">
+      <div className="dashboard-card" style={{ marginTop: '2rem' }}>
+        <div className="table-header">
           <div>
-            <h3 className="table-title">Recent Submissions</h3>
-            <p className="table-subtitle">Your latest logged maintenance and facility requests</p>
+            <h3 style={{ fontSize: '1.15rem', color: '#111827', margin: 0 }}>
+              Recent Complaints
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '2px 0 0' }}>
+              Real-time feed of your reported campus grievances
+            </p>
           </div>
-          <Link to="/student/complaints" className="btn btn-outline btn-sm">
-            <span>View All ({stats.total})</span>
-            <ArrowUpRight size={15} />
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: '0.35rem 0.65rem' }}>
+              <Search size={15} color="#9ca3af" />
+              <input
+                type="text"
+                placeholder="Search complaints..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '0.8rem', marginLeft: 6 }}
+              />
+            </div>
+            <Link to="/student/complaints" className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '0.45rem 0.85rem' }}>
+              <span>View All</span>
+              <ArrowUpRight size={15} />
+            </Link>
+          </div>
         </div>
 
         {loading ? (
-          <div className="empty-state">
-            <div className="spinner" style={{ margin: '0 auto 1.25rem' }}></div>
-            <p>Loading records from MongoDB Atlas...</p>
+          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
+            Loading grievances...
           </div>
-        ) : recentComplaints.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon-box">
-              <FilePlus2 size={34} />
-            </div>
-            <h4 className="empty-title">No complaints submitted yet</h4>
-            <p className="empty-subtitle">
-              You haven't submitted any complaints yet. When you notice a facility issue, click below.
+        ) : filteredComplaints.length === 0 ? (
+          <div style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+            <AlertCircle size={40} color="#059669" style={{ margin: '0 auto 0.75rem' }} />
+            <h4 style={{ fontSize: '1.05rem', color: '#111827', marginBottom: '0.25rem' }}>
+              No complaints filed yet
+            </h4>
+            <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
+              Have an issue with hostel Wi-Fi, lab equipment, or classroom lighting?
             </p>
-            <Link to="/student/submit" className="btn btn-primary btn-sm">
+            <Link to="/student/submit" className="btn btn-primary">
               <FilePlus2 size={16} />
               <span>Submit First Complaint</span>
             </Link>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="modern-table">
+          <div className="table-responsive">
+            <table className="data-table">
               <thead>
                 <tr>
-                  <th>Title & Description</th>
-                  <th>Category</th>
+                  <th>Ticket</th>
+                  <th>Title & Category</th>
                   <th>Location</th>
-                  <th>Submitted Date</th>
+                  <th>Date</th>
                   <th>Status</th>
-                  <th style={{ textAlign: 'right' }}>Action</th>
+                  <th style={{ textAlign: 'right' }}>Inspection</th>
                 </tr>
               </thead>
               <tbody>
-                {recentComplaints.map((item) => (
-                  <tr key={item._id}>
+                {filteredComplaints.map((c) => (
+                  <tr
+                    key={c._id}
+                    onClick={() => handleOpenDrawer(c)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <td>
-                      <div className="table-title">{item.title}</div>
-                      <div className="table-subtitle" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.description}
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                        #{c.ticketId || c._id.slice(-6).toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: '#111827' }}>{c.title}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{c.category}</div>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4b5563' }}>
+                        <MapPin size={13} color="#059669" />
+                        <span>{c.location || 'Campus'}</span>
                       </div>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 600 }}>
-                        <Tag size={14} color="#64748b" />
-                        {item.category}
+                      <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                        {new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </span>
                     </td>
-                    <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                        <MapPin size={14} color="#64748b" />
-                        {item.location}
-                      </span>
-                    </td>
-                    <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: '#64748b' }}>
-                        <Calendar size={14} />
-                        {new Date(item.createdAt).toLocaleDateString(undefined, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </span>
-                    </td>
-                    <td>{getStatusBadge(item.status)}</td>
+                    <td>{getStatusBadge(c.status)}</td>
                     <td style={{ textAlign: 'right' }}>
                       <button
-                        onClick={() => setSelectedComplaint(item)}
-                        className="btn btn-outline btn-sm"
-                        title="View Full Details"
+                        className="btn btn-outline"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDrawer(c);
+                        }}
                       >
-                        <Eye size={15} />
+                        <Eye size={14} />
                         <span>Inspect</span>
                       </button>
                     </td>
@@ -294,100 +325,12 @@ const StudentDashboard = () => {
         )}
       </div>
 
-      {/* Complaint Detail Modal */}
-      {selectedComplaint && (
-        <div className="modal-backdrop" onClick={() => setSelectedComplaint(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">Complaint Inspection</h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => setSelectedComplaint(null)}
-                aria-label="Close modal"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.35rem' }}>
-                <h4 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{selectedComplaint.title}</h4>
-                {getStatusBadge(selectedComplaint.status)}
-              </div>
-
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <span className="detail-label">Category</span>
-                  <span className="detail-value">{selectedComplaint.category}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Location / Building</span>
-                  <span className="detail-value">{selectedComplaint.location}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Submitted On</span>
-                  <span className="detail-value">
-                    {new Date(selectedComplaint.createdAt).toLocaleString()}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Last Updated</span>
-                  <span className="detail-value">
-                    {new Date(selectedComplaint.updatedAt).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '0.65rem' }}>
-                <span className="detail-label">Problem Description</span>
-                <div className="detail-desc-box">{selectedComplaint.description}</div>
-              </div>
-
-              {selectedComplaint.image && (
-                <div className="detail-image-box">
-                  <span className="detail-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
-                    Attached Photo Evidence
-                  </span>
-                  <img
-                    src={`http://localhost:5000${selectedComplaint.image}`}
-                    alt="Complaint photo"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
-
-              {selectedComplaint.adminResponse ? (
-                <div className="admin-response-box">
-                  <div className="admin-response-title">
-                    <MessageSquare size={16} />
-                    <span>Official University Administrator Response</span>
-                  </div>
-                  <p style={{ fontSize: '0.925rem', color: '#047857', lineHeight: 1.6 }}>
-                    {selectedComplaint.adminResponse}
-                  </p>
-                </div>
-              ) : (
-                <div className="alert alert-info" style={{ marginTop: '1.15rem', marginBottom: 0 }}>
-                  <AlertCircle size={16} />
-                  <span>The administration has not attached written remarks yet. Check back soon!</span>
-                </div>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setSelectedComplaint(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Slide-over Inspection Drawer */}
+      <ComplaintDrawer
+        complaint={selectedComplaint}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
     </DashboardLayout>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Menu, X, User, LogOut } from 'lucide-react';
+import { ShieldCheck, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const PublicNavbar = () => {

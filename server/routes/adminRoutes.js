@@ -15,6 +15,7 @@ router.use(adminOnly);
 router.get('/dashboard', getAdminDashboard);
 router.get('/complaints', getAllComplaints);
 router.put('/complaints/:id/status', updateComplaintStatus);
+router.patch('/complaints/:id/status', updateComplaintStatus);
 router.get('/students', getStudentsList);
 
 module.exports = router;

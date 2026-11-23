@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   ShieldCheck,
@@ -11,18 +11,32 @@ import {
   X,
   Bell,
   Search,
-  HelpCircle,
   Shield,
   GraduationCap,
-  ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import CommandPalette from '../components/CommandPalette';
+import NotificationPopover from '../components/NotificationPopover';
 
 const DashboardLayout = ({ children, title, subtitle }) => {
   const { user, logout, isAdmin } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [cmdOpen, setCmdOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Global Ctrl+K / Cmd+K listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCmdOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -149,12 +163,43 @@ const DashboardLayout = ({ children, title, subtitle }) => {
             </div>
           </div>
 
-          <div className="topbar-right">
+          <div className="topbar-right" style={{ position: 'relative' }}>
+            {/* Quick Command Palette Button */}
+            <button
+              onClick={() => setCmdOpen(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                padding: '0.45rem 0.85rem',
+                borderRadius: 10,
+                cursor: 'pointer',
+                color: '#6b7280',
+                fontSize: '0.8rem',
+                transition: 'all 0.15s ease',
+              }}
+              className="topbar-cmd-trigger"
+              title="Search tickets or jump to pages (Ctrl+K)"
+            >
+              <Search size={15} color="#059669" />
+              <span>Search or command...</span>
+              <kbd style={{ marginLeft: 6 }}>Ctrl K</kbd>
+            </button>
+
             {/* Notification Bell */}
-            <button className="topbar-icon-btn" title="Notifications">
+            <button
+              className="topbar-icon-btn"
+              title="Notifications"
+              onClick={() => setNotifOpen((prev) => !prev)}
+            >
               <Bell size={18} />
               <span className="notification-badge-dot" />
             </button>
+
+            {/* Notification Dropdown */}
+            <NotificationPopover isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
 
             {/* User Chip */}
             <div className="user-chip">
@@ -170,6 +215,9 @@ const DashboardLayout = ({ children, title, subtitle }) => {
             </div>
           </div>
         </header>
+
+        {/* Global Command Palette */}
+        <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} />
 
         {/* Page Content */}
         <main className="dashboard-content">{children}</main>

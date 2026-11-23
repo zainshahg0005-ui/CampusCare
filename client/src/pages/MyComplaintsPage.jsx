@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   FilePlus2,
   Search,
@@ -9,26 +9,42 @@ import {
   MapPin,
   Tag,
   AlertCircle,
-  X,
-  MessageSquare,
   RefreshCw,
+  Clock,
+  CheckCircle2,
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ComplaintDrawer from '../components/ComplaintDrawer';
 import api from '../services/api';
 
+const categories = [
+  'All',
+  'Electricity',
+  'Internet/Wi-Fi',
+  'Water Supply',
+  'Washroom',
+  'Laboratory',
+  'Classroom',
+  'Other',
+];
+
+const statusTabs = ['All', 'Pending', 'In Progress', 'Resolved', 'Rejected'];
+
 const MyComplaintsPage = () => {
+  const [searchParams] = useSearchParams();
+  const initialStatus = searchParams.get('status') || 'All';
+  const initialPriority = searchParams.get('priority') || 'All';
+
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState(initialStatus);
+  const [selectedPriority, setSelectedPriority] = useState(initialPriority);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => {
-    fetchComplaints();
-  }, []);
-
-  const fetchComplaints = async () => {
+  const fetchComplaints = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/complaints/my');
@@ -40,6 +56,15 @@ const MyComplaintsPage = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [fetchComplaints]);
+
+  const handleOpenDrawer = (complaint) => {
+    setSelectedComplaint(complaint);
+    setDrawerOpen(true);
   };
 
   const getStatusBadge = (status) => {
@@ -57,33 +82,75 @@ const MyComplaintsPage = () => {
     }
   };
 
-  // Filter complaints based on search query, category, and status
   const filteredComplaints = complaints.filter((item) => {
     const matchesSearch =
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.location.toLowerCase().includes(search.toLowerCase()) ||
-      item.description.toLowerCase().includes(search.toLowerCase());
+      item.title?.toLowerCase().includes(search.toLowerCase()) ||
+      item.location?.toLowerCase().includes(search.toLowerCase()) ||
+      item.description?.toLowerCase().includes(search.toLowerCase());
 
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesStatus = selectedStatus === 'All' || item.status === selectedStatus;
+    const matchesPriority = selectedPriority === 'All' || item.priority === selectedPriority;
 
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory && matchesStatus && matchesPriority;
   });
 
   return (
     <DashboardLayout
-      title="My Complaints"
-      subtitle="View all reports and track maintenance resolutions"
+      title="My Grievances & Service Logs"
+      subtitle="Track real-time progress and official technician notes"
     >
       {/* Top Filter and Action Bar */}
-      <div className="card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
-        <div className="filters-bar">
-          <div className="search-box">
+      <div className="dashboard-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        {/* Status Pill Tabs */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+          {statusTabs.map((tab) => {
+            const count = tab === 'All' ? complaints.length : complaints.filter((c) => c.status === tab).length;
+            const isSelected = selectedStatus === tab;
+            return (
+              <button
+                key={tab}
+                onClick={() => setSelectedStatus(tab)}
+                style={{
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: 999,
+                  border: isSelected ? '1px solid #059669' : '1px solid #e5e7eb',
+                  background: isSelected ? '#ecfdf5' : '#ffffff',
+                  color: isSelected ? '#064e3b' : '#6b7280',
+                  fontSize: '0.8rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>{tab}</span>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    background: isSelected ? '#059669' : '#f3f4f6',
+                    color: isSelected ? '#ffffff' : '#6b7280',
+                    padding: '0.1rem 0.4rem',
+                    borderRadius: 999,
+                  }}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="filters-bar" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="search-box" style={{ flex: 1, minWidth: 260 }}>
             <Search size={18} className="search-icon" />
             <input
               type="text"
               className="form-control search-input"
-              placeholder="Search by title, location, or keyword..."
+              placeholder="Filter by keyword, location, or issue..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -96,117 +163,126 @@ const MyComplaintsPage = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               style={{ width: 'auto', minWidth: '150px' }}
             >
-              <option value="All">All Categories</option>
-              <option value="Classroom">Classroom</option>
-              <option value="Laboratory">Laboratory</option>
-              <option value="Internet/Wi-Fi">Internet/Wi-Fi</option>
-              <option value="Washroom">Washroom</option>
-              <option value="Electricity">Electricity</option>
-              <option value="Water Supply">Water Supply</option>
-              <option value="Other">Other</option>
-            </select>
-
-            <select
-              className="form-select"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              style={{ width: 'auto', minWidth: '140px' }}
-            >
-              <option value="All">All Statuses</option>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Resolved">Resolved</option>
-              <option value="Rejected">Rejected</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
+              ))}
             </select>
 
             <button
               onClick={fetchComplaints}
               className="btn btn-outline"
-              title="Refresh list"
+              title="Refresh logs"
+              style={{ padding: '0.55rem' }}
             >
               <RefreshCw size={16} />
             </button>
 
             <Link to="/student/submit" className="btn btn-primary">
               <FilePlus2 size={16} />
-              <span>New Ticket</span>
+              <span>New Grievance</span>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className="table-container">
+      {/* Complaints List Table */}
+      <div className="dashboard-card">
         {loading ? (
-          <div className="empty-state">
-            <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-            <p>Loading your complaints...</p>
+          <div style={{ padding: '3.5rem', textAlign: 'center', color: '#6b7280' }}>
+            Loading complaints...
           </div>
         ) : filteredComplaints.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon-box">
-              <Filter size={32} />
-            </div>
-            <h4 className="empty-title">No matching complaints found</h4>
-            <p className="empty-subtitle">
-              {complaints.length === 0
-                ? "You haven't logged any complaints yet. Use the New Ticket button above to report an issue."
-                : 'Try adjusting your search keywords or filter criteria.'}
+          <div style={{ padding: '3.5rem 1.5rem', textAlign: 'center' }}>
+            <AlertCircle size={44} color="#059669" style={{ margin: '0 auto 0.75rem' }} />
+            <h4 style={{ fontSize: '1.1rem', color: '#111827', marginBottom: '0.35rem' }}>
+              No complaints match the filter
+            </h4>
+            <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
+              Try adjusting your category or status filters to view records.
             </p>
+            <button
+              className="btn btn-outline"
+              onClick={() => {
+                setSearch('');
+                setSelectedCategory('All');
+                setSelectedStatus('All');
+                setSelectedPriority('All');
+              }}
+            >
+              Reset Filters
+            </button>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="modern-table">
+          <div className="table-responsive">
+            <table className="data-table">
               <thead>
                 <tr>
-                  <th>Title & Summary</th>
+                  <th>Ticket</th>
+                  <th>Title & Description</th>
                   <th>Category</th>
                   <th>Location</th>
-                  <th>Submission Date</th>
+                  <th>Submitted</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredComplaints.map((item) => (
-                  <tr key={item._id}>
+                {filteredComplaints.map((c) => (
+                  <tr
+                    key={c._id}
+                    onClick={() => handleOpenDrawer(c)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <td>
-                      <div className="table-title">{item.title}</div>
-                      <div className="table-subtitle" style={{ maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.description}
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8rem', color: '#064e3b' }}>
+                        #{c.ticketId || c._id.slice(-6).toUpperCase()}
+                      </span>
+                    </td>
+                    <td style={{ maxWidth: 300 }}>
+                      <div style={{ fontWeight: 600, color: '#111827' }}>{c.title}</div>
+                      <div
+                        style={{
+                          fontSize: '0.775rem',
+                          color: '#6b7280',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {c.description}
                       </div>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
-                        <Tag size={14} color="#64748b" />
-                        {item.category}
+                      <span style={{ fontSize: '0.8rem', fontWeight: 550, color: '#374151' }}>
+                        {c.category}
                       </span>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
-                        <MapPin size={14} color="#64748b" />
-                        {item.location}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4b5563' }}>
+                        <MapPin size={13} color="#059669" />
+                        <span>{c.location}</span>
+                      </div>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: '#64748b' }}>
-                        <Calendar size={14} />
-                        {new Date(item.createdAt).toLocaleDateString(undefined, {
-                          year: 'numeric',
+                      <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                        {new Date(c.createdAt).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                         })}
                       </span>
                     </td>
-                    <td>{getStatusBadge(item.status)}</td>
+                    <td>{getStatusBadge(c.status)}</td>
                     <td style={{ textAlign: 'right' }}>
                       <button
-                        onClick={() => setSelectedComplaint(item)}
-                        className="btn btn-outline btn-sm"
-                        title="View details and admin remarks"
+                        className="btn btn-outline"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDrawer(c);
+                        }}
                       >
-                        <Eye size={15} />
-                        <span>View Details</span>
+                        <Eye size={14} />
+                        <span>Inspect</span>
                       </button>
                     </td>
                   </tr>
@@ -217,100 +293,12 @@ const MyComplaintsPage = () => {
         )}
       </div>
 
-      {/* Complaint Detail Modal */}
-      {selectedComplaint && (
-        <div className="modal-backdrop" onClick={() => setSelectedComplaint(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">Complaint Inspection</h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => setSelectedComplaint(null)}
-                aria-label="Close modal"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-                <h4 style={{ fontSize: '1.2rem', fontWeight: 700 }}>{selectedComplaint.title}</h4>
-                {getStatusBadge(selectedComplaint.status)}
-              </div>
-
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <span className="detail-label">Category</span>
-                  <span className="detail-value">{selectedComplaint.category}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Location / Building</span>
-                  <span className="detail-value">{selectedComplaint.location}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Lodged Date</span>
-                  <span className="detail-value">
-                    {new Date(selectedComplaint.createdAt).toLocaleString()}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Last Updated</span>
-                  <span className="detail-value">
-                    {new Date(selectedComplaint.updatedAt).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '1rem' }}>
-                <span className="detail-label">Full Problem Description</span>
-                <div className="detail-desc-box">{selectedComplaint.description}</div>
-              </div>
-
-              {selectedComplaint.image && (
-                <div className="detail-image-box">
-                  <span className="detail-label" style={{ display: 'block', marginBottom: '0.35rem' }}>
-                    Uploaded Photo Evidence
-                  </span>
-                  <img
-                    src={`http://localhost:5000${selectedComplaint.image}`}
-                    alt="Complaint photo"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
-
-              {selectedComplaint.adminResponse ? (
-                <div className="admin-response-box">
-                  <div className="admin-response-title">
-                    <MessageSquare size={16} />
-                    <span>Official University Administrator Response</span>
-                  </div>
-                  <p style={{ fontSize: '0.925rem', color: '#14532d' }}>
-                    {selectedComplaint.adminResponse}
-                  </p>
-                </div>
-              ) : (
-                <div className="alert alert-info" style={{ marginTop: '1rem', marginBottom: 0 }}>
-                  <AlertCircle size={16} />
-                  <span>The administration team is currently reviewing your ticket.</span>
-                </div>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setSelectedComplaint(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Slide-over Inspection Drawer */}
+      <ComplaintDrawer
+        complaint={selectedComplaint}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
     </DashboardLayout>
   );
 };

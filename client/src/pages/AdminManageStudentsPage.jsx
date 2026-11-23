@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   Search,
   Mail,
   CreditCard,
   Calendar,
-  FileText,
-  Clock,
-  CheckCircle,
   Eye,
   X,
   RefreshCw,
@@ -29,11 +26,7 @@ const AdminManageStudentsPage = () => {
   const [search, setSearch] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
@@ -47,7 +40,11 @@ const AdminManageStudentsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search]);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
