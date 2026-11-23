@@ -2,7 +2,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const { sendPasswordResetNotification } = require('../services/notificationService');
+const {
+  sendPasswordResetNotification,
+  sendRegistrationOtpNotification,
+} = require('../services/notificationService');
 
 // Helper to generate JWT
 const generateToken = (id, role) => {
@@ -78,62 +81,200 @@ const registerUser = async (req, res) => {
     }
 
     // Check if email already registered
-    const emailExists = await User.findOne({ email: email.toLowerCase() });
-    if (emailExists) {
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser && existingUser.isVerified !== false) {
       return res.status(400).json({
         success: false,
         message: 'An account with this email address already exists',
       });
     }
 
-    // Check if studentId already registered
-    const studentIdExists = await User.findOne({
+    // Check if studentId already registered by an active verified user
+    const existingStudentId = await User.findOne({
       studentId: studentId.toUpperCase(),
     });
-    if (studentIdExists) {
+    if (existingStudentId && existingStudentId._id.toString() !== existingUser?._id.toString() && existingStudentId.isVerified !== false) {
       return res.status(400).json({
         success: false,
         message: 'A student with this Student ID is already registered',
       });
     }
 
+    // Generate 6-digit secure numeric verification OTP (15 min lifespan)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
+
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user (Strictly enforce 'student' role for self-registration)
-    const user = await User.create({
-      name: name.trim(),
-      studentId: studentId.trim().toUpperCase(),
-      email: email.trim().toLowerCase(),
-      password: hashedPassword,
-      role: 'student', // Public registrations can only be student
-    });
-
-    if (user) {
-      res.status(201).json({
-        success: true,
-        message: 'Registration successful! Welcome to CampusCare.',
-        user: {
-          _id: user._id,
-          name: user.name,
-          studentId: user.studentId,
-          email: user.email,
-          role: user.role,
-        },
-        token: generateToken(user._id, user.role),
-      });
+    let user;
+    if (existingUser && existingUser.isVerified === false) {
+      // Update pending registration
+      existingUser.name = name.trim();
+      existingUser.studentId = studentId.trim().toUpperCase();
+      existingUser.password = hashedPassword;
+      existingUser.verificationOtp = otp;
+      existingUser.verificationOtpExpires = otpExpires;
+      user = await existingUser.save();
     } else {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid user data provided',
+      // Create new pending registration
+      user = await User.create({
+        name: name.trim(),
+        studentId: studentId.trim().toUpperCase(),
+        email: email.trim().toLowerCase(),
+        password: hashedPassword,
+        role: 'student',
+        isVerified: false,
+        verificationOtp: otp,
+        verificationOtpExpires: otpExpires,
       });
     }
+
+    // Dispatch verification OTP email asynchronously
+    await sendRegistrationOtpNotification({
+      email: user.email,
+      name: user.name,
+      otp,
+    });
+
+    res.status(200).json({
+      success: true,
+      requiresOtp: true,
+      email: user.email,
+      message: `A 6-digit verification code has been dispatched to ${user.email}. Enter it to activate your account.`,
+    });
   } catch (error) {
     console.error('[Register Error]:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Server error during registration',
+    });
+  }
+};
+
+// @desc    Verify student registration OTP and activate account
+// @route   POST /api/auth/verify-registration-otp
+// @access  Public
+const verifyRegistrationOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and 6-digit verification code are required',
+      });
+    }
+
+    const cleanOtp = String(otp).trim();
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Account not found. Please initiate registration.',
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(200).json({
+        success: true,
+        alreadyVerified: true,
+        message: 'Your account is already verified! You can proceed to sign in.',
+      });
+    }
+
+    if (!user.verificationOtp || user.verificationOtp !== cleanOtp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid verification code. Please check your email and try again.',
+      });
+    }
+
+    if (!user.verificationOtpExpires || user.verificationOtpExpires < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code has expired. Please request a new code.',
+      });
+    }
+
+    // Activate account
+    user.isVerified = true;
+    user.verificationOtp = null;
+    user.verificationOtpExpires = null;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Account verified successfully! Welcome to CampusCare.',
+      user: {
+        _id: user._id,
+        name: user.name,
+        studentId: user.studentId,
+        email: user.email,
+        role: user.role,
+      },
+      token: generateToken(user._id, user.role),
+    });
+  } catch (error) {
+    console.error('[Verify OTP Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error verifying registration code',
+    });
+  }
+};
+
+// @desc    Resend registration OTP
+// @route   POST /api/auth/resend-registration-otp
+// @access  Public
+const resendRegistrationOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required',
+      });
+    }
+
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Account not found. Please register first.',
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account is already verified. Please sign in.',
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.verificationOtp = otp;
+    user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
+    await user.save();
+
+    await sendRegistrationOtpNotification({
+      email: user.email,
+      name: user.name,
+      otp,
+    });
+
+    res.json({
+      success: true,
+      message: `A fresh 6-digit verification code has been dispatched to ${user.email}.`,
+    });
+  } catch (error) {
+    console.error('[Resend OTP Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error resending verification code',
     });
   }
 };
@@ -164,6 +305,15 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email: email.trim().toLowerCase() });
 
     if (user && (await user.matchPassword(password))) {
+      if (user.isVerified === false) {
+        return res.status(403).json({
+          success: false,
+          requiresVerification: true,
+          email: user.email,
+          message: 'Your account is pending verification. Please verify your email with the 6-digit OTP code.',
+        });
+      }
+
       res.json({
         success: true,
         message: `Welcome back, ${user.name}!`,
@@ -320,6 +470,8 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
   registerUser,
+  verifyRegistrationOtp,
+  resendRegistrationOtp,
   loginUser,
   getCurrentUser,
   forgotPassword,

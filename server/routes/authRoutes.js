@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {
   registerUser,
+  verifyRegistrationOtp,
+  resendRegistrationOtp,
   loginUser,
   getCurrentUser,
   forgotPassword,
@@ -16,6 +18,8 @@ const {
 
 // Protected against brute-force and credential stuffing
 router.post('/register', authLimiter, registerUser);
+router.post('/verify-registration-otp', authLimiter, verifyRegistrationOtp);
+router.post('/resend-registration-otp', forgotPasswordLimiter, resendRegistrationOtp);
 router.post('/login', authLimiter, loginUser);
 router.get('/me', protect, getCurrentUser);
 

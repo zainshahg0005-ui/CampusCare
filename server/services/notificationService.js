@@ -230,9 +230,42 @@ const sendPasswordResetNotification = async ({ user, otp, method = 'email' }) =>
   });
 };
 
+/**
+ * Dispatch Registration OTP Verification Email
+ */
+const sendRegistrationOtpNotification = async ({ email, name, otp }) => {
+  const subject = `CampusCare: ${otp} is your verification code`;
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; border: 1px solid #e4e4e7; border-radius: 12px; background: #ffffff;">
+      <h2 style="color: #09090b; margin-top: 0; font-size: 20px;">Welcome to CampusCare</h2>
+      <p style="color: #27272a; font-size: 14px; line-height: 1.5;">
+        Hello <strong>${name || 'Student'}</strong>, please enter the following 6-digit verification code to complete your registration:
+      </p>
+      <div style="text-align: center; margin: 24px 0;">
+        <span style="font-family: monospace; font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 12px 24px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 8px; color: #09090b; display: inline-block;">
+          ${otp}
+        </span>
+      </div>
+      <p style="color: #71717a; font-size: 13px; line-height: 1.5;">
+        This registration verification code will expire in <strong>15 minutes</strong>. If you did not sign up for CampusCare, please ignore this email.
+      </p>
+      <div style="margin-top: 24px; border-top: 1px solid #e4e4e7; padding-top: 16px; font-size: 12px; color: #a1a1aa;">
+        CampusCare Student Verification System
+      </div>
+    </div>
+  `;
+
+  return await sendEmail({
+    to: email,
+    subject,
+    html,
+  });
+};
+
 module.exports = {
   sendEmail,
   sendWhatsApp,
   sendComplaintStatusNotification,
   sendPasswordResetNotification,
+  sendRegistrationOtpNotification,
 };

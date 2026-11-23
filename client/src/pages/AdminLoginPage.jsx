@@ -171,6 +171,9 @@ const AdminLoginPage = () => {
               <GraduationCap size={15} color="#09090b" />
               <span>Enrolled student? Access Student Portal →</span>
             </Link>
+            <div style={{ marginTop: '0.85rem', fontSize: '0.75rem', color: '#a1a1aa' }}>
+              Authorized University Personnel &bull; <Link to="/terms" style={{ color: '#71717a' }}>Institutional Terms</Link>
+            </div>
           </div>
         </div>
       </div>

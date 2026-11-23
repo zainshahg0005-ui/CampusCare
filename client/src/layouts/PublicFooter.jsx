@@ -30,9 +30,10 @@ const PublicFooter = () => {
           <h4 className="footer-title">Quick Links</h4>
           <ul className="footer-links">
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/login">Student / Admin Login</Link></li>
+            <li><Link to="/login">Student Portal</Link></li>
+            <li><Link to="/admin/login">Admin Terminal</Link></li>
             <li><Link to="/register">Student Registration</Link></li>
-            <li><a href="/#how-it-works">How It Works</a></li>
+            <li><Link to="/terms">Terms & Conditions</Link></li>
           </ul>
         </div>
 

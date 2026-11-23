@@ -162,6 +162,9 @@ const LoginPage = () => {
                 <span>Administration Staff Login →</span>
               </Link>
             </div>
+            <div style={{ marginTop: '0.85rem', fontSize: '0.75rem', color: '#a1a1aa' }}>
+              Protected by CampusCare &bull; <Link to="/terms" style={{ color: '#71717a' }}>Terms & Conditions</Link>
+            </div>
           </div>
         </div>
       </div>

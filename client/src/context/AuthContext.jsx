@@ -64,6 +64,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.post('/auth/register', formData);
       if (res.data?.success) {
+        if (res.data.requiresOtp) {
+          return {
+            success: true,
+            requiresOtp: true,
+            email: res.data.email,
+            message: res.data.message,
+          };
+        }
         const { user: newUser, token: authToken } = res.data;
         setUser(newUser);
         setToken(authToken);
@@ -76,6 +84,40 @@ export const AuthProvider = ({ children }) => {
       return {
         success: false,
         message: err.response?.data?.message || err.message || 'Unable to connect to server',
+      };
+    }
+  };
+
+  // Verify Registration OTP handler
+  const verifyRegistrationOtp = async ({ email, otp }) => {
+    try {
+      const res = await api.post('/auth/verify-registration-otp', { email, otp });
+      if (res.data?.success && res.data?.token) {
+        const { user: newUser, token: authToken } = res.data;
+        setUser(newUser);
+        setToken(authToken);
+        localStorage.setItem('campuscare_token', authToken);
+        localStorage.setItem('campuscare_user', JSON.stringify(newUser));
+        return { success: true, user: newUser };
+      }
+      return { success: false, message: res.data?.message || 'Verification failed' };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || err.message || 'Verification failed',
+      };
+    }
+  };
+
+  // Resend Registration OTP
+  const resendRegistrationOtp = async (email) => {
+    try {
+      const res = await api.post('/auth/resend-registration-otp', { email });
+      return { success: !!res.data?.success, message: res.data?.message };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || 'Failed to resend code',
       };
     }
   };
@@ -99,6 +141,8 @@ export const AuthProvider = ({ children }) => {
         isStudent: user?.role === 'student',
         login,
         register,
+        verifyRegistrationOtp,
+        resendRegistrationOtp,
         logout,
       }}
     >
