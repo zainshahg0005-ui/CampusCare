@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Complaint = require('../models/Complaint');
+const { sendComplaintStatusNotification } = require('../services/notificationService');
 
 // @desc    Get admin dashboard metrics & summary
 // @route   GET /api/admin/dashboard
@@ -138,8 +139,18 @@ const updateComplaintStatus = async (req, res) => {
     const updatedComplaint = await complaint.save();
     const populated = await Complaint.findById(updatedComplaint._id).populate(
       'studentId',
-      'name studentId email'
+      'name studentId email phone'
     );
+
+    // Trigger Email / WhatsApp notification to student asynchronously
+    if (populated && populated.studentId) {
+      sendComplaintStatusNotification({
+        student: populated.studentId,
+        complaint: populated,
+      }).catch((notifyErr) => {
+        console.error('[Notification Dispatch Warning]:', notifyErr.message);
+      });
+    }
 
     res.json({
       success: true,

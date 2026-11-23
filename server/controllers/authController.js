@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const { sendPasswordResetNotification } = require('../services/notificationService');
+
 // Helper to generate JWT
 const generateToken = (id, role) => {
   return jwt.sign(
@@ -191,8 +193,113 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
+// @desc    Request Password Reset OTP (Email or WhatsApp)
+// @route   POST /api/auth/forgot-password
+// @access  Public (Rate-limited)
+const forgotPassword = async (req, res) => {
+  try {
+    const { email, method = 'email' } = req.body;
+
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid registered email address',
+      });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      // Return ambiguous success message to prevent user enumeration attacks
+      return res.json({
+        success: true,
+        message: 'If an account exists with this email, a verification code has been dispatched.',
+      });
+    }
+
+    // Generate secure 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordOtp = otp;
+    user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await user.save();
+
+    // Dispatch via Notification Service (Email or WhatsApp)
+    await sendPasswordResetNotification({
+      user,
+      otp,
+      method,
+    });
+
+    res.json({
+      success: true,
+      message: `A 6-digit verification code has been sent via ${method === 'whatsapp' ? 'WhatsApp' : 'email'}.`,
+    });
+  } catch (error) {
+    console.error('[Forgot Password Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error processing password reset request',
+    });
+  }
+};
+
+// @desc    Verify OTP and Reset Password
+// @route   POST /api/auth/reset-password
+// @access  Public (Rate-limited)
+const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email, verification code, and new password',
+      });
+    }
+
+    if (typeof newPassword !== 'string' || newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long',
+      });
+    }
+
+    const user = await User.findOne({
+      email: email.toLowerCase().trim(),
+      resetPasswordOtp: otp.toString().trim(),
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification code. Please request a new code.',
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    user.resetPasswordOtp = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Password successfully reset! You can now sign in with your new credentials.',
+    });
+  } catch (error) {
+    console.error('[Reset Password Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error resetting password',
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
+  forgotPassword,
+  resetPassword,
 };

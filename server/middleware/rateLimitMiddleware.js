@@ -36,8 +36,34 @@ const apiLimiter = rateLimit({
   },
 });
 
+// Strict rate limiter for requesting password reset OTP (prevents email/SMS bombing)
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Max 5 OTP requests per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many password reset requests from this IP. Please wait 15 minutes before requesting another code.',
+  },
+});
+
+// Strict rate limiter for verifying OTP and resetting password (prevents brute-force)
+const resetPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Max 5 verification attempts per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many verification attempts. Please wait 15 minutes before trying again.',
+  },
+});
+
 module.exports = {
   authLimiter,
   complaintSubmitLimiter,
   apiLimiter,
+  forgotPasswordLimiter,
+  resetPasswordLimiter,
 };
