@@ -1,8 +1,14 @@
 const Complaint = require('../models/Complaint');
-const cloudinary = require('cloudinary').v2;
+let cloudinary = null;
+try {
+  cloudinary = require('cloudinary').v2;
+} catch (e) {
+  // Cloudinary module fallback
+}
 
 // Configure Cloudinary if credentials are provided in environment
 if (
+  cloudinary &&
   process.env.CLOUDINARY_CLOUD_NAME &&
   process.env.CLOUDINARY_API_KEY &&
   process.env.CLOUDINARY_API_SECRET
@@ -84,6 +90,7 @@ const createComplaint = async (req, res) => {
     let imagePath = '';
     if (req.file) {
       if (
+        cloudinary &&
         process.env.CLOUDINARY_CLOUD_NAME &&
         process.env.CLOUDINARY_API_KEY &&
         process.env.CLOUDINARY_API_SECRET
