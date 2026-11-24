@@ -21,6 +21,7 @@ import StudentProfilePage from './pages/StudentProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminManageComplaintsPage from './pages/AdminManageComplaintsPage';
 import AdminManageStudentsPage from './pages/AdminManageStudentsPage';
+import AdminSupportPage from './pages/AdminSupportPage';
 
 function App() {
   return (
@@ -93,6 +94,14 @@ function App() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminManageStudentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/support"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminSupportPage />
               </ProtectedRoute>
             }
           />

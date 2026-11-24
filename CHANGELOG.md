@@ -4,15 +4,38 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.2.1` (Production Ready)
-- **Git Tag:** `v2.2.1`
+## 📌 Current Live Version: `v2.3.0` (Production Ready)
+- **Git Tag:** `v2.3.0`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
-- **Key Focus:** Mandatory strong password policy enforcement (backend & frontend) with real-time visual strength meter and live criteria checklist across Registration, Password Reset, and Profile Settings.
+- **Key Focus:** Real-time Help & Support Desk on Home Page with automated Instant Answer FAQ engine and live two-way Admin Support chat channel.
 
 ---
 
 ## 🗂️ Version Archive & Changelog
+
+### [v2.3.0] — Floating Help & Support Desk, Automated Knowledge Bot & Live Admin Chat
+- **Tag:** `v2.3.0`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Support Chat Engine & Models (`SupportMessage.js` & `supportController.js`):**
+    - Created high-performance `SupportMessage` collection indexed on `sessionId` and timestamp.
+    - Built dual-mode knowledge bot: matches user keywords or delivers instant structured answers with direct links if administrators are offline.
+    - Built Admin conversation aggregation endpoint with unread count tracking.
+  - **Home Page Floating Action Widget (`SupportChatWidget.jsx`):**
+    - Added bottom-right floating pill button with real-time status indicator.
+    - Two-tab interface:
+      1. **Instant Answers (FAQ Bot):** Instant answers for frequent questions (how to lodge complaints, turnaround times, password reset, emergency helplines, editing profile pictures, tracking status).
+      2. **Live Admin Chat:** Real-time messaging channel with automatic 3.5s background polling, seamless guest/student identification, and message history.
+  - **Admin Live Support Operations Center (`AdminSupportPage.jsx`):**
+    - Two-pane workspace in Admin portal (`/admin/support`).
+    - Left pane: Live inquiry thread list with student name, role badge, email, unread counters, and search.
+    - Right pane: Full conversation stream, quick 1-click canned responses, and custom reply dispatcher.
+  - **Navigation Integration:**
+    - Embedded floating widget onto Home Page (`HomePage.jsx`).
+    - Added "Live Support Desk" to Admin sidebar navigation in `DashboardLayout.jsx`.
+
+---
 
 ### [v2.2.1] — Strong Password Enforcement & Real-Time Strength Meter
 - **Tag:** `v2.2.1`

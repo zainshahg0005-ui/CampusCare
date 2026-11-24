@@ -1,6 +1,6 @@
-# 🎓 CampusCare – Student Complaint Management System `v2.2.1`
+# 🎓 CampusCare – Student Complaint Management System `v2.3.0`
 
-> **Current Version:** `v2.2.1` (Production Ready)  
+> **Current Version:** `v2.3.0` (Production Ready)  
 > **Changelog & Rollback Guide:** See [CHANGELOG.md](CHANGELOG.md) for full version history and 1-click rollback procedures.  
 > **Live Website:** [https://campuscare-livid.vercel.app/](https://campuscare-livid.vercel.app/)
 
@@ -9,6 +9,12 @@
 ---
 
 ## 🌟 Key Features
+
+### 💬 Help & Support Chat Desk (New in v2.3.0)
+- **Floating Action Widget:** Instant access on Home Page bottom-right corner.
+- **Instant Answers / FAQ Bot:** Pre-configured automated answers for common questions (complaint lodging, turnaround times, emergency contacts, password resets).
+- **Live Admin Chat:** Real-time two-way messaging between students/visitors and campus administrators.
+- **Admin Support Desk:** Dedicated administrative operations center (`/admin/support`) with thread management, live polling, and quick response shortcuts.
 
 ### 👨‍🎓 Student Portal
 - **Secure Authentication:** Register with Full Name, Student ID, and Email. Passwords securely hashed with `bcryptjs`.

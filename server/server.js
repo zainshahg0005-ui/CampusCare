@@ -42,6 +42,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/complaints', require('./routes/complaintRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/support', require('./routes/supportRoutes'));
 
 // Root & Health check endpoints
 app.get('/', (req, res) => {

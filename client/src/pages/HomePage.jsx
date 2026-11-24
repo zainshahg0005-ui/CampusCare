@@ -16,6 +16,7 @@ import PublicNavbar from '../layouts/PublicNavbar';
 import PublicFooter from '../layouts/PublicFooter';
 import ImageWithSkeleton from '../components/ImageWithSkeleton';
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import SupportChatWidget from '../components/SupportChatWidget';
 
 const HomePage = () => {
   useDocumentTitle('Student Grievance & Facility Management');
@@ -376,6 +377,8 @@ const HomePage = () => {
       </section>
 
       <PublicFooter />
+      {/* Real-Time Help & Support Floating Action Widget */}
+      <SupportChatWidget />
     </div>
   );
 };

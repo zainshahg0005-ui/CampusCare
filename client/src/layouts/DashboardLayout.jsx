@@ -14,6 +14,7 @@ import {
   Shield,
   GraduationCap,
   UserCheck,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CommandPalette from '../components/CommandPalette';
@@ -61,6 +62,7 @@ const DashboardLayout = ({ children, title, subtitle }) => {
     { label: 'Executive Cockpit', path: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'Manage Complaints', path: '/admin/complaints', icon: FolderOpen },
     { label: 'Student Directory', path: '/admin/students', icon: Users },
+    { label: 'Live Support Desk', path: '/admin/support', icon: MessageSquare },
   ];
 
   const navItems = isAdmin ? adminNavItems : studentNavItems;
