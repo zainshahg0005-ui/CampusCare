@@ -19,6 +19,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import CommandPalette from '../components/CommandPalette';
 import NotificationPopover from '../components/NotificationPopover';
+import SupportChatWidget from '../components/SupportChatWidget';
 
 const DashboardLayout = ({ children, title, subtitle }) => {
   const { user, logout, isAdmin, isStudent } = useAuth();
@@ -304,6 +305,9 @@ const DashboardLayout = ({ children, title, subtitle }) => {
         {/* Page Content */}
         <main className="dashboard-content">{children}</main>
       </div>
+
+      {/* Floating Help & Services Widget for Student / Admin Workspace */}
+      <SupportChatWidget />
     </div>
   );
 };

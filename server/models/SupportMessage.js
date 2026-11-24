@@ -51,4 +51,7 @@ const supportMessageSchema = new mongoose.Schema(
 // Compound index for fast conversation retrieval
 supportMessageSchema.index({ sessionId: 1, createdAt: 1 });
 
+// Automatic TTL cleanup: delete chat messages after 24 hours (86400 seconds) to save database space
+supportMessageSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });
+
 module.exports = mongoose.model('SupportMessage', supportMessageSchema);

@@ -40,11 +40,31 @@ const AUTOMATED_FAQS = [
   },
 ];
 
+// Purge chat messages older than 24 hours to automatically save database storage space
+const purgeExpiredMessages = async () => {
+  try {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    await SupportMessage.deleteMany({ createdAt: { $lt: cutoff } });
+  } catch (err) {
+    console.error('[Purge Support Messages Error]:', err.message);
+  }
+};
+
 // @desc    Get chat messages for a session
 // @route   GET /api/support/messages
-// @access  Public
+// @access  Private (Registered Members Only)
 const getMessages = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Only registered members can access Help & Services.',
+      });
+    }
+
+    // Proactively clean up messages older than 24 hours
+    await purgeExpiredMessages();
+
     const { sessionId } = req.query;
     if (!sessionId) {
       return res.status(400).json({
@@ -53,7 +73,11 @@ const getMessages = async (req, res) => {
       });
     }
 
-    const messages = await SupportMessage.find({ sessionId: String(sessionId).trim() })
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const messages = await SupportMessage.find({
+      sessionId: String(sessionId).trim(),
+      createdAt: { $gte: cutoff },
+    })
       .sort({ createdAt: 1 })
       .limit(150);
 
@@ -71,17 +95,27 @@ const getMessages = async (req, res) => {
   }
 };
 
-// @desc    Send message from user / student / visitor
+// @desc    Send message from registered student / user
 // @route   POST /api/support/message
-// @access  Public
+// @access  Private (Registered Members Only)
 const sendMessage = async (req, res) => {
   try {
-    const { sessionId, message, senderName, senderEmail, senderRole = 'guest', userId } = req.body;
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Only registered members can use Help & Services. Please sign in.',
+      });
+    }
 
-    if (!sessionId || !message || !senderName) {
+    // Proactively clean up messages older than 24 hours
+    await purgeExpiredMessages();
+
+    const { sessionId, message } = req.body;
+
+    if (!sessionId || !message) {
       return res.status(400).json({
         success: false,
-        message: 'Session ID, message content, and sender name are required',
+        message: 'Session ID and message content are required',
       });
     }
 
@@ -93,15 +127,15 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    // 1. Save user's message
+    // 1. Save registered user's message
     const userMsg = await SupportMessage.create({
       sessionId: String(sessionId).trim(),
-      user: userId || null,
-      senderName: String(senderName).trim(),
-      senderEmail: String(senderEmail || '').trim().toLowerCase(),
-      senderRole: ['student', 'admin', 'guest'].includes(senderRole) ? senderRole : 'guest',
+      user: req.user._id,
+      senderName: req.user.name,
+      senderEmail: req.user.email,
+      senderRole: req.user.role === 'admin' ? 'admin' : 'student',
       message: cleanMsg,
-      isAdminReply: false,
+      isAdminReply: req.user.role === 'admin',
       isRead: false,
     });
 
@@ -163,8 +197,16 @@ const sendMessage = async (req, res) => {
 // @access  Private (Admin Only)
 const getAdminThreads = async (req, res) => {
   try {
-    // Aggregate distinct sessions with their latest message and unread count
+    await purgeExpiredMessages();
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    // Aggregate distinct sessions with their latest message and unread count within 24h
     const sessions = await SupportMessage.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: cutoff },
+        },
+      },
       {
         $sort: { createdAt: -1 },
       },

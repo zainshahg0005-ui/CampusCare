@@ -4,15 +4,32 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.3.0` (Production Ready)
-- **Git Tag:** `v2.3.0`
+## 📌 Current Live Version: `v2.4.0` (Production Ready)
+- **Git Tag:** `v2.4.0`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
-- **Key Focus:** Real-time Help & Support Desk on Home Page with automated Instant Answer FAQ engine and live two-way Admin Support chat channel.
+- **Key Focus:** Mandatory sign-in gate for Help & Services, continuous student dashboard chat continuity, and automatic 24-hour MongoDB chat space-saving purging.
 
 ---
 
 ## 🗂️ Version Archive & Changelog
+
+### [v2.4.0] — Help & Services Member Gate, Dashboard Chat Continuity & 24h Auto-Purge
+- **Tag:** `v2.4.0`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Automatic 24-Hour Chat Purging (`SupportMessage.js` & `supportController.js`):**
+    - Configured MongoDB TTL index `{ createdAt: 1 }, { expireAfterSeconds: 86400 }` to automatically and permanently purge chat documents older than 24 hours.
+    - Proactive query-level cleanup guarantees zero bloat and optimized database storage in MongoDB Atlas.
+    - Added 24-hour auto-delete security notices to students in the chat UI.
+  - **Mandatory Sign-In Gate (`SupportChatWidget.jsx`):**
+    - Help & Services button opens a dedicated sign-in gate for unauthenticated users, directing students to log in before chatting with administrators.
+    - API endpoints (`GET /api/support/messages`, `POST /api/support/message`) strictly protected with JWT authentication middleware.
+  - **Student Dashboard Chat Continuity (`DashboardLayout.jsx`):**
+    - Embedded the floating Help & Services icon directly onto the Student Dashboard (`/student/dashboard`).
+    - Bound conversation sessions permanently to the student's authenticated user ID (`user_${user._id}`), enabling seamless continuation of discussions with university administrators.
+
+---
 
 ### [v2.3.0] — Floating Help & Support Desk, Automated Knowledge Bot & Live Admin Chat
 - **Tag:** `v2.3.0`
