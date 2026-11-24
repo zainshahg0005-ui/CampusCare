@@ -4,10 +4,28 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.3` (Production Ready)
-- **Git Tag:** `v2.4.3`
+## 📌 Current Live Version: `v2.4.4` (Production Ready)
+- **Git Tag:** `v2.4.4`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.4] — Home Page Mobile Layout & Floating Help Widget Overhaul
+- **Tag:** `v2.4.4`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Sleek Circular Floating Action Button on Mobile (`SupportChatWidget.jsx` & `index.css`):**
+    - Converted wide 170px horizontal pill into a clean 48px circular dark-glass action button (`width: 48px; height: 48px; border-radius: 50%`) with the headphones icon and green active dot on mobile viewports (< 640px).
+    - Prevents the floating widget from ever covering CTA buttons or page content while preserving the full pill on desktop.
+  - **Home Page Hero Mobile Structure Overhaul (`HomePage.jsx` & `index.css`):**
+    - Placed primary CTA buttons (`Lodge a Complaint` and `Portal Sign In`) directly beneath the subtitle.
+    - On mobile (< 640px), CTAs render as a neat 2-column grid (`grid-template-columns: 1fr 1fr; gap: 0.65rem`), saving over 60px of vertical height.
+    - Moved the Quick Ticket Lookup search bar below the CTAs as an unobtrusive secondary utility with dedicated fluid class `.hero-ticket-search`.
+    - Reduced `.editorial-hero` top padding from `4.5rem` (72px) down to `1.75rem` (28px) on mobile, eliminating massive wasted white space.
+  - **Hero Visual Responsiveness (`ImageWithSkeleton.jsx` & `HomePage.jsx`):**
+    - Removed hardcoded inline `height: 380` on the image container and added `containerClassName="hero-image-container"`.
+    - Handled dynamically in CSS: 380px on desktop, 280px on tablet, and 210px on mobile with 12px rounded corners, fully displaying the campus photo without awkward clipping.
 
 ---
 

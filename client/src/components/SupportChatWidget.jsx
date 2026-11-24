@@ -186,22 +186,7 @@ const SupportChatWidget = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open CampusCare Help and Services"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
-            background: '#09090b',
-            color: '#ffffff',
-            padding: '0.75rem 1.25rem',
-            borderRadius: '9999px',
-            border: '1px solid #27272a',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-            cursor: 'pointer',
-            transition: 'all 0.25s ease',
-            transform: isOpen ? 'scale(0.96)' : 'scale(1)',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = isOpen ? 'scale(0.96)' : 'scale(1)')}
+          className="support-chat-fab-btn"
         >
           {isOpen ? (
             <X size={20} color="#ffffff" />
@@ -222,7 +207,7 @@ const SupportChatWidget = () => {
               />
             </div>
           )}
-          <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.3px' }}>
+          <span className="support-chat-fab-text">
             {isOpen ? 'Close Services' : 'Help & Services'}
           </span>
         </button>

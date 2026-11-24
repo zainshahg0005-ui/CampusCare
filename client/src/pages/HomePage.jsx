@@ -55,68 +55,6 @@ const HomePage = () => {
               fixed fast across residence halls, labs, and classrooms.
             </p>
 
-            {/* Quick Ticket Lookup */}
-            <form onSubmit={handleTicketLookup} style={{ marginBottom: '1.75rem', maxWidth: 440 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  background: '#ffffff',
-                  border: '1px solid #d4d4d8',
-                  borderRadius: 10,
-                  padding: '0.25rem 0.35rem 0.25rem 0.75rem',
-                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                }}
-              >
-                <Search size={16} color="#71717a" />
-                <input
-                  type="text"
-                  placeholder="Enter Ticket ID (e.g. CC-104)..."
-                  value={ticketSearch}
-                  onChange={(e) => setTicketSearch(e.target.value)}
-                  style={{
-                    flex: 1,
-                    border: 'none',
-                    outline: 'none',
-                    padding: '0.5rem 0.65rem',
-                    fontSize: '0.875rem',
-                    fontFamily: 'inherit',
-                  }}
-                />
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-sm"
-                  style={{ borderRadius: 6 }}
-                >
-                  Track
-                </button>
-              </div>
-
-              {searchFeedback && (
-                <div
-                  style={{
-                    marginTop: '0.75rem',
-                    background: '#f4f4f5',
-                    border: '1px solid #e4e4e7',
-                    borderRadius: 8,
-                    padding: '0.65rem 0.85rem',
-                    fontSize: '0.8rem',
-                    color: '#18181b',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <div>
-                    <strong>#{searchFeedback.ticketId}</strong>: {searchFeedback.status} — {searchFeedback.note}
-                  </div>
-                  <Link to="/login" style={{ fontWeight: 600, color: '#09090b', textDecoration: 'underline' }}>
-                    View details →
-                  </Link>
-                </div>
-              )}
-            </form>
-
             <div className="hero-cta-group">
               <Link to="/register" className="btn btn-primary btn-lg">
                 <span>Lodge a Complaint</span>
@@ -127,6 +65,38 @@ const HomePage = () => {
                 <ChevronRight size={16} />
               </Link>
             </div>
+
+            {/* Quick Ticket Lookup */}
+            <form onSubmit={handleTicketLookup} className="hero-ticket-search">
+              <div className="ticket-search-bar">
+                <Search size={16} color="#71717a" style={{ flexShrink: 0 }} />
+                <input
+                  type="text"
+                  placeholder="Enter Ticket ID (e.g. CC-104)..."
+                  value={ticketSearch}
+                  onChange={(e) => setTicketSearch(e.target.value)}
+                  className="ticket-search-input"
+                />
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  style={{ borderRadius: 6, flexShrink: 0 }}
+                >
+                  Track
+                </button>
+              </div>
+
+              {searchFeedback && (
+                <div className="ticket-search-feedback">
+                  <div>
+                    <strong>#{searchFeedback.ticketId}</strong>: {searchFeedback.status} — {searchFeedback.note}
+                  </div>
+                  <Link to="/login" style={{ fontWeight: 600, color: '#09090b', textDecoration: 'underline', flexShrink: 0 }}>
+                    View details →
+                  </Link>
+                </div>
+              )}
+            </form>
           </div>
 
           {/* Hero Visual with Skeleton Loader & Lazy Loading */}
@@ -135,7 +105,7 @@ const HomePage = () => {
               src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1000&q=80&fm=webp"
               alt="University Campus Architecture"
               className="hero-main-photo"
-              containerStyle={{ borderRadius: 16, height: 380 }}
+              containerClassName="hero-image-container"
             />
             <div className="hero-floating-glass-card">
               <div

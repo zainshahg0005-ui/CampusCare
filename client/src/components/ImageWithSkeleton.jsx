@@ -5,6 +5,7 @@ const ImageWithSkeleton = ({
   src,
   alt = '',
   className = '',
+  containerClassName = '',
   style = {},
   containerStyle = {},
   width,
@@ -15,7 +16,7 @@ const ImageWithSkeleton = ({
 
   return (
     <div
-      className="image-skeleton-container"
+      className={`image-skeleton-container ${containerClassName}`}
       style={{
         width: width || '100%',
         height: height || '100%',
