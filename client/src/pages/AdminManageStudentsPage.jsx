@@ -98,7 +98,7 @@ const AdminManageStudentsPage = () => {
         <div className="table-header-strip">
           <div>
             <h3 className="table-title">Enrolled Students</h3>
-            <p className="table-subtitle">Showing {students.length} student records from MongoDB Atlas</p>
+            <p className="table-subtitle">Showing {students.length} verified enrolled students from MongoDB Atlas</p>
           </div>
         </div>
 

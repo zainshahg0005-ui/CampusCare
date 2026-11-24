@@ -7,7 +7,7 @@ const { sendComplaintStatusNotification } = require('../services/notificationSer
 // @access  Private (Admin only)
 const getAdminDashboard = async (req, res) => {
   try {
-    const totalStudents = await User.countDocuments({ role: 'student' });
+    const totalStudents = await User.countDocuments({ role: 'student', isVerified: true });
     const totalComplaints = await Complaint.countDocuments();
     const pendingComplaints = await Complaint.countDocuments({ status: 'Pending' });
     const inProgressComplaints = await Complaint.countDocuments({ status: 'In Progress' });
@@ -175,7 +175,7 @@ const getStudentsList = async (req, res) => {
   try {
     const { search } = req.query;
 
-    const query = { role: 'student' };
+    const query = { role: 'student', isVerified: true };
 
     if (search && search.trim() !== '') {
       // Escape regex special characters to prevent ReDoS

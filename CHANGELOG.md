@@ -4,15 +4,25 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.1.0` (Production Ready)
-- **Git Tag:** `v2.1.0`
+## 📌 Current Live Version: `v2.1.1` (Production Ready)
+- **Git Tag:** `v2.1.1`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
-- **Key Focus:** Comprehensive mobile-first architecture, iOS Safari input auto-zoom prevention, touch-friendly navigation & tables, and database cleanup.
+- **Key Focus:** Strict verified-only student enrollment filter (`isVerified: true`) on Admin Cockpit and Directory.
 
 ---
 
 ## 🗂️ Version Archive & Changelog
+
+### [v2.1.1] — Enforce Verified-Only Student Directory & Dashboard Metrics
+- **Tag:** `v2.1.1`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Enrolled Student Filter (`adminController.js`):** Updated `getStudentsList` to strictly query `{ role: 'student', isVerified: true }`, ensuring students still on the OTP verification screen are never listed as enrolled until their 6-digit code is successfully validated.
+  - **Admin Dashboard KPI Alignment (`adminController.js`):** Updated `getAdminDashboard` total student counter to count only verified students (`{ role: 'student', isVerified: true }`).
+  - **Directory Subtitle Polish (`AdminManageStudentsPage.jsx`):** Clarified directory counter to show verified enrolled students.
+
+---
 
 ### [v2.1.0] — Mobile-First Architecture & Production Polish
 - **Commit:** `bab7517` | **Tag:** `v2.1.0`
