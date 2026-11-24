@@ -195,9 +195,10 @@ const SubmitComplaintPage = () => {
               1. Select Facility Category <span style={{ color: '#dc2626' }}>*</span>
             </label>
             <div
+              className="category-picker-grid"
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
                 gap: '0.75rem',
               }}
             >
@@ -446,7 +447,7 @@ const SubmitComplaintPage = () => {
           </div>
 
           {/* Submit Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid #f3f4f6', paddingTop: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid #f3f4f6', paddingTop: '1.5rem', flexWrap: 'wrap' }}>
             <button
               type="button"
               className="btn btn-outline"

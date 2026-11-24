@@ -95,7 +95,7 @@ const StudentDashboard = () => {
     >
       {/* Top Banner */}
       <div
-        className="card"
+        className="card student-banner-card"
         style={{
           background: '#09090b',
           border: '1px solid #27272a',
@@ -106,7 +106,7 @@ const StudentDashboard = () => {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '1.25rem',
-          padding: '1.75rem 2rem',
+          padding: 'clamp(1.1rem, 4vw, 1.75rem) clamp(1rem, 5vw, 2rem)',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
           borderRadius: 'var(--radius-lg)',
           position: 'relative',
@@ -274,8 +274,8 @@ const StudentDashboard = () => {
                 <tr>
                   <th>Ticket</th>
                   <th>Title & Category</th>
-                  <th>Location</th>
-                  <th>Date</th>
+                  <th className="col-hide-mobile">Location</th>
+                  <th className="col-hide-mobile">Date</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Inspection</th>
                 </tr>
@@ -296,13 +296,13 @@ const StudentDashboard = () => {
                       <div style={{ fontWeight: 600, color: '#111827' }}>{c.title}</div>
                       <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{c.category}</div>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4b5563' }}>
                         <MapPin size={13} color="#71717a" />
                         <span>{c.location || 'Campus'}</span>
                       </div>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
                         {new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </span>
