@@ -461,6 +461,7 @@ const AdminSupportPage = () => {
                     e.preventDefault();
                     handleSendReply();
                   }}
+                  className="admin-reply-form"
                   style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}
                 >
                   <input
@@ -469,6 +470,7 @@ const AdminSupportPage = () => {
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="Type official administrative reply to this student..."
                     disabled={sending}
+                    className="admin-reply-input"
                     style={{
                       flex: 1,
                       padding: '0.75rem 1rem',
@@ -481,11 +483,11 @@ const AdminSupportPage = () => {
                   <button
                     type="submit"
                     disabled={!replyText.trim() || sending}
-                    className="btn btn-primary"
-                    style={{ padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}
+                    className="btn btn-primary admin-reply-btn"
+                    style={{ padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.45rem', flexShrink: 0 }}
                   >
                     <Send size={16} />
-                    <span>Send Reply</span>
+                    <span className="admin-reply-btn-text">Send Reply</span>
                   </button>
                 </form>
               </div>

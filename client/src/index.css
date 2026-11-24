@@ -17,6 +17,12 @@
   --card-border: #e4e4e7;
   --card-border-hover: #d4d4d8;
 
+  /* Standard aliases for components & markdown */
+  --foreground: var(--text-body);
+  --border: var(--brand-border);
+  --muted: var(--text-muted);
+  --background: var(--canvas);
+
   --sidebar-bg: #ffffff;
   --sidebar-border: #f4f4f5;
 
@@ -1661,6 +1667,9 @@ kbd, .kbd-chip {
     gap: 0.65rem;
     margin-bottom: 1.25rem;
   }
+  .admin-metric-grid .metric-card:last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
   .metric-card {
     padding: 1rem 0.85rem;
   }
@@ -2089,5 +2098,20 @@ kbd, .kbd-chip {
     .drawer-panel {
       padding-bottom: env(safe-area-inset-bottom);
     }
+  }
+}
+
+/* ==========================================================================
+   Admin Support Reply Bar Mobile Ergonomics
+   ========================================================================== */
+@media (max-width: 480px) {
+  .admin-reply-btn {
+    padding: 0.75rem 0.85rem !important;
+  }
+  .admin-reply-btn-text {
+    display: none;
+  }
+  .admin-reply-input {
+    font-size: 16px !important; /* iOS zoom prevention */
   }
 }

@@ -391,7 +391,7 @@ const StudentProfilePage = () => {
             </div>
 
             {/* DP Action Buttons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
               <input
                 ref={fileInputRef}
                 type="file"

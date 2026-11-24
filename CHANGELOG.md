@@ -4,10 +4,28 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.2` (Production Ready)
-- **Git Tag:** `v2.4.2`
+## 📌 Current Live Version: `v2.4.3` (Production Ready)
+- **Git Tag:** `v2.4.3`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.3] — Senior Frontend Multi-Device Polish & Responsive Ergonomics
+- **Tag:** `v2.4.3`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Admin Dashboard Table Hardening (`AdminDashboard.jsx`):**
+    - Added `.col-hide-mobile` progressive disclosure to Location and Date columns on Live Grievance Dispatch Feed, aligning with other tables and eliminating horizontal blowout on narrow mobile devices.
+  - **Metric Grid Layout Balance (`index.css`):**
+    - Applied `.admin-metric-grid .metric-card:last-child:nth-child(odd) { grid-column: span 2; }` so the 5th KPI card spans 2 columns on mobile (381px–640px) instead of leaving an unbalanced single orphan card.
+  - **Admin Support Reply Bar Mobile Ergonomics (`AdminSupportPage.jsx` & `index.css`):**
+    - Introduced `.admin-reply-form`, `.admin-reply-input`, and `.admin-reply-btn`.
+    - Under 480px, button collapses text to icon-only with `0.75rem 0.85rem` padding, giving maximum horizontal typing width on small screens and locking input font to 16px to prevent iOS auto-zoom.
+  - **Student Profile Header Mobile Refinement (`StudentProfilePage.jsx`):**
+    - Profile picture action buttons allow `flex-wrap: wrap` to prevent clipping when student name and verification badges wrap on small viewports.
+  - **Global Theme Token Fallbacks (`index.css`):**
+    - Defined standard `--foreground`, `--border`, `--muted`, `--background` aliases in `:root` for cross-component and markdown compatibility.
 
 ---
 
