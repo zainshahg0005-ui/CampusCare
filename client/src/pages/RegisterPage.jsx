@@ -205,7 +205,14 @@ const RegisterPage = () => {
           {error && (
             <div className="alert alert-error" style={{ marginBottom: '1.25rem' }}>
               <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{error}</span>
+              <div>
+                <span>{error}</span>
+                {error.toLowerCase().includes('already exists') && (
+                  <div style={{ marginTop: '0.4rem', fontSize: '12px' }}>
+                    Already have an account? <Link to="/login" style={{ color: '#09090b', fontWeight: 700, textDecoration: 'underline' }}>Sign In here</Link> or <Link to="/forgot-password" style={{ color: '#09090b', fontWeight: 700, textDecoration: 'underline' }}>Reset your password</Link>.
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -425,6 +432,22 @@ const RegisterPage = () => {
                 <div style={{ color: '#52525b', fontSize: '12px' }}>
                   {formData.email} {formData.phone ? `• ${formData.phone}` : ''}
                 </div>
+              </div>
+
+              {/* Auto-Dispatch Clarification Notice */}
+              <div
+                style={{
+                  background: '#f4f4f5',
+                  border: '1px solid #e4e4e7',
+                  borderRadius: '8px',
+                  padding: '12px 14px',
+                  marginBottom: '1.25rem',
+                  fontSize: '13px',
+                  color: '#27272a',
+                  lineHeight: 1.5,
+                }}
+              >
+                📬 A 6-digit verification code was automatically dispatched to <strong>{formData.email}</strong>. Please check your Inbox and <strong>Spam / Junk</strong> folder.
               </div>
 
               {/* Delivery Channel Picker (if phone is provided) */}
