@@ -1,6 +1,6 @@
 {
   "name": "campuscare-server",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "Backend API for CampusCare Student Complaint Management System",
   "main": "server.js",
   "scripts": {

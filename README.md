@@ -1,4 +1,8 @@
-# 🎓 CampusCare – Student Complaint Management System
+# 🎓 CampusCare – Student Complaint Management System `v2.1.0`
+
+> **Current Version:** `v2.1.0` (Production Ready)  
+> **Changelog & Rollback Guide:** See [CHANGELOG.md](CHANGELOG.md) for full version history and 1-click rollback procedures.  
+> **Live Website:** [https://campuscare-livid.vercel.app/](https://campuscare-livid.vercel.app/)
 
 **CampusCare** is a modern, responsive full-stack MERN (MongoDB, Express.js, React.js, Node.js) web application designed for colleges and universities. It bridges the communication gap between students and campus administrators, allowing students to report facility issues (classrooms, Wi-Fi, electricity, washrooms, labs, etc.) and administrators to review, dispatch maintenance teams, and resolve complaints in real time.
 
