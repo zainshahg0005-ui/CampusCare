@@ -4,10 +4,30 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.6` (Production Ready)
-- **Git Tag:** `v2.4.6`
+## 📌 Current Live Version: `v2.4.7` (Production Ready)
+- **Git Tag:** `v2.4.7`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.7] — Zero-Overflow Mobile Architecture & Viewport Hardening
+- **Tag:** `v2.4.7`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Eliminated Horizontal Viewport Overflow (`client/src/index.css`):**
+    - Enforced `max-width: 100vw; width: 100%; overflow-x: hidden;` across `html`, `body`, `#root`, and `.home-page`.
+    - Added `box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0;` to `.container`, `.editorial-hero`, `.hero-grid`, `.hero-content`, and `.hero-visual-wrapper`.
+  - **Hero Grid & Column Blowout Prevention:**
+    - Switched `.hero-grid` from `1fr` to `minmax(0, 1fr)` at `<= 992px` and `<= 640px` to prevent child intrinsic width from forcing the grid to expand beyond the viewport.
+    - Updated `.hero-cta-group` to `grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)` with text ellipsis safeguards (`text-overflow: ellipsis; white-space: nowrap; overflow: hidden`), ensuring button text never blows out column boundaries.
+  - **Fluid Search Input & Placeholder Shrink:**
+    - Configured `.ticket-search-bar` with `box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0;`.
+    - Set `.ticket-search-input` to `flex: 1 1 0%; min-width: 0; width: 100%`, allowing the input to shrink fluidly on narrow screens without forcing the `Track` button off-screen.
+  - **Negative Absolute Position Containment on Tablets & Mobile:**
+    - Hidden `.hero-floating-top-card` and reset `.hero-floating-glass-card` to `position: static` at `<= 992px` so desktop negative offsets (`right: -16px`, `left: -18px`) never cause horizontal overflow.
+  - **Ultra-Narrow Viewport Hardening (<= 360px):**
+    - Added dedicated styling for compact devices (Galaxy Fold outer display, iPhone SE): single-column stacked CTAs, condensed 12px gutters (`padding: 0 0.75rem`), and proportionate typography.
 
 ---
 

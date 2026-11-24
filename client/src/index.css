@@ -81,6 +81,8 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 * {
@@ -97,8 +99,20 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   width: 100%;
+  max-width: 100vw;
+  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 ::selection {
@@ -145,6 +159,13 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  box-sizing: border-box;
+}
+
+.home-page {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .full-width {
@@ -703,6 +724,9 @@ h1, h2, h3, h4, h5, h6 {
 .editorial-hero {
   padding: 4.5rem 0 3.5rem;
   background: radial-gradient(circle at 50% -20%, rgba(24, 24, 27, 0.04) 0%, rgba(250, 250, 250, 0) 70%), var(--canvas);
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .hero-grid {
@@ -710,6 +734,17 @@ h1, h2, h3, h4, h5, h6 {
   grid-template-columns: 1.1fr 0.9fr;
   align-items: center;
   gap: 3.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .hero-pill {
@@ -725,6 +760,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.25rem;
   border: 1px solid var(--card-border);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  max-width: 100%;
 }
 
 .hero-title {
@@ -749,12 +785,17 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   gap: 0.85rem;
   flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .hero-ticket-search {
   margin-top: 1.5rem;
   max-width: 440px;
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .ticket-search-bar {
@@ -767,6 +808,10 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.25rem 0.35rem 0.25rem 0.75rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: border-color 0.15s ease;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .ticket-search-bar:focus-within {
@@ -774,8 +819,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ticket-search-input {
-  flex: 1;
+  flex: 1 1 0%;
   min-width: 0;
+  width: 100%;
   border: none;
   outline: none;
   padding: 0.5rem 0.25rem;
@@ -804,10 +850,15 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 16px;
   height: 380px;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .hero-visual-wrapper {
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* Image Skeleton Shimmer Loader */
@@ -1680,8 +1731,23 @@ kbd, .kbd-chip {
 /* Tablet & Smaller Laptops (<= 992px) */
 @media (max-width: 992px) {
   .hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .hero-floating-top-card {
+    display: none !important;
+  }
+  .hero-floating-glass-card {
+    position: static !important;
+    margin-top: 0.75rem !important;
+    left: auto !important;
+    bottom: auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   .sidebar {
     transform: translateX(-100%);
@@ -1742,7 +1808,10 @@ kbd, .kbd-chip {
   }
 
   .container {
-    padding: 0 1.15rem;
+    padding: 0 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   /* Compact Dashboard Shell */
@@ -1812,60 +1881,113 @@ kbd, .kbd-chip {
   /* Hero Section */
   .editorial-hero {
     padding: 1.75rem 0 2rem;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
+    width: 100%;
+    max-width: 100%;
+  }
+  .hero-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
   .hero-pill {
     margin-bottom: 0.75rem;
+    max-width: 100%;
   }
   .hero-title {
     font-size: 1.85rem;
     letter-spacing: -0.025em;
     line-height: 1.18;
     margin-bottom: 0.75rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
   .hero-subtitle {
     font-size: 0.9rem;
     line-height: 1.55;
     margin-bottom: 1.25rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
   .hero-cta-group {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     width: 100%;
-    gap: 0.65rem;
+    max-width: 100%;
+    gap: 0.5rem;
   }
   .hero-cta-group .btn {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     justify-content: center;
-    padding: 0.65rem 0.75rem;
-    font-size: 0.825rem;
+    padding: 0.65rem 0.45rem;
+    font-size: 0.8125rem;
     min-height: 44px;
+    gap: 0.35rem;
+  }
+  .hero-cta-group .btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .hero-cta-group .btn svg {
+    flex-shrink: 0;
   }
   .hero-ticket-search {
     margin-top: 1rem;
     max-width: 100%;
+    width: 100%;
+    min-width: 0;
+  }
+  .ticket-search-bar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0.3rem 0.35rem 0.3rem 0.65rem;
+  }
+  .ticket-search-input {
+    font-size: 0.8125rem;
+    min-width: 0;
+    width: 100%;
   }
   .hero-visual-wrapper {
     margin-top: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
   .hero-image-container {
     height: 210px;
     border-radius: 12px;
+    width: 100%;
+    max-width: 100%;
   }
   .hero-main-photo {
     height: 100%;
+    width: 100%;
+    max-width: 100%;
+    display: block;
   }
   .hero-floating-glass-card {
     position: static;
     margin-top: 0.65rem;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.85rem;
     max-width: 100%;
+    width: 100%;
     box-shadow: var(--shadow-card);
+    box-sizing: border-box;
   }
   .hero-floating-top-card {
-    display: none;
+    display: none !important;
   }
 
   /* Landing Sections on Mobile */
@@ -2422,5 +2544,32 @@ kbd, .kbd-chip {
   }
   .admin-reply-input {
     font-size: 16px !important; /* iOS zoom prevention */
+  }
+}
+
+/* ==========================================================================
+   Ultra-Narrow Viewport Hardening (<= 360px: Galaxy Fold, iPhone SE)
+   ========================================================================== */
+@media (max-width: 360px) {
+  .container {
+    padding: 0 0.75rem !important;
+  }
+  .hero-cta-group {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  .hero-cta-group .btn {
+    font-size: 0.85rem !important;
+    padding: 0.7rem 0.75rem !important;
+    min-height: 46px !important;
+  }
+  .hero-title {
+    font-size: 1.65rem !important;
+  }
+  .hero-ticket-search {
+    margin-top: 0.85rem !important;
+  }
+  .ticket-search-bar {
+    padding: 0.25rem 0.3rem 0.25rem 0.5rem !important;
   }
 }
