@@ -177,7 +177,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
             <div className="card" style={{ padding: '1.75rem' }}>
               <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#71717a', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
                 01 / Report
@@ -229,7 +229,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
             {[
               { icon: Wifi, title: 'Network & Wi-Fi', desc: 'Hostels, libraries, auditoriums, and academic quads.' },
               { icon: Zap, title: 'Power & Electrics', desc: 'Lighting, laboratory power, UPS, and circuit breakers.' },
@@ -301,8 +301,8 @@ const HomePage = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '1.5rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1.25rem',
               maxWidth: 960,
               margin: '0 auto',
             }}

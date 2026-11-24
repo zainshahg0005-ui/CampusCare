@@ -197,7 +197,7 @@ const SubmitComplaintPage = () => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                 gap: '0.75rem',
               }}
             >
@@ -269,7 +269,7 @@ const SubmitComplaintPage = () => {
                 {selectedPriorityObj.sla}
               </span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+            <div className="priority-picker-grid">
               {priorityLevels.map((p) => {
                 const isSelected = formData.priority === p.id;
                 return (
@@ -298,7 +298,7 @@ const SubmitComplaintPage = () => {
           </div>
 
           {/* Step 3: Specific Location & Title */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.25rem', marginBottom: '1.5rem' }}>
+          <div className="form-grid-2col">
             <div>
               <label className="form-label" htmlFor="title">
                 Incident Title <span style={{ color: '#dc2626' }}>*</span>

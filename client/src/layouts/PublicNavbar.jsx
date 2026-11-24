@@ -74,10 +74,22 @@ const PublicNavbar = () => {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="mobile-menu-drawer">
-          <a href="/#features" onClick={() => setMobileMenuOpen(false)} className="mobile-link">Features</a>
-          <a href="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className="mobile-link">How It Works</a>
-          <a href="/#stats" onClick={() => setMobileMenuOpen(false)} className="mobile-link">Statistics</a>
-          <a href="/#contact" onClick={() => setMobileMenuOpen(false)} className="mobile-link">Contact</a>
+          <Link to="/" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
+            <span>Home</span>
+            <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>Overview</span>
+          </Link>
+          <a href="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
+            <span>How It Works</span>
+            <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>3 Steps</span>
+          </a>
+          <a href="/#facilities" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
+            <span>Campus Facilities</span>
+            <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>Coverage</span>
+          </a>
+          <Link to="/terms" onClick={() => setMobileMenuOpen(false)} className="mobile-link">
+            <span>Terms & Conditions</span>
+            <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>Rules</span>
+          </Link>
           <hr className="divider" />
           {isAuthenticated ? (
             <div className="mobile-auth-stack">
@@ -88,7 +100,7 @@ const PublicNavbar = () => {
                 }}
                 className="btn btn-primary full-width"
               >
-                Go to Dashboard
+                Go to Dashboard ({user?.name?.split(' ')[0] || 'User'})
               </button>
               <button
                 onClick={() => {
@@ -107,14 +119,22 @@ const PublicNavbar = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className="btn btn-outline full-width"
               >
-                Log In
+                Student Sign In
               </Link>
               <Link
                 to="/register"
                 onClick={() => setMobileMenuOpen(false)}
                 className="btn btn-primary full-width"
               >
-                Get Started (Register)
+                Register Student Account
+              </Link>
+              <Link
+                to="/admin/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn btn-ghost full-width"
+                style={{ border: '1px solid #e4e4e7', fontSize: '0.85rem' }}
+              >
+                Admin Terminal Access
               </Link>
             </div>
           )}

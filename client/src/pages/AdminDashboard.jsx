@@ -174,7 +174,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Analytics Charts & Telemetry Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+      <div className="dashboard-grid-2col">
         {/* Weekly Velocity Chart */}
         <div className="dashboard-card" style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>

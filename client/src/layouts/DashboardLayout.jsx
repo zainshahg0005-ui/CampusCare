@@ -26,6 +26,12 @@ const DashboardLayout = ({ children, title, subtitle }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Auto-close mobile sidebar and popovers on route transition
+  useEffect(() => {
+    setSidebarOpen(false);
+    setNotifOpen(false);
+  }, [location.pathname]);
+
   // Global Ctrl+K / Cmd+K listener
   useEffect(() => {
     const handleKeyDown = (e) => {

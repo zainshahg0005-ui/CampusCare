@@ -115,8 +115,8 @@ const AdminManageStudentsPage = () => {
             }
           />
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="modern-table">
+          <div className="table-responsive">
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>Student Name</th>
