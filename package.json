@@ -1,6 +1,6 @@
 {
     "name": "campuscare",
-    "version": "2.4.10",
+    "version": "2.4.11",
     "description": "CampusCare - Student Complaint Management System (MERN Stack)",
     "scripts": {
         "server": "cd server && npm run dev",

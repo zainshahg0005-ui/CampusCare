@@ -4,10 +4,25 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.10` (Production Ready)
-- **Git Tag:** `v2.4.10`
+## 📌 Current Live Version: `v2.4.11` (Production Ready)
+- **Git Tag:** `v2.4.11`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.11] — Mobile Support Chat Floating Action Button Overlap Resolution
+- **Tag:** `v2.4.11`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Eliminated Mobile Chat Button Collision (`SupportChatWidget.jsx`, `index.css`):**
+    - Bound dynamic `.chat-open` state to the floating action button container (`.support-chat-fab-wrap`).
+    - Added `@media (max-width: 640px) { .support-chat-fab-wrap.chat-open { display: none !important; } }` so the fixed FAB button is seamlessly hidden whenever the bottom sheet chat window is open on mobile devices.
+    - Added high-contrast backdrop overlay (`.support-chat-mobile-backdrop`) with 45% black wash and backdrop-blur, allowing one-tap dismiss from outside the sheet.
+  - **Enhanced Mobile Touch Targets & Input Field Ergonomics:**
+    - Upgraded mobile chat input to 16px font size to eliminate automatic iOS WebKit browser viewport zooming upon focus.
+    - Set explicit `minWidth: 42px; minHeight: 42px` touch targets on the Send button conforming to Apple HIG and Material Design mobile accessibility specifications.
+    - Ensured full visibility and accessibility of the message input and Send button on all mobile screens.
 
 ---
 

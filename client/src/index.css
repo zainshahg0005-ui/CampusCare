@@ -2455,7 +2455,23 @@ kbd, .kbd-chip {
   animation: fadeIn 0.22s ease-out forwards;
 }
 
+.support-chat-mobile-backdrop {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  .support-chat-mobile-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 9, 11, 0.45);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 9997;
+  }
+  .support-chat-fab-wrap.chat-open {
+    display: none !important;
+  }
   .support-chat-fab-wrap {
     bottom: 20px;
     right: 20px;

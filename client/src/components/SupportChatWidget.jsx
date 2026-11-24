@@ -187,7 +187,7 @@ const SupportChatWidget = () => {
       {/* ========================================================================= */}
       {/* 1. FLOATING ACTION BUTTON (Bottom-Right) */}
       {/* ========================================================================= */}
-      <div className="support-chat-fab-wrap">
+      <div className={`support-chat-fab-wrap ${isOpen ? 'chat-open' : ''}`}>
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open CampusCare Help and Services"
@@ -222,7 +222,9 @@ const SupportChatWidget = () => {
       {/* 2. CHAT & FAQ WINDOW CONTAINER */}
       {/* ========================================================================= */}
       {isOpen && (
-        <div className="support-chat-window">
+        <>
+          <div className="support-chat-mobile-backdrop" onClick={() => setIsOpen(false)} />
+          <div className="support-chat-window">
           {/* Mobile drag handle indicator */}
           <div style={{
             width: 36,
@@ -577,8 +579,9 @@ const SupportChatWidget = () => {
                     disabled={sending}
                     style={{
                       flex: 1,
+                      minWidth: 0,
                       padding: '0.65rem 0.85rem',
-                      fontSize: '0.85rem',
+                      fontSize: '16px',
                       borderRadius: '8px',
                       border: '1px solid #d4d4d8',
                       outline: 'none',
@@ -593,6 +596,8 @@ const SupportChatWidget = () => {
                       border: 'none',
                       borderRadius: '8px',
                       padding: '0.65rem 0.85rem',
+                      minWidth: '42px',
+                      minHeight: '42px',
                       cursor: !inputText.trim() || sending ? 'not-allowed' : 'pointer',
                       opacity: !inputText.trim() || sending ? 0.6 : 1,
                       display: 'flex',
@@ -600,6 +605,7 @@ const SupportChatWidget = () => {
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}
+                    aria-label="Send message"
                   >
                     <Send size={16} />
                   </button>
@@ -727,9 +733,10 @@ const SupportChatWidget = () => {
           )}
         </>
       )}
-    </div>
-  )}
-</>
+          </div>
+        </>
+      )}
+    </>
   );
 };
 
