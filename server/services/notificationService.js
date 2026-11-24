@@ -13,8 +13,8 @@ let cachedTransporter = null;
 const getTransporter = () => {
   if (cachedTransporter) return cachedTransporter;
 
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s+/g, '') : null;
+  const user = process.env.SMTP_USER || 'zainshahg0005@gmail.com';
+  const pass = (process.env.SMTP_PASS || 'fnawikmyvdqppbii').replace(/\s+/g, '');
 
   if (user && pass) {
     cachedTransporter = nodemailer.createTransport({

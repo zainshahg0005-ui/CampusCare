@@ -213,13 +213,17 @@ const registerUser = async (req, res) => {
     }
 
     // Dispatch verification OTP via chosen channel (WhatsApp or Email)
-    await sendRegistrationOtpNotification({
-      email: user.email,
-      phone: user.phone,
-      name: user.name,
-      otp,
-      method,
-    });
+    try {
+      await sendRegistrationOtpNotification({
+        email: user.email,
+        phone: user.phone,
+        name: user.name,
+        otp,
+        method,
+      });
+    } catch (dispatchErr) {
+      console.warn('[Registration OTP Dispatch Warning]:', dispatchErr.message);
+    }
 
     const destination = user.email;
     res.status(200).json({

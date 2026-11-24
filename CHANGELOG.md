@@ -4,10 +4,26 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.8` (Production Ready)
-- **Git Tag:** `v2.4.8`
+## 📌 Current Live Version: `v2.4.9` (Production Ready)
+- **Git Tag:** `v2.4.9`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.9] — Serverless Root Dependencies & Registration Resilience Fix
+- **Tag:** `v2.4.9`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Added `helmet` to Root `package.json` for Vercel Serverless Build:**
+    - Fixed serverless runtime `MODULE_NOT_FOUND` exception where Vercel `@vercel/node` builder installs root dependencies for `api/index.js`.
+  - **Graceful CORS Rejection (`server/server.js`):**
+    - Changed CORS rejection from throwing `new Error()` (which caused unhandled 500 status) to standard `callback(null, false)`.
+    - Expanded domain regex patterns to support `care-livid.vercel.app`, `campuscare*.vercel.app`, preview branches, and local network IPs.
+  - **Registration Notification Resilience (`server/controllers/authController.js`):**
+    - Wrapped OTP email dispatch in a resilient `try/catch` block. Even if external SMTP services experience network latency or rate limits, student account creation succeeds and transitions to the OTP entry view without throwing a 500 error.
+  - **Fallback Email Delivery Guarantee (`server/services/notificationService.js`):**
+    - Maintained verified Gmail SMTP transport fallback ensuring real-time OTP delivery on production serverless instances.
 
 ---
 

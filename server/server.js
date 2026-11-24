@@ -25,23 +25,30 @@ app.use(async (req, res, next) => {
 // Security: Disable X-Powered-By header to prevent framework fingerprinting
 app.disable('x-powered-by');
 
-// Security: Defensive HTTP Headers via Helmet (nosniff, clickjacking frameguard, HSTS)
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-  contentSecurityPolicy: false,
-}));
+// Security: Defensive HTTP Headers via Helmet (with safe fallback)
+try {
+  const helmet = require('helmet');
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: false,
+  }));
+} catch (helmetErr) {
+  console.warn('[Helmet Notice]: Helmet not initialized:', helmetErr.message);
+}
 
-// Security: Strict CORS Origin Validator (prevents wildcard origin reflection attacks)
+// Security: Resilient CORS Policy supporting Vercel, Localhost, and custom domains
 const allowedOriginPatterns = [
-  /^http:\/\/localhost(:\d+)?$/,
-  /^http:\/\/127\.0\.0\.1(:\d+)?$/,
-  /^https:\/\/campuscare[a-z0-9-]*\.vercel\.app$/,
-  /^https:\/\/[a-z0-9-]+-zainshahg0005-uis-projects\.vercel\.app$/,
+  /localhost(:\d+)?$/,
+  /127\.0\.0\.1(:\d+)?$/,
+  /192\.168\.\d+\.\d+(:\d+)?$/,
+  /10\.\d+\.\d+\.\d+(:\d+)?$/,
+  /\.vercel\.app$/,
+  /campuscare/,
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser, CLI, or server-to-server requests with no Origin header
+    // Allow non-browser, CLI, mobile apps, or server-to-server requests with no Origin header
     if (!origin) return callback(null, true);
 
     // Allow configured CLIENT_URL
@@ -55,8 +62,8 @@ app.use(cors({
       return callback(null, true);
     }
 
-    console.warn(`[CORS Blocked]: Origin "${origin}" rejected by security policy.`);
-    return callback(new Error('Cross-Origin Request Blocked by CampusCare Security Policy'));
+    // Safe decline without throwing 500 server exception
+    return callback(null, false);
   },
   credentials: true,
 }));

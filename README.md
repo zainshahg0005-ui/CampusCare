@@ -1,6 +1,6 @@
-﻿# 🎓 CampusCare – Student Complaint Management System `v2.4.8`
+﻿# 🎓 CampusCare – Student Complaint Management System `v2.4.9`
 
-> **Current Version:** `v2.4.8` (Production Ready)  
+> **Current Version:** `v2.4.9` (Production Ready)  
 > **Changelog & Rollback Guide:** See [CHANGELOG.md](CHANGELOG.md) for full version history and 1-click rollback procedures.  
 > **Live Website:** [https://campuscare-livid.vercel.app/](https://campuscare-livid.vercel.app/)
 
