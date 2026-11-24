@@ -22,6 +22,7 @@ import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../layouts/PublicNavbar';
 import useOtpTimer from '../hooks/useOtpTimer';
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import PasswordStrengthIndicator, { isStrongPassword } from '../components/PasswordStrengthIndicator';
 
 const RegisterPage = () => {
   useDocumentTitle('Student Registration');
@@ -77,13 +78,13 @@ const RegisterPage = () => {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter.');
       return;
     }
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match. Please re-enter.');
+    if (!isStrongPassword(password)) {
+      setError('Please choose a stronger password meeting all security requirements below (8+ characters, uppercase, lowercase, number, and symbol).');
       return;
     }
 
@@ -329,7 +330,7 @@ const RegisterPage = () => {
                     name="password"
                     type={showPassword ? 'text' : 'password'}
                     className="form-control"
-                    placeholder="At least 6 characters"
+                    placeholder="Create a strong password (8+ chars)"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -343,6 +344,7 @@ const RegisterPage = () => {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                <PasswordStrengthIndicator password={formData.password} showOnlyWhenTyping={true} />
               </div>
 
               <div className="form-group">

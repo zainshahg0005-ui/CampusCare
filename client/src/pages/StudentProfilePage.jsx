@@ -22,6 +22,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import DashboardLayout from '../layouts/DashboardLayout';
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import PasswordStrengthIndicator, { isStrongPassword } from '../components/PasswordStrengthIndicator';
 
 const StudentProfilePage = () => {
   useDocumentTitle('My Student Profile');
@@ -216,13 +217,16 @@ const StudentProfilePage = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setPasswordMsg({ type: 'error', text: 'New password must be at least 6 characters long.' });
+    if (newPassword !== confirmNewPassword) {
+      setPasswordMsg({ type: 'error', text: 'New passwords do not match. Please re-enter.' });
       return;
     }
 
-    if (newPassword !== confirmNewPassword) {
-      setPasswordMsg({ type: 'error', text: 'New passwords do not match. Please re-enter.' });
+    if (!isStrongPassword(newPassword)) {
+      setPasswordMsg({
+        type: 'error',
+        text: 'New password must be strong: at least 8 characters with uppercase, lowercase, number, and special symbol.',
+      });
       return;
     }
 
@@ -672,7 +676,7 @@ const StudentProfilePage = () => {
                     className="form-control"
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    placeholder="Minimum 6 characters"
+                    placeholder="Create a strong password (8+ chars)"
                   />
                   <button
                     type="button"
@@ -683,6 +687,7 @@ const StudentProfilePage = () => {
                     {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+                <PasswordStrengthIndicator password={passwordData.newPassword} showOnlyWhenTyping={true} />
               </div>
 
               <div className="form-group" style={{ marginBottom: '1.5rem' }}>

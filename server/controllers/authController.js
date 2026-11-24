@@ -22,6 +22,29 @@ const matchesOtp = (storedOtp, inputOtp) => {
   return storedOtp === hashed || storedOtp === clean;
 };
 
+// Password policy: At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character
+const validateStrongPassword = (pwd) => {
+  if (typeof pwd !== 'string') {
+    return { isValid: false, message: 'Password must be a valid text string.' };
+  }
+  if (pwd.length < 8) {
+    return { isValid: false, message: 'Password must be at least 8 characters long.' };
+  }
+  if (!/[A-Z]/.test(pwd)) {
+    return { isValid: false, message: 'Password must include at least one uppercase letter (A-Z).' };
+  }
+  if (!/[a-z]/.test(pwd)) {
+    return { isValid: false, message: 'Password must include at least one lowercase letter (a-z).' };
+  }
+  if (!/[0-9]/.test(pwd)) {
+    return { isValid: false, message: 'Password must include at least one number (0-9).' };
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(pwd)) {
+    return { isValid: false, message: 'Password must include at least one special symbol (e.g. !@#$%^&*).' };
+  }
+  return { isValid: true };
+};
+
 // Helper to generate JWT
 const generateToken = (id, role) => {
   return jwt.sign(
@@ -66,10 +89,11 @@ const registerUser = async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
+    const pwdCheck = validateStrongPassword(password);
+    if (!pwdCheck.isValid) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long',
+        message: pwdCheck.message,
       });
     }
 
@@ -567,10 +591,11 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    if (typeof newPassword !== 'string' || newPassword.length < 6) {
+    const pwdCheck = validateStrongPassword(newPassword);
+    if (!pwdCheck.isValid) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long',
+        message: pwdCheck.message,
       });
     }
 
@@ -690,10 +715,11 @@ const updateProfile = async (req, res) => {
           message: 'Current password does not match',
         });
       }
-      if (typeof newPassword !== 'string' || newPassword.length < 6) {
+      const pwdCheck = validateStrongPassword(newPassword);
+      if (!pwdCheck.isValid) {
         return res.status(400).json({
           success: false,
-          message: 'New password must be at least 6 characters long',
+          message: pwdCheck.message,
         });
       }
       const salt = await bcrypt.genSalt(10);

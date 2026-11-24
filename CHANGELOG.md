@@ -4,15 +4,31 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.2.0` (Production Ready)
-- **Git Tag:** `v2.2.0`
+## 📌 Current Live Version: `v2.2.1` (Production Ready)
+- **Git Tag:** `v2.2.1`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
-- **Key Focus:** Comprehensive Student Profile management (Display Picture / DP upload, editable profile, security card) and verified Admin Student Dossier with live student avatars and details.
+- **Key Focus:** Mandatory strong password policy enforcement (backend & frontend) with real-time visual strength meter and live criteria checklist across Registration, Password Reset, and Profile Settings.
 
 ---
 
 ## 🗂️ Version Archive & Changelog
+
+### [v2.2.1] — Strong Password Enforcement & Real-Time Strength Meter
+- **Tag:** `v2.2.1`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Backend Strong Password Enforcement (`authController.js` & `User.js`):**
+    - Built unified `validateStrongPassword` policy requiring: minimum 8 characters, at least 1 uppercase letter (`A-Z`), at least 1 lowercase letter (`a-z`), at least 1 numeric digit (`0-9`), and at least 1 special symbol (`!@#$%^&*()_+-=[]{};':"|,.<>/?~`).
+    - Enforced on `registerUser` (`POST /api/auth/register`), `resetPassword` (`POST /api/auth/reset-password`), and `updateProfile` (`PUT /api/auth/profile`).
+    - Updated Mongoose `User` schema minimum password length from 6 to 8 characters.
+  - **Live Password Strength Indicator (`PasswordStrengthIndicator.jsx`):**
+    - Created reusable component rendering an animated multi-level strength bar (Weak, Moderate, Strong) and 5 live rule verification badges.
+    - Embedded across Student Registration (`RegisterPage.jsx`), Password Recovery (`ForgotPasswordPage.jsx`), and Student Profile Settings (`StudentProfilePage.jsx`).
+  - **UI Polish:**
+    - Cleaned modal button in Admin Student Directory from "Close Dossier" to "Close" and title to "Student Profile".
+
+---
 
 ### [v2.2.0] — Student Profile Management, Avatar / DP Uploads & Admin Profile Dossier
 - **Tag:** `v2.2.0`

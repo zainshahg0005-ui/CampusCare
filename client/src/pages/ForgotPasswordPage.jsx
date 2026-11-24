@@ -17,6 +17,7 @@ import PublicNavbar from '../layouts/PublicNavbar';
 import api from '../services/api';
 import useOtpTimer from '../hooks/useOtpTimer';
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import PasswordStrengthIndicator, { isStrongPassword } from '../components/PasswordStrengthIndicator';
 
 const ForgotPasswordPage = () => {
   useDocumentTitle('Password Recovery');
@@ -87,13 +88,13 @@ const ForgotPasswordPage = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter.');
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match. Please re-enter.');
+    if (!isStrongPassword(newPassword)) {
+      setError('Please choose a stronger password meeting all security requirements below (8+ characters, uppercase, lowercase, number, and symbol).');
       return;
     }
 
@@ -350,7 +351,7 @@ const ForgotPasswordPage = () => {
                     id="newPassword"
                     type={showPassword ? 'text' : 'password'}
                     className="form-control"
-                    placeholder="At least 6 characters"
+                    placeholder="Create a strong password (8+ chars)"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -364,6 +365,7 @@ const ForgotPasswordPage = () => {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                <PasswordStrengthIndicator password={newPassword} showOnlyWhenTyping={true} />
               </div>
 
               <div className="form-group">
