@@ -4,15 +4,33 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.0` (Production Ready)
-- **Git Tag:** `v2.4.0`
+## 📌 Current Live Version: `v2.4.1` (Production Ready)
+- **Git Tag:** `v2.4.1`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
-- **Key Focus:** Mandatory sign-in gate for Help & Services, continuous student dashboard chat continuity, and automatic 24-hour MongoDB chat space-saving purging.
+- **Key Focus:** Comprehensive device-adaptive responsiveness across all screen sizes (mobile < 640px, tablet 640px–1024px, desktop), mobile bottom-sheet modals, and fluid touch layouts.
 
 ---
 
 ## 🗂️ Version Archive & Changelog
+
+### [v2.4.1] — Senior Frontend Responsive Architecture & Fluid Touch Layouts
+- **Tag:** `v2.4.1`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Mobile Bottom-Sheet Modals (`index.css`):**
+    - Redesigned `.modal-container` to automatically transform into a fluid bottom-sheet on screens <= 640px (`border-radius: 20px 20px 0 0`, `max-height: 92dvh`), eliminating clipped modal content on small viewports.
+  - **Help & Services Widget Mobile Adaptation (`SupportChatWidget.jsx` & `index.css`):**
+    - Converted the floating chat modal into a native full-width bottom sheet on mobile screens (< 640px).
+    - Repositioned the floating action button to `bottom: 16px; right: 16px` to prevent viewport collisions.
+  - **Admin Support Desk Multi-Device Grid (`AdminSupportPage.jsx`):**
+    - Replaced rigid inline 2-column styles with responsive `.admin-support-container` that automatically stacks into a mobile-friendly view on tablets and mobile screens (< 900px).
+  - **Student Profile Responsive Stacking (`StudentProfilePage.jsx`):**
+    - Converted rigid inline grid to `.profile-grid-2col`, allowing personal info and security cards to stack cleanly below 960px.
+  - **Password Strength & Metrics Fluid Wrap (`PasswordStrengthIndicator.jsx` & `AdminManageStudentsPage.jsx`):**
+    - Reduced minimum checklist item widths to `130px` to guarantee seamless multi-column rendering on narrow devices like iPhone SE.
+
+---
 
 ### [v2.4.0] — Help & Services Member Gate, Dashboard Chat Continuity & 24h Auto-Purge
 - **Tag:** `v2.4.0`

@@ -481,7 +481,7 @@ const StudentProfilePage = () => {
         </div>
 
         {/* 2-Column Section: Editable Profile & Security */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: '1.75rem' }} className="form-grid-2col">
+        <div className="profile-grid-2col">
           {/* Card 1: Personal & Campus Profile Details */}
           <div className="dashboard-card" style={{ padding: '1.75rem', background: '#ffffff', borderRadius: '16px' }}>
             <div style={{ marginBottom: '1.25rem', borderBottom: '1px solid #f4f4f5', paddingBottom: '0.85rem' }}>
