@@ -150,29 +150,11 @@ const AdminSupportPage = () => {
       title="Live Support Desk 💬"
       subtitle="Real-time communication with campus students and facility inquiries"
     >
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(280px, 340px) 1fr',
-          gap: '1.25rem',
-          height: 'calc(100vh - 210px)',
-          minHeight: '560px',
-        }}
-      >
+      <div className="admin-support-container">
         {/* ========================================================================= */}
         {/* LEFT PANE: CONVERSATION LIST */}
         {/* ========================================================================= */}
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e4e4e7',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          }}
-        >
+        <div className="admin-support-sidebar">
           {/* Header & Search */}
           <div style={{ padding: '1rem', borderBottom: '1px solid #e4e4e7' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
@@ -304,17 +286,7 @@ const AdminSupportPage = () => {
         {/* ========================================================================= */}
         {/* RIGHT PANE: ACTIVE CHAT STREAM & REPLY */}
         {/* ========================================================================= */}
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e4e4e7',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          }}
-        >
+        <div className="admin-support-chat">
           {selectedThread ? (
             <>
               {/* Thread Header */}

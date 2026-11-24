@@ -182,17 +182,7 @@ const SupportChatWidget = () => {
       {/* ========================================================================= */}
       {/* 1. FLOATING ACTION BUTTON (Bottom-Right) */}
       {/* ========================================================================= */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          zIndex: 9999,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-        }}
-      >
+      <div className="support-chat-fab-wrap">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open CampusCare Help and Support"
@@ -242,23 +232,7 @@ const SupportChatWidget = () => {
       {/* 2. CHAT & FAQ WINDOW CONTAINER */}
       {/* ========================================================================= */}
       {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 84,
-            right: 24,
-            width: 'min(420px, calc(100vw - 32px))',
-            height: 'min(620px, calc(100dvh - 110px))',
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            zIndex: 9998,
-            animation: 'fadeInUp 0.25s ease-out forwards',
-          }}
-        >
+        <div className="support-chat-window">
           {/* Header */}
           <div
             style={{

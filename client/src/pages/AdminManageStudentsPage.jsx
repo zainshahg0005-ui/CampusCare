@@ -341,7 +341,7 @@ const AdminManageStudentsPage = () => {
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#71717a', letterSpacing: '0.5px', marginBottom: '0.75rem' }}>
                   Grievance Resolution Summary
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', textAlign: 'center' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.75rem', textAlign: 'center' }}>
                   <div style={{ padding: '0.75rem', background: '#ffffff', borderRadius: '8px', border: '1px solid #e4e4e7' }}>
                     <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#09090b' }}>{selectedStudent.complaintCount}</div>
                     <div style={{ fontSize: '0.75rem', color: '#71717a', fontWeight: 600 }}>Total Complaints</div>

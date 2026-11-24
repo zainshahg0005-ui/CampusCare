@@ -96,7 +96,7 @@ const PasswordStrengthIndicator = ({ password = '', showOnlyWhenTyping = false }
       </div>
 
       {/* Rules Checklist */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.35rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.35rem' }}>
         {rules.map((rule, idx) => (
           <div
             key={idx}
