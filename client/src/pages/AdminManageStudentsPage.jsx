@@ -231,7 +231,7 @@ const AdminManageStudentsPage = () => {
         <div className="modal-backdrop" onClick={() => setSelectedStudent(null)}>
           <div className="modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 580 }}>
             <div className="modal-header">
-              <h3 className="modal-title">Student Profile Dossier</h3>
+              <h3 className="modal-title">Student Profile</h3>
               <button
                 className="modal-close-btn"
                 onClick={() => setSelectedStudent(null)}
@@ -367,10 +367,10 @@ const AdminManageStudentsPage = () => {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-outline"
                 onClick={() => setSelectedStudent(null)}
               >
-                Close Dossier
+                Close
               </button>
             </div>
           </div>
