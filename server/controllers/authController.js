@@ -300,8 +300,11 @@ const verifyRegistrationOtp = async (req, res) => {
         name: user.name,
         studentId: user.studentId,
         email: user.email,
-        phone: user.phone,
+        phone: user.phone || '',
         role: user.role,
+        avatar: user.avatar || '',
+        department: user.department || '',
+        bio: user.bio || '',
       },
       token: generateToken(user._id, user.role),
     });
@@ -419,7 +422,11 @@ const loginUser = async (req, res) => {
           name: user.name,
           studentId: user.studentId,
           email: user.email,
+          phone: user.phone || '',
           role: user.role,
+          avatar: user.avatar || '',
+          department: user.department || '',
+          bio: user.bio || '',
         },
         token: generateToken(user._id, user.role),
       });
@@ -643,6 +650,203 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// @desc    Update student profile details
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const { name, phone, department, bio, currentPassword, newPassword } = req.body;
+
+    if (name && typeof name === 'string') {
+      user.name = name.trim();
+    }
+    if (phone !== undefined) {
+      user.phone = typeof phone === 'string' ? phone.trim() : '';
+    }
+    if (department !== undefined) {
+      user.department = typeof department === 'string' ? department.trim() : '';
+    }
+    if (bio !== undefined) {
+      user.bio = typeof bio === 'string' ? bio.trim() : '';
+    }
+
+    // Optional password change
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password is required to change password',
+        });
+      }
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password does not match',
+        });
+      }
+      if (typeof newPassword !== 'string' || newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: 'New password must be at least 6 characters long',
+        });
+      }
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully!',
+      user: {
+        _id: user._id,
+        name: user.name,
+        studentId: user.studentId,
+        email: user.email,
+        phone: user.phone || '',
+        role: user.role,
+        avatar: user.avatar || '',
+        department: user.department || '',
+        bio: user.bio || '',
+      },
+    });
+  } catch (error) {
+    console.error('[Update Profile Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error updating profile',
+    });
+  }
+};
+
+// @desc    Upload or update student profile photo (DP)
+// @route   POST /api/auth/profile/avatar
+// @access  Private
+const updateAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please select an image file (PNG, JPG, JPEG, WEBP)',
+      });
+    }
+
+    let avatarUrl = '';
+    let cloudinary = null;
+    try {
+      cloudinary = require('cloudinary').v2;
+    } catch (e) {
+      cloudinary = null;
+    }
+
+    if (
+      cloudinary &&
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET
+    ) {
+      cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      });
+
+      avatarUrl = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'campuscare/avatars',
+            resource_type: 'image',
+            transformation: [{ width: 300, height: 300, crop: 'fill', gravity: 'face' }],
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          }
+        );
+        uploadStream.end(req.file.buffer);
+      });
+    } else {
+      avatarUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    }
+
+    user.avatar = avatarUrl;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile photo updated successfully!',
+      avatar: user.avatar,
+      user: {
+        _id: user._id,
+        name: user.name,
+        studentId: user.studentId,
+        email: user.email,
+        phone: user.phone || '',
+        role: user.role,
+        avatar: user.avatar,
+        department: user.department || '',
+        bio: user.bio || '',
+      },
+    });
+  } catch (error) {
+    console.error('[Upload Avatar Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error updating profile photo',
+    });
+  }
+};
+
+// @desc    Remove student profile photo
+// @route   DELETE /api/auth/profile/avatar
+// @access  Private
+const removeAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.avatar = '';
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile photo removed.',
+      avatar: '',
+      user: {
+        _id: user._id,
+        name: user.name,
+        studentId: user.studentId,
+        email: user.email,
+        phone: user.phone || '',
+        role: user.role,
+        avatar: '',
+        department: user.department || '',
+        bio: user.bio || '',
+      },
+    });
+  } catch (error) {
+    console.error('[Remove Avatar Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error removing profile photo',
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   verifyRegistrationOtp,
@@ -651,4 +855,7 @@ module.exports = {
   getCurrentUser,
   forgotPassword,
   resetPassword,
+  updateProfile,
+  updateAvatar,
+  removeAvatar,
 };

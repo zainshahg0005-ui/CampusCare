@@ -4,15 +4,40 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.1.1` (Production Ready)
-- **Git Tag:** `v2.1.1`
+## 📌 Current Live Version: `v2.2.0` (Production Ready)
+- **Git Tag:** `v2.2.0`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
-- **Key Focus:** Strict verified-only student enrollment filter (`isVerified: true`) on Admin Cockpit and Directory.
+- **Key Focus:** Comprehensive Student Profile management (Display Picture / DP upload, editable profile, security card) and verified Admin Student Dossier with live student avatars and details.
 
 ---
 
 ## 🗂️ Version Archive & Changelog
+
+### [v2.2.0] — Student Profile Management, Avatar / DP Uploads & Admin Profile Dossier
+- **Tag:** `v2.2.0`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **User Schema Extensions (`User.js`):** Added `avatar` (URL/base64 string), `department` (academic department), and `bio` (campus residence or personal bio) fields to the MongoDB User schema.
+  - **Profile Management API (`authController.js` & `authRoutes.js`):**
+    - `PUT /api/auth/profile`: Securely update personal details (name, phone, department, bio) and optional password change with current password verification.
+    - `POST /api/auth/profile/avatar`: Memory-stored image upload with seamless dual-mode storage (Cloudinary buffer stream when configured, with high-quality Base64 Data URI fallback). 100% serverless compatible with Vercel serverless functions.
+    - `DELETE /api/auth/profile/avatar`: One-click profile picture removal restoring default initials badge.
+  - **Student Profile Experience (`StudentProfilePage.jsx`):**
+    - Interactive DP / Avatar header with live upload, preview, and delete controls.
+    - Personal Information card allowing students to update their contact number, department, and bio while preserving student ID and email integrity.
+    - Security & Password change card with validation and confirmation.
+    - Grievance resolution stats overview card showing real-time counts.
+  - **Admin Enrolled Student Dossier (`AdminManageStudentsPage.jsx`):**
+    - Removed all dummy/mock avatars.
+    - Enrolled student table now renders real student profile avatars (or initials badge).
+    - "Profile" button opens an enriched Student Profile Dossier modal showcasing student DP, Student ID, Email, WhatsApp/Phone, Department, Enrolled Date, Student Bio/Residence, and full grievance metrics breakdown.
+  - **Navigation Integration (`DashboardLayout.jsx` & `App.jsx`):**
+    - Added "My Profile" to student dashboard sidebar.
+    - Made user profile chip in topbar and sidebar clickable for instant profile access.
+    - Topbar and sidebar automatically reflect the student's custom avatar in real-time.
+
+---
 
 ### [v2.1.1] — Enforce Verified-Only Student Directory & Dashboard Metrics
 - **Tag:** `v2.1.1`

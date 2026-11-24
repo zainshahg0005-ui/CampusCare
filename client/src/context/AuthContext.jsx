@@ -125,6 +125,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Update local user state and storage
+  const updateUser = (updatedUserData) => {
+    setUser((prev) => {
+      const merged = { ...prev, ...updatedUserData };
+      localStorage.setItem('campuscare_user', JSON.stringify(merged));
+      return merged;
+    });
+  };
+
   // Logout handler
   const logout = () => {
     setUser(null);
@@ -146,6 +155,7 @@ export const AuthProvider = ({ children }) => {
         register,
         verifyRegistrationOtp,
         resendRegistrationOtp,
+        updateUser,
         logout,
       }}
     >

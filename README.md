@@ -1,6 +1,6 @@
-# 🎓 CampusCare – Student Complaint Management System `v2.1.1`
+# 🎓 CampusCare – Student Complaint Management System `v2.2.0`
 
-> **Current Version:** `v2.1.1` (Production Ready)  
+> **Current Version:** `v2.2.0` (Production Ready)  
 > **Changelog & Rollback Guide:** See [CHANGELOG.md](CHANGELOG.md) for full version history and 1-click rollback procedures.  
 > **Live Website:** [https://campuscare-livid.vercel.app/](https://campuscare-livid.vercel.app/)
 
@@ -12,6 +12,7 @@
 
 ### 👨‍🎓 Student Portal
 - **Secure Authentication:** Register with Full Name, Student ID, and Email. Passwords securely hashed with `bcryptjs`.
+- **Student Profile & DP:** Upload, change, or remove a custom Profile Picture (DP). Edit phone number, academic department, and bio. Secure in-app password changes.
 - **Intuitive Dashboard:** Quick metrics showing Total Submitted, Pending, In Progress, and Resolved complaints.
 - **Lodge Complaints:** Submit facility complaints categorized by Classroom, Laboratory, Internet/Wi-Fi, Washroom, Electricity, Water Supply, or Other with optional photo evidence.
 - **My Complaints View:** Real-time status badges, search and filter by category or status, and comprehensive inspection modal.
@@ -21,7 +22,7 @@
 - **Executive Cockpit:** Overview metrics for enrolled students, total grievances, pending issues, and resolved tickets.
 - **Visual Analytics:** Breakdown charts displaying complaint distribution across campus departments.
 - **Manage Complaints:** Filter and search tickets across the campus. Update ticket statuses (`Pending`, `In Progress`, `Resolved`, `Rejected`) and write official remarks published directly to students.
-- **Manage Students:** Directory of registered students with their complaint history and resolution statistics.
+- **Manage Students & Dossier:** Directory of verified enrolled students with real uploaded profile pictures, contact details, department, bio, and instant profile dossier inspector.
 - **Protected Backend:** Role-based access control (RBAC) enforced on the backend via JWT authentication middleware.
 
 ---

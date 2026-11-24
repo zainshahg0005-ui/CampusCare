@@ -8,6 +8,11 @@ import {
   Eye,
   X,
   RefreshCw,
+  Phone,
+  Building2,
+  FileText,
+  Clock,
+  CheckCircle2,
 } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import SkeletonTable from '../components/SkeletonTable';
@@ -133,25 +138,40 @@ const AdminManageStudentsPage = () => {
                   <tr key={student._id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div
-                          style={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: '50%',
-                            background: '#09090b',
-                            color: '#ffffff',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 700,
-                            fontSize: '0.8rem',
-                            letterSpacing: '0.5px',
-                            flexShrink: 0,
-                            border: '1px solid #27272a',
-                          }}
-                        >
-                          {getInitials(student.name)}
-                        </div>
+                        {student.avatar ? (
+                          <img
+                            src={student.avatar}
+                            alt={student.name}
+                            style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: '1px solid #27272a',
+                              flexShrink: 0,
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: '50%',
+                              background: '#09090b',
+                              color: '#ffffff',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 700,
+                              fontSize: '0.8rem',
+                              letterSpacing: '0.5px',
+                              flexShrink: 0,
+                              border: '1px solid #27272a',
+                            }}
+                          >
+                            {getInitials(student.name)}
+                          </div>
+                        )}
                         <div className="table-title">{student.name}</div>
                       </div>
                     </td>
@@ -190,7 +210,7 @@ const AdminManageStudentsPage = () => {
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <button
-                        onClick={() => setSelectedStudent({ ...student, avatar: studentAvatars[idx % studentAvatars.length] })}
+                        onClick={() => setSelectedStudent(student)}
                         className="btn btn-outline btn-sm"
                         title="View Full Profile"
                       >
@@ -209,7 +229,7 @@ const AdminManageStudentsPage = () => {
       {/* Student Profile Modal */}
       {selectedStudent && (
         <div className="modal-backdrop" onClick={() => setSelectedStudent(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 580 }}>
             <div className="modal-header">
               <h3 className="modal-title">Student Profile Dossier</h3>
               <button
@@ -222,59 +242,135 @@ const AdminManageStudentsPage = () => {
             </div>
 
             <div className="modal-body">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                <img
-                  src={selectedStudent.avatar || studentAvatars[0]}
-                  alt="Student Profile"
-                  style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.5rem', paddingBottom: '1.25rem', borderBottom: '1px solid #e4e4e7' }}>
+                {selectedStudent.avatar ? (
+                  <img
+                    src={selectedStudent.avatar}
+                    alt={selectedStudent.name}
+                    style={{
+                      width: 72,
+                      height: 72,
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '3px solid #09090b',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                      flexShrink: 0,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 72,
+                      height: 72,
+                      borderRadius: '50%',
+                      background: '#09090b',
+                      color: '#ffffff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 800,
+                      fontSize: '1.5rem',
+                      letterSpacing: '1px',
+                      flexShrink: 0,
+                      border: '3px solid #18181b',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                    }}
+                  >
+                    {getInitials(selectedStudent.name)}
+                  </div>
+                )}
                 <div>
-                  <h4 style={{ fontSize: '1.35rem', fontWeight: 800 }}>{selectedStudent.name}</h4>
-                  <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
-                    Student Identification: <strong style={{ color: '#1e3a8a' }}>{selectedStudent.studentId}</strong>
-                  </p>
+                  <h4 style={{ fontSize: '1.35rem', fontWeight: 800, margin: '0 0 0.35rem', color: '#09090b' }}>
+                    {selectedStudent.name}
+                  </h4>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', fontSize: '0.85rem', color: '#71717a' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontWeight: 700, color: '#09090b', fontFamily: 'monospace' }}>
+                      <CreditCard size={14} color="#71717a" />
+                      ID: {selectedStudent.studentId}
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <Building2 size={14} color="#71717a" />
+                      {selectedStudent.department || 'Department Unassigned'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <div className="detail-grid">
                 <div className="detail-item">
-                  <span className="detail-label">Email Address</span>
-                  <span className="detail-value">{selectedStudent.email}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Enrolled Since</span>
-                  <span className="detail-value">
-                    {new Date(selectedStudent.createdAt).toLocaleString()}
+                  <span className="detail-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Mail size={13} /> Email Address
                   </span>
+                  <span className="detail-value" style={{ wordBreak: 'break-all' }}>{selectedStudent.email}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-label">Total Grievances Lodged</span>
-                  <span className="detail-value">{selectedStudent.complaintCount}</span>
+                  <span className="detail-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Phone size={13} /> Contact / WhatsApp
+                  </span>
+                  <span className="detail-value">{selectedStudent.phone || 'Not provided'}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-label">Pending Tickets</span>
-                  <span className="detail-value">{selectedStudent.pendingCount}</span>
+                  <span className="detail-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Building2 size={13} /> Department
+                  </span>
+                  <span className="detail-value">{selectedStudent.department || 'General Enrollment'}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Calendar size={13} /> Enrolled Date
+                  </span>
+                  <span className="detail-value">
+                    {new Date(selectedStudent.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
 
-              <div className="card" style={{ backgroundColor: '#f8fafc', marginTop: '1rem', padding: '1.25rem' }}>
-                <h5 style={{ fontSize: '0.9rem', marginBottom: '0.4rem', color: '#0f172a', fontWeight: 700 }}>
-                  Account Status & Standing
-                </h5>
-                <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
-                  Active campus user registered via the CampusCare portal. All grievances lodged by this
-                  student are securely stored and verified in your MongoDB Atlas cloud database.
-                </p>
+              {selectedStudent.bio && (
+                <div style={{ marginTop: '1rem', padding: '0.85rem 1rem', background: '#f4f4f5', borderRadius: '8px', border: '1px solid #e4e4e7' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#71717a', marginBottom: '0.35rem', letterSpacing: '0.5px' }}>
+                    <FileText size={13} /> Student Bio / Campus Residence
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: '#27272a', lineHeight: 1.5 }}>
+                    {selectedStudent.bio}
+                  </p>
+                </div>
+              )}
+
+              {/* Grievance Statistics */}
+              <div style={{ marginTop: '1.25rem', padding: '1rem', background: '#fafafa', borderRadius: '10px', border: '1px solid #e4e4e7' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#71717a', letterSpacing: '0.5px', marginBottom: '0.75rem' }}>
+                  Grievance Resolution Summary
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', textAlign: 'center' }}>
+                  <div style={{ padding: '0.75rem', background: '#ffffff', borderRadius: '8px', border: '1px solid #e4e4e7' }}>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#09090b' }}>{selectedStudent.complaintCount}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#71717a', fontWeight: 600 }}>Total Complaints</div>
+                  </div>
+                  <div style={{ padding: '0.75rem', background: '#ffffff', borderRadius: '8px', border: '1px solid #fef08a' }}>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ca8a04', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                      <Clock size={16} />
+                      {selectedStudent.pendingCount}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#854d0e', fontWeight: 600 }}>Pending</div>
+                  </div>
+                  <div style={{ padding: '0.75rem', background: '#ffffff', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                      <CheckCircle2 size={16} />
+                      {selectedStudent.resolvedCount}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>Resolved</div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-outline"
+                className="btn btn-primary"
                 onClick={() => setSelectedStudent(null)}
               >
-                Close
+                Close Dossier
               </button>
             </div>
           </div>

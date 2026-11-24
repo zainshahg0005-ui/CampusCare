@@ -13,13 +13,14 @@ import {
   Search,
   Shield,
   GraduationCap,
+  UserCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CommandPalette from '../components/CommandPalette';
 import NotificationPopover from '../components/NotificationPopover';
 
 const DashboardLayout = ({ children, title, subtitle }) => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isStudent } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -53,6 +54,7 @@ const DashboardLayout = ({ children, title, subtitle }) => {
     { label: 'Overview', path: '/student/dashboard', icon: LayoutDashboard },
     { label: 'Submit Complaint', path: '/student/submit', icon: FilePlus2 },
     { label: 'My Complaints', path: '/student/complaints', icon: FolderOpen },
+    { label: 'My Profile', path: '/student/profile', icon: UserCheck },
   ];
 
   const adminNavItems = [
@@ -133,7 +135,17 @@ const DashboardLayout = ({ children, title, subtitle }) => {
 
         {/* Bottom Profile Card */}
         <div className="sidebar-footer">
-          <div className="user-profile-card">
+          <div
+            className="user-profile-card"
+            style={{ cursor: isStudent ? 'pointer' : 'default' }}
+            onClick={() => {
+              if (isStudent) {
+                navigate('/student/profile');
+                setSidebarOpen(false);
+              }
+            }}
+            title={isStudent ? 'View and edit your student profile' : ''}
+          >
             <div
               className="user-avatar-badge"
               style={{
@@ -150,9 +162,18 @@ const DashboardLayout = ({ children, title, subtitle }) => {
                 letterSpacing: '0.5px',
                 flexShrink: 0,
                 border: '1px solid #27272a',
+                overflow: 'hidden',
               }}
             >
-              {initials}
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user?.name || 'Profile'}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                initials
+              )}
             </div>
             <div className="user-info">
               <div className="user-name" title={user?.name}>{user?.name}</div>
@@ -230,7 +251,14 @@ const DashboardLayout = ({ children, title, subtitle }) => {
             <NotificationPopover isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
 
             {/* User Chip */}
-            <div className="user-chip">
+            <div
+              className="user-chip"
+              style={{ cursor: isStudent ? 'pointer' : 'default' }}
+              onClick={() => {
+                if (isStudent) navigate('/student/profile');
+              }}
+              title={isStudent ? 'Go to My Profile' : ''}
+            >
               <div
                 className="user-chip-avatar-badge"
                 style={{
@@ -247,9 +275,18 @@ const DashboardLayout = ({ children, title, subtitle }) => {
                   letterSpacing: '0.5px',
                   flexShrink: 0,
                   border: '1px solid #27272a',
+                  overflow: 'hidden',
                 }}
               >
-                {initials}
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user?.name || 'Profile'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  initials
+                )}
               </div>
               <div className="user-chip-text">
                 <span className="chip-name">{user?.name}</span>

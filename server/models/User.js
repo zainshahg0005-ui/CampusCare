@@ -39,6 +39,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  avatar: {
+    type: String,
+    default: '',
+  },
+  department: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  bio: {
+    type: String,
+    default: '',
+    trim: true,
+  },
   resetPasswordOtp: {
     type: String,
     default: null,

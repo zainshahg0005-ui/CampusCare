@@ -15,6 +15,7 @@ import TermsPage from './pages/TermsPage';
 import StudentDashboard from './pages/StudentDashboard';
 import SubmitComplaintPage from './pages/SubmitComplaintPage';
 import MyComplaintsPage from './pages/MyComplaintsPage';
+import StudentProfilePage from './pages/StudentProfilePage';
 
 // Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -58,6 +59,14 @@ function App() {
             element={
               <ProtectedRoute requiredRole="student">
                 <MyComplaintsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/profile"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <StudentProfilePage />
               </ProtectedRoute>
             }
           />
