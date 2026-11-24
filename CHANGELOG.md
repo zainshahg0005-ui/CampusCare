@@ -4,10 +4,31 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.5` (Production Ready)
-- **Git Tag:** `v2.4.5`
+## 📌 Current Live Version: `v2.4.6` (Production Ready)
+- **Git Tag:** `v2.4.6`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.6] — Senior Frontend Mobile Experience Overhaul (HomePage & Design System)
+- **Tag:** `v2.4.6`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Sleek Glassmorphic Floating Support FAB (`index.css`):**
+    - Enhanced the mobile circular chat action button with a high-contrast white rim (`border: 2px solid #ffffff`) and deep layered elevation (`box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.45), 0 4px 8px -2px rgba(0, 0, 0, 0.2)`).
+    - Positioned at `bottom: calc(20px + env(safe-area-inset-bottom)); right: calc(20px + env(safe-area-inset-right))` with an active tap press state (`scale(0.92)`).
+    - Floating widget stands out cleanly over any background or photo without visually obstructing content.
+  - **Balanced Symmetrical CTA Buttons (`HomePage.jsx` & `index.css`):**
+    - Standardized button labels to `Lodge Complaint` and `Student Portal` with matching icon sizes (`<ArrowRight>` / `<ChevronRight>`), ensuring uniform button widths and no edge-clipping.
+    - Set `min-height: 46px` and `font-size: 0.825rem` with balanced internal padding for comfortable touch targets.
+  - **Fluid Ticket Tracker Input (`HomePage.jsx` & `index.css`):**
+    - Styled search box with modern neutral border and focused glow (`0 0 0 3px rgba(9, 9, 11, 0.06)`).
+    - Enforced 16px minimum font size to eliminate iOS Safari automatic viewport zooming on tap.
+  - **Multi-Device Landing Page Sections Architecture (`HomePage.jsx` & `index.css`):**
+    - Converted inline padding to responsive classes: `.home-lifecycle-section`, `.home-facilities-section`, `.home-team-section`.
+    - Transformed repetitive 6-item facility list on mobile into a clean 2-column card grid (`grid-template-columns: repeat(2, 1fr)`).
+    - Reduced excessive section padding on phones by 50% (`2.25rem` vs `4.5rem`), significantly improving vertical flow and readability.
 
 ---
 

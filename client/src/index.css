@@ -880,6 +880,148 @@ h1, h2, h3, h4, h5, h6 {
   gap: 0.65rem;
 }
 
+/* ==========================================================================
+   Home Landing Sections (Lifecycle, Facilities, Team)
+   ========================================================================== */
+.home-section-header {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 3rem;
+}
+
+.home-section-title {
+  font-size: 1.85rem;
+  color: #09090b;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.home-section-subtitle {
+  color: #71717a;
+  font-size: 0.925rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.home-team-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #52525b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.home-lifecycle-section {
+  padding: 4.5rem 0;
+  background: #ffffff;
+  border-top: 1px solid #e4e4e7;
+  border-bottom: 1px solid #e4e4e7;
+}
+
+.home-lifecycle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.home-lifecycle-card {
+  padding: 1.75rem;
+}
+
+.home-step-tag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #71717a;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: monospace;
+}
+
+.home-step-title {
+  font-size: 1.15rem;
+  color: #09090b;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.home-step-desc {
+  font-size: 0.85rem;
+  color: #52525b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.home-facilities-section {
+  padding: 4.5rem 0;
+  background: #fafafa;
+}
+
+.home-facilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.home-facility-card {
+  padding: 1.35rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-facility-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.home-facility-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f4f4f5;
+  color: #18181b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.85rem;
+}
+
+.home-facility-title {
+  font-size: 0.975rem;
+  color: #09090b;
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+}
+
+.home-facility-desc {
+  font-size: 0.825rem;
+  color: #71717a;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.home-team-section {
+  padding: 4.5rem 0 5rem;
+  background: #ffffff;
+  border-top: 1px solid #e4e4e7;
+}
+
+.home-team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
 /* Dashboard Shell (Sidebar + Topbar) */
 .dashboard-container {
   display: flex;
@@ -1726,6 +1868,53 @@ kbd, .kbd-chip {
     display: none;
   }
 
+  /* Landing Sections on Mobile */
+  .home-section-header {
+    margin-bottom: 1.75rem;
+  }
+  .home-section-title {
+    font-size: 1.45rem;
+  }
+  .home-section-subtitle {
+    font-size: 0.85rem;
+  }
+  .home-lifecycle-section,
+  .home-facilities-section,
+  .home-team-section {
+    padding: 2.25rem 0;
+  }
+  .home-lifecycle-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .home-lifecycle-card {
+    padding: 1.25rem 1.15rem;
+  }
+  .home-facilities-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+  .home-facility-card {
+    padding: 1rem 0.85rem;
+  }
+  .home-facility-icon-box {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 0.5rem;
+  }
+  .home-facility-title {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+  .home-facility-desc {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+  .home-team-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
   /* Auth Screens on Mobile */
   .auth-container {
     padding: 1.25rem 0.75rem;
@@ -2146,8 +2335,8 @@ kbd, .kbd-chip {
 
 @media (max-width: 640px) {
   .support-chat-fab-wrap {
-    bottom: 16px;
-    right: 16px;
+    bottom: 20px;
+    right: 20px;
   }
   .support-chat-fab-btn {
     padding: 0 !important;
@@ -2155,7 +2344,11 @@ kbd, .kbd-chip {
     height: 48px !important;
     border-radius: 50% !important;
     justify-content: center !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
+  }
+  .support-chat-fab-btn:active {
+    transform: scale(0.92) !important;
   }
   .support-chat-fab-text {
     display: none !important;
@@ -2206,7 +2399,7 @@ kbd, .kbd-chip {
 @supports (padding: env(safe-area-inset-bottom)) {
   @media (max-width: 640px) {
     .support-chat-fab-wrap {
-      bottom: calc(16px + env(safe-area-inset-bottom));
+      bottom: calc(20px + env(safe-area-inset-bottom));
     }
     .support-chat-window {
       padding-bottom: env(safe-area-inset-bottom);

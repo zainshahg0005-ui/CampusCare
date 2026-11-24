@@ -57,11 +57,11 @@ const HomePage = () => {
 
             <div className="hero-cta-group">
               <Link to="/register" className="btn btn-primary btn-lg">
-                <span>Lodge a Complaint</span>
+                <span>Lodge Complaint</span>
                 <ArrowRight size={16} />
               </Link>
               <Link to="/login" className="btn btn-outline btn-lg">
-                <span>Portal Sign In</span>
+                <span>Student Portal</span>
                 <ChevronRight size={16} />
               </Link>
             </div>
@@ -72,7 +72,7 @@ const HomePage = () => {
                 <Search size={16} color="#71717a" style={{ flexShrink: 0 }} />
                 <input
                   type="text"
-                  placeholder="Enter Ticket ID (e.g. CC-104)..."
+                  placeholder="Track Ticket ID (e.g. CC-104)..."
                   value={ticketSearch}
                   onChange={(e) => setTicketSearch(e.target.value)}
                   className="ticket-search-input"
@@ -110,8 +110,8 @@ const HomePage = () => {
             <div className="hero-floating-glass-card">
               <div
                 style={{
-                  width: 38,
-                  height: 38,
+                  width: 36,
+                  height: 36,
                   borderRadius: 8,
                   background: '#f4f4f5',
                   color: '#18181b',
@@ -121,13 +121,13 @@ const HomePage = () => {
                   flexShrink: 0,
                 }}
               >
-                <CheckCircle2 size={20} />
+                <CheckCircle2 size={18} />
               </div>
               <div>
-                <strong style={{ display: 'block', fontSize: '0.85rem', color: '#09090b' }}>
+                <strong style={{ display: 'block', fontSize: '0.825rem', color: '#09090b' }}>
                   Audited Resolutions
                 </strong>
-                <span style={{ fontSize: '0.75rem', color: '#71717a' }}>
+                <span style={{ fontSize: '0.725rem', color: '#71717a' }}>
                   Average turnaround under 3.2 hours
                 </span>
               </div>
@@ -136,51 +136,51 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 3-Step Lifecycle (Clean, Simple, Direct) */}
-      <section style={{ padding: '4rem 0', background: '#ffffff', borderTop: '1px solid #e4e4e7', borderBottom: '1px solid #e4e4e7' }}>
+      {/* 3-Step Lifecycle */}
+      <section className="home-lifecycle-section">
         <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: 540, margin: '0 auto 3rem' }}>
-            <h2 style={{ fontSize: '1.85rem', color: '#09090b', marginBottom: '0.5rem' }}>
+          <div className="home-section-header">
+            <h2 className="home-section-title">
               How CampusCare Works
             </h2>
-            <p style={{ color: '#71717a', fontSize: '0.925rem' }}>
+            <p className="home-section-subtitle">
               A transparent, 3-step lifecycle connecting students directly with facility engineers.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
-            <div className="card" style={{ padding: '1.75rem' }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#71717a', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+          <div className="home-lifecycle-grid">
+            <div className="card home-lifecycle-card">
+              <div className="home-step-tag">
                 01 / Report
               </div>
-              <h3 style={{ fontSize: '1.15rem', color: '#09090b', marginBottom: '0.5rem' }}>
+              <h3 className="home-step-title">
                 File in 60 Seconds
               </h3>
-              <p style={{ fontSize: '0.85rem', color: '#52525b', lineHeight: 1.6 }}>
+              <p className="home-step-desc">
                 Select category, enter room or block location, and attach photo evidence directly from your device.
               </p>
             </div>
 
-            <div className="card" style={{ padding: '1.75rem' }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#71717a', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+            <div className="card home-lifecycle-card">
+              <div className="home-step-tag">
                 02 / Dispatch
               </div>
-              <h3 style={{ fontSize: '1.15rem', color: '#09090b', marginBottom: '0.5rem' }}>
+              <h3 className="home-step-title">
                 Automated Triage & SLA
               </h3>
-              <p style={{ fontSize: '0.85rem', color: '#52525b', lineHeight: 1.6 }}>
+              <p className="home-step-desc">
                 Tickets are routed to specific maintenance teams with defined turnaround guarantees based on urgency.
               </p>
             </div>
 
-            <div className="card" style={{ padding: '1.75rem' }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#71717a', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+            <div className="card home-lifecycle-card">
+              <div className="home-step-tag">
                 03 / Resolve
               </div>
-              <h3 style={{ fontSize: '1.15rem', color: '#09090b', marginBottom: '0.5rem' }}>
+              <h3 className="home-step-title">
                 Verified Closure
               </h3>
-              <p style={{ fontSize: '0.85rem', color: '#52525b', lineHeight: 1.6 }}>
+              <p className="home-step-desc">
                 Technician logs official repair notes, and the ticket is closed with full audit history accessible to you.
               </p>
             </div>
@@ -189,18 +189,18 @@ const HomePage = () => {
       </section>
 
       {/* Facilities Covered Grid */}
-      <section style={{ padding: '4.5rem 0', background: '#fafafa' }}>
+      <section className="home-facilities-section">
         <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: 540, margin: '0 auto 2.5rem' }}>
-            <h2 style={{ fontSize: '1.85rem', color: '#09090b', marginBottom: '0.5rem' }}>
+          <div className="home-section-header">
+            <h2 className="home-section-title">
               Campus Facilities Covered
             </h2>
-            <p style={{ color: '#71717a', fontSize: '0.925rem' }}>
+            <p className="home-section-subtitle">
               Comprehensive maintenance coverage across academic and residential infrastructure.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+          <div className="home-facilities-grid">
             {[
               { icon: Wifi, title: 'Network & Wi-Fi', desc: 'Hostels, libraries, auditoriums, and academic quads.' },
               { icon: Zap, title: 'Power & Electrics', desc: 'Lighting, laboratory power, UPS, and circuit breakers.' },
@@ -211,24 +211,12 @@ const HomePage = () => {
             ].map((item, idx) => {
               const Icon = item.icon;
               return (
-                <div key={idx} className="card" style={{ padding: '1.35rem' }}>
-                  <div
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 8,
-                      background: '#f4f4f5',
-                      color: '#18181b',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '0.85rem',
-                    }}
-                  >
+                <div key={idx} className="card home-facility-card">
+                  <div className="home-facility-icon-box">
                     <Icon size={18} />
                   </div>
-                  <h3 style={{ fontSize: '0.975rem', color: '#09090b', marginBottom: '0.35rem' }}>{item.title}</h3>
-                  <p style={{ fontSize: '0.825rem', color: '#71717a', margin: 0, lineHeight: 1.5 }}>
+                  <h3 className="home-facility-title">{item.title}</h3>
+                  <p className="home-facility-desc">
                     {item.desc}
                   </p>
                 </div>
@@ -239,45 +227,21 @@ const HomePage = () => {
       </section>
 
       {/* Project Team Credits Section */}
-      <section style={{ padding: '4.5rem 0 5rem', background: '#ffffff', borderTop: '1px solid #e4e4e7' }}>
+      <section className="home-team-section">
         <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 2.75rem' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                padding: '0.35rem 0.85rem',
-                background: '#f4f4f5',
-                border: '1px solid #e4e4e7',
-                borderRadius: '9999px',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                color: '#52525b',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                marginBottom: '1rem',
-              }}
-            >
+          <div className="home-section-header">
+            <div className="home-team-badge">
               <span>Project Team</span>
             </div>
-            <h2 style={{ fontSize: '1.85rem', color: '#09090b', marginBottom: '0.5rem', fontWeight: 700 }}>
+            <h2 className="home-section-title">
               Developed By
             </h2>
-            <p style={{ color: '#71717a', fontSize: '0.925rem' }}>
+            <p className="home-section-subtitle">
               Engineered by the CampusCare development team with modern MERN architecture, secure authentication, and real-time maintenance telemetry.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '1.25rem',
-              maxWidth: 960,
-              margin: '0 auto',
-            }}
-          >
+          <div className="home-team-grid">
             {[
               { name: 'Zain Shah', rollNo: '2665', initials: 'ZS', role: 'Full Stack & Security' },
               { name: 'M. Salman', rollNo: '2652', initials: 'MS', role: 'Frontend & Architecture' },
