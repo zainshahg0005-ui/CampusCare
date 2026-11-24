@@ -177,6 +177,11 @@ const SupportChatWidget = () => {
     handleSendMessage(`Question: ${faq.question}`);
   };
 
+  // Administrators handle support directly via the Live Support Desk (/admin/support)
+  if (isAdmin) {
+    return null;
+  }
+
   return (
     <>
       {/* ========================================================================= */}

@@ -4,10 +4,20 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.4` (Production Ready)
-- **Git Tag:** `v2.4.4`
+## 📌 Current Live Version: `v2.4.5` (Production Ready)
+- **Git Tag:** `v2.4.5`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.5] — Administrator Workspace Cleanliness (Hide Help & Services FAB for Admins)
+- **Tag:** `v2.4.5`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Admin-Exclusion Guard (`SupportChatWidget.jsx` & `DashboardLayout.jsx`):**
+    - Suppressed the student-facing floating "Help & Services" button whenever an administrator is logged in.
+    - Administrators manage, review, and reply to all two-way real-time communications directly from the **Live Support Desk** (`/admin/support`), keeping their administrative interface uncluttered and free of redundant chat triggers.
 
 ---
 

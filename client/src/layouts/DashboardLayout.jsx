@@ -306,8 +306,8 @@ const DashboardLayout = ({ children, title, subtitle }) => {
         <main className="dashboard-content">{children}</main>
       </div>
 
-      {/* Floating Help & Services Widget for Student / Admin Workspace */}
-      <SupportChatWidget />
+      {/* Floating Help & Services Widget (Students only — Admins manage via Live Support Desk) */}
+      {!isAdmin && <SupportChatWidget />}
     </div>
   );
 };
