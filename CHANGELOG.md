@@ -4,10 +4,20 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.9` (Production Ready)
-- **Git Tag:** `v2.4.9`
+## 📌 Current Live Version: `v2.4.10` (Production Ready)
+- **Git Tag:** `v2.4.10`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.10] — Evidence Photo Rendering in Complaint Inspection Drawer
+- **Tag:** `v2.4.10`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Mapped `complaint.image` in Inspection Drawer (`ComplaintDrawer.jsx`):**
+    - Resolved key mismatch where the drawer inspected `complaint.photoUrl` instead of `complaint.image || complaint.photoUrl`.
+    - Both student and administrator inspection modals now cleanly render attached photo evidence (Cloudinary CDN or Base64 URI) with full lightbox zoom.
 
 ---
 

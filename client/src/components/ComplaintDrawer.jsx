@@ -92,6 +92,7 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
   };
 
   const currentPriority = priorityStyles[complaint.priority] || priorityStyles.Medium;
+  const evidenceImage = complaint.image || complaint.photoUrl;
 
   return (
     <>
@@ -265,7 +266,7 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
             </div>
 
             {/* Photo Attachment View */}
-            {complaint.photoUrl && (
+            {evidenceImage && (
               <div>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#6b7280', marginBottom: '0.5rem' }}>
                   Inspection Photograph
@@ -282,7 +283,7 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
                   onClick={() => setLightboxOpen(true)}
                 >
                   <ImageWithSkeleton
-                    src={complaint.photoUrl}
+                    src={evidenceImage}
                     alt="Complaint Evidence"
                     height="100%"
                   />
@@ -400,10 +401,10 @@ const ComplaintDrawer = ({ complaint, isOpen, onClose, onComplaintUpdated }) => 
       </div>
 
       {/* Lightbox Modal */}
-      {lightboxOpen && complaint.photoUrl && (
+      {lightboxOpen && evidenceImage && (
         <div className="lightbox-backdrop" onClick={() => setLightboxOpen(false)}>
           <img
-            src={complaint.photoUrl}
+            src={evidenceImage}
             alt="Expanded Evidence"
             className="lightbox-content"
             onClick={(e) => e.stopPropagation()}
