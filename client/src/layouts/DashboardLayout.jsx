@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   ShieldCheck,
   LayoutDashboard,
@@ -15,12 +15,10 @@ import {
   GraduationCap,
   UserCheck,
   MessageSquare,
-  Home,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CommandPalette from '../components/CommandPalette';
 import NotificationPopover from '../components/NotificationPopover';
-import SupportChatWidget from '../components/SupportChatWidget';
 
 const DashboardLayout = ({ children, title, subtitle }) => {
   const { user, logout, isAdmin, isStudent } = useAuth();
@@ -54,7 +52,6 @@ const DashboardLayout = ({ children, title, subtitle }) => {
   };
 
   const studentNavItems = [
-    { label: 'Campus Home', path: '/', icon: Home },
     { label: 'Overview', path: '/student/dashboard', icon: LayoutDashboard },
     { label: 'Submit Complaint', path: '/student/submit', icon: FilePlus2 },
     { label: 'My Complaints', path: '/student/complaints', icon: FolderOpen },
@@ -62,7 +59,6 @@ const DashboardLayout = ({ children, title, subtitle }) => {
   ];
 
   const adminNavItems = [
-    { label: 'Campus Home', path: '/', icon: Home },
     { label: 'Executive Cockpit', path: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'Manage Complaints', path: '/admin/complaints', icon: FolderOpen },
     { label: 'Student Directory', path: '/admin/students', icon: Users },
@@ -92,14 +88,14 @@ const DashboardLayout = ({ children, title, subtitle }) => {
       {/* Figma Sales Dashboard Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
-          <Link to="/" className="brand-logo" title="Back to CampusCare Home" style={{ textDecoration: 'none' }}>
+          <div className="brand-logo">
             <div className="brand-icon-box">
               <ShieldCheck size={20} color="#ffffff" />
             </div>
             <span className="brand-text">
               Campus<span className="brand-accent">Care</span>
             </span>
-          </Link>
+          </div>
           <button
             className="sidebar-close-btn"
             onClick={() => setSidebarOpen(false)}
@@ -219,30 +215,6 @@ const DashboardLayout = ({ children, title, subtitle }) => {
           </div>
 
           <div className="topbar-right" style={{ position: 'relative' }}>
-            {/* Quick Link to Campus Public Home Page */}
-            <Link
-              to="/"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                background: '#ffffff',
-                border: '1px solid #e4e4e7',
-                padding: '0.45rem 0.85rem',
-                borderRadius: 10,
-                color: '#09090b',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                textDecoration: 'none',
-                transition: 'all 0.15s ease',
-              }}
-              className="topbar-home-link"
-              title="Return to CampusCare Public Home Page"
-            >
-              <Home size={15} color="#09090b" />
-              <span>Campus Home</span>
-            </Link>
-
             {/* Quick Command Palette Button */}
             <button
               onClick={() => setCmdOpen(true)}
@@ -332,9 +304,6 @@ const DashboardLayout = ({ children, title, subtitle }) => {
         {/* Page Content */}
         <main className="dashboard-content">{children}</main>
       </div>
-
-      {/* Floating Help & Support Widget available for registered users */}
-      <SupportChatWidget />
     </div>
   );
 };

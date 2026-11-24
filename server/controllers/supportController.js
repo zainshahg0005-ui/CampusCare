@@ -42,16 +42,9 @@ const AUTOMATED_FAQS = [
 
 // @desc    Get chat messages for a session
 // @route   GET /api/support/messages
-// @access  Private (Registered Users Only)
+// @access  Public
 const getMessages = async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Only registered users can access Help & Support.',
-      });
-    }
-
     const { sessionId } = req.query;
     if (!sessionId) {
       return res.status(400).json({
@@ -78,24 +71,17 @@ const getMessages = async (req, res) => {
   }
 };
 
-// @desc    Send message from registered student / user
+// @desc    Send message from user / student / visitor
 // @route   POST /api/support/message
-// @access  Private (Registered Users Only)
+// @access  Public
 const sendMessage = async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Only registered users can use Help & Support. Please log in.',
-      });
-    }
+    const { sessionId, message, senderName, senderEmail, senderRole = 'guest', userId } = req.body;
 
-    const { sessionId, message } = req.body;
-
-    if (!sessionId || !message) {
+    if (!sessionId || !message || !senderName) {
       return res.status(400).json({
         success: false,
-        message: 'Session ID and message content are required',
+        message: 'Session ID, message content, and sender name are required',
       });
     }
 
@@ -107,15 +93,15 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    // 1. Save registered user's message
+    // 1. Save user's message
     const userMsg = await SupportMessage.create({
       sessionId: String(sessionId).trim(),
-      user: req.user._id,
-      senderName: req.user.name,
-      senderEmail: req.user.email,
-      senderRole: req.user.role === 'admin' ? 'admin' : 'student',
+      user: userId || null,
+      senderName: String(senderName).trim(),
+      senderEmail: String(senderEmail || '').trim().toLowerCase(),
+      senderRole: ['student', 'admin', 'guest'].includes(senderRole) ? senderRole : 'guest',
       message: cleanMsg,
-      isAdminReply: req.user.role === 'admin',
+      isAdminReply: false,
       isRead: false,
     });
 

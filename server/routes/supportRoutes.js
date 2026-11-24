@@ -9,9 +9,9 @@ const {
   markThreadRead,
 } = require('../controllers/supportController');
 
-// Registered Student / Admin endpoints (Protected: Only registered users)
-router.get('/messages', protect, getMessages);
-router.post('/message', protect, sendMessage);
+// Public / Student endpoints
+router.get('/messages', getMessages);
+router.post('/message', sendMessage);
 
 // Admin endpoints (Protected)
 router.get('/admin/threads', protect, adminOnly, getAdminThreads);
