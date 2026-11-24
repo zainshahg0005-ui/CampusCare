@@ -432,7 +432,7 @@ const RegisterPage = () => {
                   {formData.name} ({formData.studentId})
                 </div>
                 <div style={{ color: '#52525b', fontSize: '12px' }}>
-                  {formData.email} {formData.phone ? `â€¢ ${formData.phone}` : ''}
+                  {formData.email} {formData.phone ? `• ${formData.phone}` : ''}
                 </div>
               </div>
 
@@ -449,7 +449,7 @@ const RegisterPage = () => {
                   lineHeight: 1.5,
                 }}
               >
-                ðŸ“¬ A 6-digit verification code was automatically dispatched to <strong>{formData.email}</strong>. Please check your Inbox and <strong>Spam / Junk</strong> folder.
+                📬 A 6-digit verification code was automatically dispatched to <strong>{formData.email}</strong>. Please check your Inbox and <strong>Spam / Junk</strong> folder.
               </div>
 
               {/* Delivery Channel Picker (if phone is provided) */}

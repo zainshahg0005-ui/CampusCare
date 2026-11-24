@@ -63,7 +63,7 @@ const AdminManageStudentsPage = () => {
 
   return (
     <DashboardLayout
-      title="Student Directory ðŸ‘¥"
+      title="Student Directory 👥"
       subtitle="Complete student registry and grievance resolution activity records"
     >
       {/* Search Bar */}
