@@ -13,8 +13,8 @@ let cachedTransporter = null;
 const getTransporter = () => {
   if (cachedTransporter) return cachedTransporter;
 
-  const user = process.env.SMTP_USER || 'zainshahg0005@gmail.com';
-  const pass = (process.env.SMTP_PASS || Buffer.from('Zm5hd2lrbXl2ZHFwcGJpaQ==', 'base64').toString('utf8')).replace(/\s+/g, '');
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s+/g, '') : null;
 
   if (user && pass) {
     cachedTransporter = nodemailer.createTransport({
@@ -40,7 +40,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
   const transporter = getTransporter();
   if (transporter) {
     try {
-      const fromAddr = process.env.EMAIL_FROM || 'CampusCare <zainshahg0005@gmail.com>';
+      const fromAddr = process.env.EMAIL_FROM || 'CampusCare <support@campuscare.edu>';
       const info = await transporter.sendMail({
         from: fromAddr,
         to,

@@ -1,12 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const path = require('path');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const { apiLimiter } = require('./middleware/rateLimitMiddleware');
 
-// Load environment variables
-dotenv.config();
+// Load environment variables (supports running from any working directory)
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 
@@ -21,12 +22,42 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Security: Disable X-Powered-By header to prevent fingerprinting
+// Security: Disable X-Powered-By header to prevent framework fingerprinting
 app.disable('x-powered-by');
 
-// Middleware
+// Security: Defensive HTTP Headers via Helmet (nosniff, clickjacking frameguard, HSTS)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false,
+}));
+
+// Security: Strict CORS Origin Validator (prevents wildcard origin reflection attacks)
+const allowedOriginPatterns = [
+  /^http:\/\/localhost(:\d+)?$/,
+  /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+  /^https:\/\/campuscare[a-z0-9-]*\.vercel\.app$/,
+  /^https:\/\/[a-z0-9-]+-zainshahg0005-uis-projects\.vercel\.app$/,
+];
+
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    // Allow non-browser, CLI, or server-to-server requests with no Origin header
+    if (!origin) return callback(null, true);
+
+    // Allow configured CLIENT_URL
+    if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
+      return callback(null, true);
+    }
+
+    // Check trusted origin patterns
+    const isAllowed = allowedOriginPatterns.some((pattern) => pattern.test(origin));
+    if (isAllowed) {
+      return callback(null, true);
+    }
+
+    console.warn(`[CORS Blocked]: Origin "${origin}" rejected by security policy.`);
+    return callback(new Error('Cross-Origin Request Blocked by CampusCare Security Policy'));
+  },
   credentials: true,
 }));
 app.use(express.json());

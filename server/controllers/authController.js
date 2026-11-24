@@ -174,8 +174,8 @@ const registerUser = async (req, res) => {
       }
     }
 
-    // Generate 6-digit secure numeric verification OTP (15 min lifespan)
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate 6-digit cryptographically secure numeric verification OTP (15 min lifespan)
+    const otp = crypto.randomInt(100000, 1000000).toString();
     const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
     const unverifiedExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 min MongoDB TTL
 
@@ -374,7 +374,7 @@ const resendRegistrationOtp = async (req, res) => {
       });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = crypto.randomInt(100000, 1000000).toString();
     user.verificationOtp = hashOtp(otp);
     user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
     user.otpAttempts = 0;
@@ -547,7 +547,7 @@ const forgotPassword = async (req, res) => {
     }
 
     // Generate secure 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = crypto.randomInt(100000, 1000000).toString();
     user.resetPasswordOtp = hashOtp(otp);
     user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     user.otpAttempts = 0;

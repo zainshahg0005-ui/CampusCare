@@ -66,7 +66,14 @@ const getMessages = async (req, res) => {
     await purgeExpiredMessages();
 
     const { sessionId } = req.query;
-    if (!sessionId) {
+
+    // Security: Administrators can inspect any session thread;
+    // Regular students are strictly constrained to their own authenticated session (`user_${req.user._id}`).
+    const targetSessionId = req.user.role === 'admin'
+      ? String(sessionId || `user_${req.user._id}`).trim()
+      : `user_${req.user._id}`;
+
+    if (!targetSessionId) {
       return res.status(400).json({
         success: false,
         message: 'Session ID is required',
@@ -75,7 +82,7 @@ const getMessages = async (req, res) => {
 
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const messages = await SupportMessage.find({
-      sessionId: String(sessionId).trim(),
+      sessionId: targetSessionId,
       createdAt: { $gte: cutoff },
     })
       .sort({ createdAt: 1 })
@@ -112,7 +119,12 @@ const sendMessage = async (req, res) => {
 
     const { sessionId, message } = req.body;
 
-    if (!sessionId || !message) {
+    // Security: Non-admin students are strictly constrained to their own user session.
+    const targetSessionId = req.user.role === 'admin'
+      ? String(sessionId || `user_${req.user._id}`).trim()
+      : `user_${req.user._id}`;
+
+    if (!targetSessionId || !message) {
       return res.status(400).json({
         success: false,
         message: 'Session ID and message content are required',
@@ -129,7 +141,7 @@ const sendMessage = async (req, res) => {
 
     // 1. Save registered user's message
     const userMsg = await SupportMessage.create({
-      sessionId: String(sessionId).trim(),
+      sessionId: targetSessionId,
       user: req.user._id,
       senderName: req.user.name,
       senderEmail: req.user.email,
@@ -148,7 +160,7 @@ const sendMessage = async (req, res) => {
 
     if (matchedFaq) {
       botReply = await SupportMessage.create({
-        sessionId: String(sessionId).trim(),
+        sessionId: targetSessionId,
         user: null,
         senderName: 'CampusCare Assistant 🤖',
         senderEmail: 'support@campuscare.edu',
@@ -160,12 +172,12 @@ const sendMessage = async (req, res) => {
     } else {
       // Check if session has any prior automated greeting
       const priorCount = await SupportMessage.countDocuments({
-        sessionId: String(sessionId).trim(),
+        sessionId: targetSessionId,
       });
 
       if (priorCount <= 1) {
         botReply = await SupportMessage.create({
-          sessionId: String(sessionId).trim(),
+          sessionId: targetSessionId,
           user: null,
           senderName: 'CampusCare Assistant 🤖',
           senderEmail: 'support@campuscare.edu',

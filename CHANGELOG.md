@@ -4,10 +4,29 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.7` (Production Ready)
-- **Git Tag:** `v2.4.7`
+## 📌 Current Live Version: `v2.4.8` (Production Ready)
+- **Git Tag:** `v2.4.8`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.8] — Full-Stack Security Hardening & Vulnerability Remediation
+- **Tag:** `v2.4.8`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Removed Hardcoded Credentials (`server/services/notificationService.js`):**
+    - Eliminated hardcoded base64 SMTP email password fallback; all credentials strictly sourced from environment variables (`process.env.SMTP_USER`, `process.env.SMTP_PASS`).
+  - **Patched Support Chat IDOR (`server/controllers/supportController.js`):**
+    - Enforced server-side session binding on `getMessages` and `sendMessage`. Regular students are restricted to querying and posting exclusively to their authenticated user session (`user_${req.user._id}`).
+  - **Cryptographically Secure OTP Generation (`server/controllers/authController.js`):**
+    - Replaced `Math.random()` with Node.js's native `crypto.randomInt(100000, 1000000)` across registration verification, resend OTP, and password reset flows.
+  - **Strict CORS Origin Whitelist (`server/server.js`):**
+    - Replaced wildcard `origin: true` reflection with an explicit regex-based whitelist supporting `CLIENT_URL`, localhost development ports, and official Vercel deployment domains (`*.vercel.app`).
+  - **Defensive HTTP Security Headers via Helmet (`server/server.js`):**
+    - Integrated `helmet` with `crossOriginResourcePolicy: { policy: 'cross-origin' }` to automatically inject `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and HSTS headers.
+  - **Cross-Directory Environment Path Safety (`server/server.js`):**
+    - Configured `dotenv.config({ path: path.join(__dirname, '.env') })` ensuring database and JWT secrets load reliably from any execution directory.
 
 ---
 
