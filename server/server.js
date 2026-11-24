@@ -43,6 +43,23 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/complaints', require('./routes/complaintRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
+// Temporary diagnostic endpoint for email delivery verification
+app.get('/api/test-email', async (req, res) => {
+  const { sendEmail } = require('./services/notificationService');
+  const target = req.query.to || 'zainshahg0005@gmail.com';
+  const result = await sendEmail({
+    to: target,
+    subject: 'CampusCare Diagnostic Test',
+    html: '<p>Testing Gmail and notification delivery</p>',
+  });
+  res.json({
+    result,
+    hasSmtpUser: !!process.env.SMTP_USER,
+    hasSmtpPass: !!process.env.SMTP_PASS,
+    hasResendKey: !!process.env.RESEND_API_KEY,
+  });
+});
+
 // Root & Health check endpoints
 app.get('/', (req, res) => {
   res.json({
