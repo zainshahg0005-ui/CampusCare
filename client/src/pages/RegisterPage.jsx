@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   User,
@@ -432,7 +432,7 @@ const RegisterPage = () => {
                   {formData.name} ({formData.studentId})
                 </div>
                 <div style={{ color: '#52525b', fontSize: '12px' }}>
-                  {formData.email} {formData.phone ? `• ${formData.phone}` : ''}
+                  {formData.email} {formData.phone ? `â€¢ ${formData.phone}` : ''}
                 </div>
               </div>
 
@@ -449,7 +449,7 @@ const RegisterPage = () => {
                   lineHeight: 1.5,
                 }}
               >
-                📬 A 6-digit verification code was automatically dispatched to <strong>{formData.email}</strong>. Please check your Inbox and <strong>Spam / Junk</strong> folder.
+                ðŸ“¬ A 6-digit verification code was automatically dispatched to <strong>{formData.email}</strong>. Please check your Inbox and <strong>Spam / Junk</strong> folder.
               </div>
 
               {/* Delivery Channel Picker (if phone is provided) */}
@@ -458,7 +458,7 @@ const RegisterPage = () => {
                   <label className="form-label" style={{ marginBottom: '0.4rem', display: 'block', fontSize: '12px' }}>
                     Verification Code Delivery Channel
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.5rem' }}>
                     <button
                       type="button"
                       onClick={() => setMethod('email')}

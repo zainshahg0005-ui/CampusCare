@@ -233,6 +233,15 @@ const SupportChatWidget = () => {
       {/* ========================================================================= */}
       {isOpen && (
         <div className="support-chat-window">
+          {/* Mobile drag handle indicator */}
+          <div style={{
+            width: 36,
+            height: 4,
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.25)',
+            margin: '8px auto 0',
+            display: 'none',
+          }} className="mobile-drag-handle" />
           {/* Header */}
           <div
             style={{

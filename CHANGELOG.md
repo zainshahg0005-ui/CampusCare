@@ -4,10 +4,45 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.4.1` (Production Ready)
-- **Git Tag:** `v2.4.1`
+## 📌 Current Live Version: `v2.4.2` (Production Ready)
+- **Git Tag:** `v2.4.2`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
+
+---
+
+### [v2.4.2] — Full-Spectrum Mobile & Multi-Screen Responsive Hardening
+- **Tag:** `v2.4.2`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Comprehensive Responsive CSS Pass (`index.css`):**
+    - Added complete breakpoint coverage: 1400px (wide), 1024px (laptop), 768px (tablet portrait), 640px (phone), 480px (narrow phone), 380px (iPhone SE / Galaxy compact)
+    - Landscape orientation guard (`max-height: 500px`) prevents hero overflow on rotated phones
+    - iOS Safe Area Inset support (`env(safe-area-inset-*)`) for Dynamic Island, notch, and home bar across all sticky/floating elements
+    - All interactive elements enforced to minimum 44px touch target on mobile (WCAG 2.1 AA compliant)
+    - iOS Safari auto-zoom prevention on input focus (`font-size: 16px !important`)
+    - Print stylesheet: hides sidebar, topbar, and floating widgets for clean prints
+  - **Viewport Meta Hardening (`index.html`):**
+    - Added `viewport-fit=cover` for iPhone notch/Dynamic Island safe areas
+    - Added `theme-color`, `apple-mobile-web-app-capable`, and status bar meta tags for PWA-ready behaviour
+  - **Dashboard Tables — `col-hide-mobile` Progressive Disclosure:**
+    - `StudentDashboard`: Location and Date columns hidden on ≤ 480px; always-scrollable via `table-responsive`
+    - `AdminManageComplaintsPage`: Category, Location, Submitted columns hidden on mobile; core info always visible
+    - `MyComplaintsPage`: Same progressive disclosure applied
+    - `AdminManageStudentsPage`: Email, Registered Date, Status Breakdown hidden on mobile
+  - **Student Dashboard Banner (`StudentDashboard.jsx`):**
+    - Black hero banner padding converted to `clamp()` fluid values — no overflow on 320px screens
+  - **Submit Complaint Page (`SubmitComplaintPage.jsx`):**
+    - Category picker grid: `minmax(140px → 130px)` and assigned `category-picker-grid` class for breakpoint overrides
+    - Submit actions row: `flex-wrap: wrap` ensures buttons stack on very narrow viewports
+  - **Forgot Password & Register Pages:**
+    - OTP delivery method selector: replaced `1fr 1fr` with `repeat(auto-fit, minmax(140px, 1fr))` — stacks cleanly on iPhone SE
+  - **Support Chat Widget (`SupportChatWidget.jsx`):**
+    - Added mobile drag handle indicator (pill bar) at top of bottom-sheet on screens ≤ 640px
+  - **Admin Complaints Status Tabs:**
+    - Already had `overflowX: auto` — now enhanced with `-webkit-overflow-scrolling: touch` and `scroll-snap-type: x mandatory` on table
+
+---
 - **Key Focus:** Comprehensive device-adaptive responsiveness across all screen sizes (mobile < 640px, tablet 640px–1024px, desktop), mobile bottom-sheet modals, and fluid touch layouts.
 
 ---

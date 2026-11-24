@@ -1,6 +1,6 @@
-# 🎓 CampusCare – Student Complaint Management System `v2.4.1`
+﻿# ðŸŽ“ CampusCare â€“ Student Complaint Management System `v2.4.2`
 
-> **Current Version:** `v2.4.1` (Production Ready)  
+> **Current Version:** `v2.4.2` (Production Ready)  
 > **Changelog & Rollback Guide:** See [CHANGELOG.md](CHANGELOG.md) for full version history and 1-click rollback procedures.  
 > **Live Website:** [https://campuscare-livid.vercel.app/](https://campuscare-livid.vercel.app/)
 
@@ -8,9 +8,9 @@
 
 ---
 
-## 🌟 Key Features
+## ðŸŒŸ Key Features
 
-### 💬 Help & Services Chat Desk (v2.4.0)
+### ðŸ’¬ Help & Services Chat Desk (v2.4.0)
 - **Registered Members Gate:** Sign-in gate enforces authentication before chatting with administrators.
 - **Dashboard Chat Continuity:** Carry on real-time discussions directly within the Student Dashboard workspace.
 - **24-Hour Space Optimization:** MongoDB TTL auto-cleanup permanently purges chat records after 24 hours to preserve database storage.
@@ -18,7 +18,7 @@
 - **Live Admin Chat:** Real-time two-way messaging between students/visitors and campus administrators.
 - **Admin Support Desk:** Dedicated administrative operations center (`/admin/support`) with thread management, live polling, and quick response shortcuts.
 
-### 👨‍🎓 Student Portal
+### ðŸ‘¨â€ðŸŽ“ Student Portal
 - **Secure Authentication:** Register with Full Name, Student ID, and Email. Passwords securely hashed with `bcryptjs`.
 - **Student Profile & DP:** Upload, change, or remove a custom Profile Picture (DP). Edit phone number, academic department, and bio. Secure in-app password changes.
 - **Intuitive Dashboard:** Quick metrics showing Total Submitted, Pending, In Progress, and Resolved complaints.
@@ -26,7 +26,7 @@
 - **My Complaints View:** Real-time status badges, search and filter by category or status, and comprehensive inspection modal.
 - **Administrative Transparency:** Direct view of official administrator remarks and status changes without permission to tamper with statuses.
 
-### 🛡️ Admin Operations Portal
+### ðŸ›¡ï¸ Admin Operations Portal
 - **Executive Cockpit:** Overview metrics for enrolled students, total grievances, pending issues, and resolved tickets.
 - **Visual Analytics:** Breakdown charts displaying complaint distribution across campus departments.
 - **Manage Complaints:** Filter and search tickets across the campus. Update ticket statuses (`Pending`, `In Progress`, `Resolved`, `Rejected`) and write official remarks published directly to students.
@@ -35,7 +35,7 @@
 
 ---
 
-## 🛠️ Technologies Used
+## ðŸ› ï¸ Technologies Used
 
 - **Frontend:**
   - React.js 18+ (bootstrapped with Vite)
@@ -52,43 +52,43 @@
 
 ---
 
-## 📁 Project Structure
+## ðŸ“ Project Structure
 
 ```text
 CampusCare/
-├── client/                     # Frontend (React + Vite)
-│   ├── src/
-│   │   ├── assets/             # Static assets & icons
-│   │   ├── components/         # ProtectedRoute, UI components
-│   │   ├── context/            # AuthContext (JWT session management)
-│   │   ├── layouts/            # DashboardLayout, PublicNavbar, PublicFooter
-│   │   ├── pages/              # Home, Login, Register, Student & Admin pages
-│   │   ├── services/           # api.js (Axios instance with auth interceptors)
-│   │   ├── App.jsx             # Router definition
-│   │   ├── main.jsx            # React root mount
-│   │   └── index.css           # Complete SaaS styling system
-│   ├── .env.example            # Frontend environment template
-│   └── package.json
-│
-├── server/                     # Backend (Node.js + Express + MongoDB)
-│   ├── config/                 # db.js (MongoDB Mongoose connection)
-│   ├── controllers/            # authController, complaintController, adminController
-│   ├── middleware/             # authMiddleware (JWT + RBAC), uploadMiddleware (Multer)
-│   ├── models/                 # User.js, Complaint.js (Mongoose models)
-│   ├── routes/                 # authRoutes, complaintRoutes, adminRoutes
-│   ├── scripts/                # seedAdmin.js (Secure first admin account creator)
-│   ├── uploads/                # Directory for uploaded complaint images
-│   ├── .env.example            # Backend environment template
-│   ├── server.js               # Express application entrypoint
-│   └── package.json
-│
-├── package.json                # Workspace helper scripts
-└── README.md                   # Full documentation & setup guide
+â”œâ”€â”€ client/                     # Frontend (React + Vite)
+â”‚   â”œâ”€â”€ src/
+â”‚   â”‚   â”œâ”€â”€ assets/             # Static assets & icons
+â”‚   â”‚   â”œâ”€â”€ components/         # ProtectedRoute, UI components
+â”‚   â”‚   â”œâ”€â”€ context/            # AuthContext (JWT session management)
+â”‚   â”‚   â”œâ”€â”€ layouts/            # DashboardLayout, PublicNavbar, PublicFooter
+â”‚   â”‚   â”œâ”€â”€ pages/              # Home, Login, Register, Student & Admin pages
+â”‚   â”‚   â”œâ”€â”€ services/           # api.js (Axios instance with auth interceptors)
+â”‚   â”‚   â”œâ”€â”€ App.jsx             # Router definition
+â”‚   â”‚   â”œâ”€â”€ main.jsx            # React root mount
+â”‚   â”‚   â””â”€â”€ index.css           # Complete SaaS styling system
+â”‚   â”œâ”€â”€ .env.example            # Frontend environment template
+â”‚   â””â”€â”€ package.json
+â”‚
+â”œâ”€â”€ server/                     # Backend (Node.js + Express + MongoDB)
+â”‚   â”œâ”€â”€ config/                 # db.js (MongoDB Mongoose connection)
+â”‚   â”œâ”€â”€ controllers/            # authController, complaintController, adminController
+â”‚   â”œâ”€â”€ middleware/             # authMiddleware (JWT + RBAC), uploadMiddleware (Multer)
+â”‚   â”œâ”€â”€ models/                 # User.js, Complaint.js (Mongoose models)
+â”‚   â”œâ”€â”€ routes/                 # authRoutes, complaintRoutes, adminRoutes
+â”‚   â”œâ”€â”€ scripts/                # seedAdmin.js (Secure first admin account creator)
+â”‚   â”œâ”€â”€ uploads/                # Directory for uploaded complaint images
+â”‚   â”œâ”€â”€ .env.example            # Backend environment template
+â”‚   â”œâ”€â”€ server.js               # Express application entrypoint
+â”‚   â””â”€â”€ package.json
+â”‚
+â”œâ”€â”€ package.json                # Workspace helper scripts
+â””â”€â”€ README.md                   # Full documentation & setup guide
 ```
 
 ---
 
-## 🚀 Step-by-Step Installation & Setup
+## ðŸš€ Step-by-Step Installation & Setup
 
 ### 1. Prerequisites
 Ensure you have the following installed on your machine:
@@ -152,7 +152,7 @@ npm run dev
 
 ---
 
-## 🧪 Demonstration & Testing Walkthrough
+## ðŸ§ª Demonstration & Testing Walkthrough
 
 1. Open your browser and navigate to `http://localhost:5173`.
 2. Explore the **Landing Page** (`/`) featuring hero headlines, how-it-works workflow, statistics, and category highlights.
@@ -168,7 +168,7 @@ npm run dev
 
 ---
 
-## 🔒 Security Best Practices Implemented
+## ðŸ”’ Security Best Practices Implemented
 
 - Passwords hashed using `bcryptjs` with salt rounds.
 - Admin APIs protected via role-based middleware (`adminOnly`).

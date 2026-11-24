@@ -2046,3 +2046,48 @@ kbd, .kbd-chip {
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2) !important;
   }
 }
+
+/* Mobile drag handle for chat bottom-sheet */
+@media (max-width: 640px) {
+  .mobile-drag-handle {
+    display: block !important;
+  }
+}
+
+/* ==========================================================================
+   iOS Safe Area Insets (notch, home bar, Dynamic Island support)
+   ========================================================================== */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .support-chat-fab-wrap {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+  .dashboard-topbar {
+    padding-left: max(1.75rem, env(safe-area-inset-left));
+    padding-right: max(1.75rem, env(safe-area-inset-right));
+  }
+  .navbar-wrapper {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .sidebar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .modal-footer,
+  .drawer-header {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media (max-width: 640px) {
+    .support-chat-fab-wrap {
+      bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+    .support-chat-window {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .drawer-panel {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+}

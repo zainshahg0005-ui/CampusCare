@@ -1,31 +1,31 @@
 {
-  "name": "campuscare",
-  "version": "2.4.1",
-  "description": "CampusCare - Student Complaint Management System (MERN Stack)",
-  "scripts": {
-    "server": "cd server && npm run dev",
-    "client": "cd client && npm run dev",
-    "seed:admin": "cd server && npm run seed:admin"
-  },
-  "keywords": [
-    "mern",
-    "react",
-    "express",
-    "mongodb",
-    "complaint-management"
-  ],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.11.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "express-rate-limit": "^8.7.5",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.9.5",
-    "multer": "^1.4.5-lts.1",
-    "nodemailer": "^10.6.1"
-  }
+    "name":  "campuscare",
+    "version":  "2.4.2",
+    "description":  "CampusCare - Student Complaint Management System (MERN Stack)",
+    "scripts":  {
+                    "server":  "cd server \u0026\u0026 npm run dev",
+                    "client":  "cd client \u0026\u0026 npm run dev",
+                    "seed:admin":  "cd server \u0026\u0026 npm run seed:admin"
+                },
+    "keywords":  [
+                     "mern",
+                     "react",
+                     "express",
+                     "mongodb",
+                     "complaint-management"
+                 ],
+    "author":  "",
+    "license":  "ISC",
+    "dependencies":  {
+                         "bcryptjs":  "^3.0.2",
+                         "cloudinary":  "^2.11.0",
+                         "cors":  "^2.8.5",
+                         "dotenv":  "^16.4.7",
+                         "express":  "^4.21.2",
+                         "express-rate-limit":  "^8.7.5",
+                         "jsonwebtoken":  "^9.0.2",
+                         "mongoose":  "^8.9.5",
+                         "multer":  "^1.4.5-lts.1",
+                         "nodemailer":  "^10.6.1"
+                     }
 }

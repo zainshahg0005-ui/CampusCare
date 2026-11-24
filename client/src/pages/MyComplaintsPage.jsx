@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   FilePlus2,
@@ -211,9 +211,9 @@ const MyComplaintsPage = () => {
                 <tr>
                   <th>Ticket</th>
                   <th>Title & Description</th>
-                  <th>Category</th>
-                  <th>Location</th>
-                  <th>Submitted</th>
+                  <th className="col-hide-mobile">Category</th>
+                  <th className="col-hide-mobile">Location</th>
+                  <th className="col-hide-mobile">Submitted</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
@@ -244,18 +244,18 @@ const MyComplaintsPage = () => {
                         {c.description}
                       </div>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <span style={{ fontSize: '0.8rem', fontWeight: 550, color: '#374151' }}>
                         {c.category}
                       </span>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem', color: '#4b5563' }}>
                         <MapPin size={13} color="#059669" />
                         <span>{c.location}</span>
                       </div>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
                         {new Date(c.createdAt).toLocaleDateString('en-US', {
                           month: 'short',

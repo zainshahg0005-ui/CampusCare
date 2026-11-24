@@ -167,7 +167,7 @@ const ForgotPasswordPage = () => {
                 <label className="form-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
                   Recovery Delivery Channel <span className="required">*</span>
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.5rem' }}>
                   <button
                     type="button"
                     onClick={() => {

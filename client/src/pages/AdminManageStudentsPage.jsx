@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   Search,
@@ -63,7 +63,7 @@ const AdminManageStudentsPage = () => {
 
   return (
     <DashboardLayout
-      title="Student Directory 👥"
+      title="Student Directory ðŸ‘¥"
       subtitle="Complete student registry and grievance resolution activity records"
     >
       {/* Search Bar */}
@@ -126,10 +126,10 @@ const AdminManageStudentsPage = () => {
                 <tr>
                   <th>Student Name</th>
                   <th>Student ID</th>
-                  <th>Email Address</th>
-                  <th>Registered Date</th>
+                  <th className="col-hide-mobile">Email Address</th>
+                  <th className="col-hide-mobile">Registered Date</th>
                   <th>Total Complaints</th>
-                  <th>Status Breakdown</th>
+                  <th className="col-hide-mobile">Status Breakdown</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
@@ -181,13 +181,13 @@ const AdminManageStudentsPage = () => {
                         {student.studentId}
                       </span>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#64748b' }}>
                         <Mail size={15} />
                         {student.email}
                       </span>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', fontSize: '0.85rem' }}>
                         <Calendar size={14} />
                         {new Date(student.createdAt).toLocaleDateString()}
@@ -198,7 +198,7 @@ const AdminManageStudentsPage = () => {
                         {student.complaintCount}
                       </span>
                     </td>
-                    <td>
+                    <td className="col-hide-mobile">
                       <div style={{ display: 'flex', gap: '0.45rem' }}>
                         <span className="badge badge-pending" style={{ padding: '0.2rem 0.55rem' }}>
                           {student.pendingCount} Pending
