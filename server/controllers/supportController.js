@@ -42,9 +42,16 @@ const AUTOMATED_FAQS = [
 
 // @desc    Get chat messages for a session
 // @route   GET /api/support/messages
-// @access  Public
+// @access  Private (Registered Users Only)
 const getMessages = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Only registered users can access Help & Support.',
+      });
+    }
+
     const { sessionId } = req.query;
     if (!sessionId) {
       return res.status(400).json({
@@ -71,17 +78,24 @@ const getMessages = async (req, res) => {
   }
 };
 
-// @desc    Send message from user / student / visitor
+// @desc    Send message from registered student / user
 // @route   POST /api/support/message
-// @access  Public
+// @access  Private (Registered Users Only)
 const sendMessage = async (req, res) => {
   try {
-    const { sessionId, message, senderName, senderEmail, senderRole = 'guest', userId } = req.body;
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Only registered users can use Help & Support. Please log in.',
+      });
+    }
 
-    if (!sessionId || !message || !senderName) {
+    const { sessionId, message } = req.body;
+
+    if (!sessionId || !message) {
       return res.status(400).json({
         success: false,
-        message: 'Session ID, message content, and sender name are required',
+        message: 'Session ID and message content are required',
       });
     }
 
@@ -93,15 +107,15 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    // 1. Save user's message
+    // 1. Save registered user's message
     const userMsg = await SupportMessage.create({
       sessionId: String(sessionId).trim(),
-      user: userId || null,
-      senderName: String(senderName).trim(),
-      senderEmail: String(senderEmail || '').trim().toLowerCase(),
-      senderRole: ['student', 'admin', 'guest'].includes(senderRole) ? senderRole : 'guest',
+      user: req.user._id,
+      senderName: req.user.name,
+      senderEmail: req.user.email,
+      senderRole: req.user.role === 'admin' ? 'admin' : 'student',
       message: cleanMsg,
-      isAdminReply: false,
+      isAdminReply: req.user.role === 'admin',
       isRead: false,
     });
 

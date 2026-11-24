@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   MessageCircle,
   X,
@@ -14,6 +15,7 @@ import {
   Phone,
   ArrowRight,
   Check,
+  Lock,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -74,20 +76,8 @@ const SupportChatWidget = () => {
   const [sending, setSending] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
-  // Guest details if not authenticated
-  const [guestName, setGuestName] = useState(() => localStorage.getItem('cc_guest_name') || '');
-  const [guestEmail, setGuestEmail] = useState(() => localStorage.getItem('cc_guest_email') || '');
-  const [showGuestForm, setShowGuestForm] = useState(false);
-
-  // Persistent session ID
-  const [sessionId] = useState(() => {
-    let stored = localStorage.getItem('campuscare_support_session_id');
-    if (!stored) {
-      stored = 'sess_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now();
-      localStorage.setItem('campuscare_support_session_id', stored);
-    }
-    return stored;
-  });
+  // Registered user session ID (tied to user account)
+  const sessionId = user?._id ? `user_${user._id}` : 'unauthenticated_guest';
 
   const messagesEndRef = useRef(null);
 
@@ -95,8 +85,9 @@ const SupportChatWidget = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Fetch messages from backend
+  // Fetch messages from backend for authenticated user
   const fetchMessages = useCallback(async () => {
+    if (!isAuthenticated) return;
     try {
       const res = await api.get('/support/messages', { params: { sessionId } });
       if (res.data?.success && Array.isArray(res.data.messages)) {
@@ -105,24 +96,24 @@ const SupportChatWidget = () => {
     } catch (err) {
       console.error('Failed to poll support messages:', err);
     }
-  }, [sessionId]);
+  }, [sessionId, isAuthenticated]);
 
   // Initial load
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isAuthenticated) {
       setLoadingHistory(true);
       fetchMessages().finally(() => setLoadingHistory(false));
     }
-  }, [isOpen, fetchMessages]);
+  }, [isOpen, isAuthenticated, fetchMessages]);
 
   // Polling for live real-time replies every 3.5 seconds when widget is open
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !isAuthenticated) return;
     const interval = setInterval(() => {
       fetchMessages();
     }, 3500);
     return () => clearInterval(interval);
-  }, [isOpen, fetchMessages]);
+  }, [isOpen, isAuthenticated, fetchMessages]);
 
   // Auto-scroll when messages update
   useEffect(() => {
@@ -132,12 +123,13 @@ const SupportChatWidget = () => {
   }, [messages, isOpen, activeTab]);
 
   const handleSendMessage = async (customText = null) => {
+    if (!isAuthenticated) return;
     const textToSend = customText || inputText;
     if (!textToSend.trim() || sending) return;
 
-    const senderName = user?.name || guestName.trim() || 'Campus Student';
-    const senderEmail = user?.email || guestEmail.trim() || '';
-    const senderRole = isAdmin ? 'admin' : isAuthenticated ? 'student' : 'guest';
+    const senderName = user?.name || 'Campus Student';
+    const senderEmail = user?.email || '';
+    const senderRole = isAdmin ? 'admin' : 'student';
 
     // Optimistic user message
     const tempId = 'temp_' + Date.now();
@@ -160,10 +152,6 @@ const SupportChatWidget = () => {
       const res = await api.post('/support/message', {
         sessionId,
         message: textToSend.trim(),
-        senderName,
-        senderEmail,
-        senderRole,
-        userId: user?._id || undefined,
       });
 
       if (res.data?.success) {
@@ -326,62 +314,122 @@ const SupportChatWidget = () => {
             </button>
           </div>
 
-          {/* Subheader Navigation Tabs */}
-          <div
-            style={{
-              display: 'flex',
-              borderBottom: '1px solid #e4e4e7',
-              background: '#fafafa',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setActiveTab('chat')}
+          {/* Gated Access: Only Registered Students / Staff */}
+          {!isAuthenticated ? (
+            <div
               style={{
                 flex: 1,
-                padding: '0.65rem 0.5rem',
-                border: 'none',
-                borderBottom: activeTab === 'chat' ? '2px solid #09090b' : '2px solid transparent',
-                background: activeTab === 'chat' ? '#ffffff' : 'transparent',
-                fontWeight: activeTab === 'chat' ? 700 : 500,
-                color: activeTab === 'chat' ? '#09090b' : '#71717a',
-                fontSize: '0.825rem',
-                cursor: 'pointer',
+                padding: '2.5rem 1.75rem',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.35rem',
-                transition: 'all 0.15s ease',
+                textAlign: 'center',
+                backgroundColor: '#ffffff',
               }}
             >
-              <MessageCircle size={15} />
-              <span>Live Admin Chat</span>
-            </button>
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  background: '#f4f4f5',
+                  border: '1px solid #e4e4e7',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '1.25rem',
+                }}
+              >
+                <Lock size={28} color="#09090b" />
+              </div>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('faqs')}
-              style={{
-                flex: 1,
-                padding: '0.65rem 0.5rem',
-                border: 'none',
-                borderBottom: activeTab === 'faqs' ? '2px solid #09090b' : '2px solid transparent',
-                background: activeTab === 'faqs' ? '#ffffff' : 'transparent',
-                fontWeight: activeTab === 'faqs' ? 700 : 500,
-                color: activeTab === 'faqs' ? '#09090b' : '#71717a',
-                fontSize: '0.825rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.35rem',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Sparkles size={15} color="#eab308" />
-              <span>Instant Answers</span>
-            </button>
-          </div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#09090b', margin: '0 0 0.5rem' }}>
+                Registered Students Only
+              </h3>
+
+              <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5, margin: '0 0 1.75rem', maxWidth: 320 }}>
+                Real-time Help & Support and direct messaging with university administrators are exclusively available for registered campus students and staff.
+              </p>
+
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="btn btn-primary full-width"
+                  style={{ textDecoration: 'none', justifyContent: 'center', padding: '0.75rem' }}
+                >
+                  Student Sign In
+                </Link>
+
+                <Link
+                  to="/register"
+                  onClick={() => setIsOpen(false)}
+                  className="btn btn-outline full-width"
+                  style={{ textDecoration: 'none', justifyContent: 'center', padding: '0.75rem' }}
+                >
+                  Register New Account
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Subheader Navigation Tabs */}
+              <div
+                style={{
+                  display: 'flex',
+                  borderBottom: '1px solid #e4e4e7',
+                  background: '#fafafa',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('chat')}
+                  style={{
+                    flex: 1,
+                    padding: '0.65rem 0.5rem',
+                    border: 'none',
+                    borderBottom: activeTab === 'chat' ? '2px solid #09090b' : '2px solid transparent',
+                    background: activeTab === 'chat' ? '#ffffff' : 'transparent',
+                    fontWeight: activeTab === 'chat' ? 700 : 500,
+                    color: activeTab === 'chat' ? '#09090b' : '#71717a',
+                    fontSize: '0.825rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <MessageCircle size={15} />
+                  <span>Live Admin Chat</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('faqs')}
+                  style={{
+                    flex: 1,
+                    padding: '0.65rem 0.5rem',
+                    border: 'none',
+                    borderBottom: activeTab === 'faqs' ? '2px solid #09090b' : '2px solid transparent',
+                    background: activeTab === 'faqs' ? '#ffffff' : 'transparent',
+                    fontWeight: activeTab === 'faqs' ? 700 : 500,
+                    color: activeTab === 'faqs' ? '#09090b' : '#71717a',
+                    fontSize: '0.825rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <Sparkles size={15} color="#eab308" />
+                  <span>Instant Answers</span>
+                </button>
+              </div>
 
           {/* ========================================================================= */}
           {/* TAB 1: LIVE ADMIN & ASSISTANT CHAT */}
@@ -703,9 +751,11 @@ const SupportChatWidget = () => {
               })}
             </div>
           )}
-        </div>
+        </>
       )}
-    </>
+    </div>
+  )}
+</>
   );
 };
 

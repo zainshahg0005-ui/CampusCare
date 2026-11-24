@@ -4,15 +4,30 @@ This document maintains an immutable audit trail of every major and minor releas
 
 ---
 
-## 📌 Current Live Version: `v2.3.0` (Production Ready)
-- **Git Tag:** `v2.3.0`
+## 📌 Current Live Version: `v2.3.1` (Production Ready)
+- **Git Tag:** `v2.3.1`
 - **Release Date:** November 24, 2026
 - **Status:** Active in Production ([Live Deployment](https://campuscare-livid.vercel.app/))
-- **Key Focus:** Real-time Help & Support Desk on Home Page with automated Instant Answer FAQ engine and live two-way Admin Support chat channel.
+- **Key Focus:** Strict registered-user gating for Help & Support chat, persistent user chat sessions, bidirectional Home navigation from Student Dashboard, and ubiquitous Help & Support availability.
 
 ---
 
 ## 🗂️ Version Archive & Changelog
+
+### [v2.3.1] — Registered-User Help & Support Enforcement & Seamless Home Navigation
+- **Tag:** `v2.3.1`
+- **Release Date:** November 24, 2026
+- **Changes & Enhancements:**
+  - **Registered-User Support Guard (`SupportChatWidget.jsx` & `supportRoutes.js`):**
+    - Enforced mandatory authentication lock screen on the Help & Support widget for unauthenticated visitors, presenting direct routes to sign in or register.
+    - Added `protect` middleware to `POST /api/support/message` and `GET /api/support/messages`, preventing unregistered users from sending messages or retrieving chat data.
+    - Tied conversation sessions directly to `user_${user._id}`, allowing students to access their unified support history across devices.
+  - **Bidirectional Home Navigation from Student Dashboard (`DashboardLayout.jsx`):**
+    - Added clickable **"Campus Home"** link to sidebar navigation and a dedicated topbar button with `Home` icon so logged-in students can seamlessly navigate between their Student Workspace and the public Home page without signing out.
+    - Wrapped sidebar header brand logo in `<Link to="/" />` for instant 1-click home navigation.
+    - Embedded floating `<SupportChatWidget />` across both the Home page and the Student Dashboard layout for continuous access.
+
+---
 
 ### [v2.3.0] — Floating Help & Support Desk, Automated Knowledge Bot & Live Admin Chat
 - **Tag:** `v2.3.0`
